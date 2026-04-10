@@ -58,6 +58,7 @@ ci     = "ruff format src/ --check && ruff check src/ && pytest tests/ -v --cov=
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-v"
+pythonpath = ["src"]
 
 [tool.coverage.run]
 source = ["src/dataforge"]
