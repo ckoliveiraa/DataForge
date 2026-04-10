@@ -8,7 +8,6 @@ from pathlib import Path
 import click
 
 from dataforge.domains import DOMAIN_REGISTRY
-from dataforge.writers import WRITER_REGISTRY
 from dataforge.uploaders import UPLOADER_REGISTRY
 
 
@@ -48,6 +47,44 @@ def _filter_schema(schema, tables: tuple[str, ...], columns: tuple[str, ...]):
     return schema
 
 
+def _write_df_direct(df, fmt: str, dest: Path, json_mode: str = "flat") -> None:
+    """Escreve um DataFrame diretamente em dest no formato solicitado."""
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    if fmt == "csv":
+        df.to_csv(dest, index=False)
+    elif fmt == "json":
+        if json_mode == "flat":
+            df.to_json(dest, orient="records", lines=True, force_ascii=False)
+        else:
+            df.to_json(dest, orient="records", force_ascii=False, indent=2)
+    elif fmt == "parquet":
+        import pyarrow as pa
+        import pyarrow.parquet as pq
+
+        pq.write_table(pa.Table.from_pandas(df, preserve_index=False), dest, compression="snappy")
+    elif fmt == "avro":
+        import fastavro
+        import pandas as _pd
+
+        def _avro_type(series):
+            if _pd.api.types.is_integer_dtype(series):
+                return ["null", "long"]
+            if _pd.api.types.is_float_dtype(series):
+                return ["null", "double"]
+            if _pd.api.types.is_bool_dtype(series):
+                return ["null", "boolean"]
+            return ["null", "string"]
+
+        records = df.astype(object).where(df.notna(), other=None).to_dict(orient="records")
+        schema = {
+            "type": "record",
+            "name": dest.stem,
+            "fields": [{"name": c, "type": _avro_type(df[c]), "default": None} for c in df.columns],
+        }
+        with open(dest, "wb") as f:
+            fastavro.writer(f, schema, records)
+
+
 def _write_batch(
     datasets: dict,
     formats: tuple[str, ...],
@@ -56,95 +93,112 @@ def _write_batch(
     schema,
     batch: int,
     recurrence: bool,
-) -> list[Path]:
-    """Escreve um batch de datasets nos formatos solicitados. Retorna lista de arquivos escritos."""
-    written: list[Path] = []
+    partition_by: str | None = None,
+) -> list[tuple[Path, str]]:
+    """Escreve um batch de datasets. Retorna lista de (local_path, remote_sub) onde
+    remote_sub é o caminho relativo ao prefix: 'table_name/[col=val/]filename.ext'."""
+    written: list[tuple[Path, str]] = []
 
     for fmt in set(formats):
+        ext = {"csv": ".csv", "json": ".json", "parquet": ".parquet", "avro": ".avro"}[fmt]
+
         if fmt == "json" and json_mode == "nested":
             from dataforge.writers.json_writer import JsonWriter
-            writer = JsonWriter(out_path, mode="nested", schema=schema)
+
+            writer = JsonWriter(out_path / schema.name, mode="nested", schema=schema)
             paths = writer.write_nested(datasets)
             for name, path in paths.items():
                 click.echo(f"  [json/nested] {path}")
-                written.append(path)
+                written.append((path, f"{schema.name}/{name}/{path.name}"))
 
-        elif fmt == "json":
-            # Em recorrência: append de linhas NDJSON no mesmo arquivo
-            from dataforge.writers.json_writer import JsonWriter
-            if recurrence and batch > 1:
-                _append_json_flat(datasets, out_path)
-                for name in datasets:
-                    written.append(out_path / "json" / f"{name}.json")
-            else:
-                writer = JsonWriter(out_path, mode="flat")
-                for name, df in datasets.items():
-                    path = writer.write(name, df)
-                    click.echo(f"  [json] {path}")
-                    written.append(path)
+        elif fmt == "json" and recurrence and batch > 1:
+            _append_json_flat(datasets, out_path, schema.name)
+            for name in datasets:
+                path = out_path / schema.name / name / f"{name}.json"
+                written.append((path, f"{schema.name}/{name}/{path.name}"))
 
-        elif fmt == "csv":
-            # Em recorrência: append de linhas CSV (sem header a partir do batch 2)
-            if recurrence and batch > 1:
-                _append_csv(datasets, out_path)
-                for name in datasets:
-                    written.append(out_path / "csv" / f"{name}.csv")
-            else:
-                writer = WRITER_REGISTRY["csv"](out_path)
-                for name, df in datasets.items():
-                    path = writer.write(name, df)
-                    click.echo(f"  [csv] {path}")
-                    written.append(path)
+        elif fmt == "csv" and recurrence and batch > 1:
+            _append_csv(datasets, out_path, schema.name)
+            for name in datasets:
+                path = out_path / schema.name / name / f"{name}.csv"
+                written.append((path, f"{schema.name}/{name}/{path.name}"))
 
         else:
-            # Parquet e Avro: novo arquivo por batch com sufixo de timestamp
             ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-            writer = WRITER_REGISTRY[fmt](out_path)
+
             for name, df in datasets.items():
-                # Renomeia após escrita para incluir o timestamp
-                path = writer.write(name, df)
-                if recurrence and batch > 1:
-                    new_path = path.parent / f"{name}_{ts}{path.suffix}"
-                    path.rename(new_path)
-                    path = new_path
-                click.echo(f"  [{fmt}] {path}")
-                written.append(path)
+                if partition_by and partition_by in df.columns:
+                    # Escrita particionada: uma subpasta por valor da coluna
+                    for val, group in df.groupby(partition_by):
+                        safe_val = str(val).replace("/", "-").replace(" ", "_")
+                        filename = (
+                            f"{name}{ext}"
+                            if not (recurrence and batch > 1)
+                            else f"{name}_{ts}{ext}"
+                        )
+                        dest = (
+                            out_path / schema.name / name / f"{partition_by}={safe_val}" / filename
+                        )
+                        _write_df_direct(group, fmt, dest, json_mode)
+                        remote_sub = f"{schema.name}/{name}/{partition_by}={safe_val}/{filename}"
+                        click.echo(f"  [{fmt}] {dest}")
+                        written.append((dest, remote_sub))
+                else:
+                    # Escrita normal: pasta por tabela
+                    filename = (
+                        f"{name}{ext}" if not (recurrence and batch > 1) else f"{name}_{ts}{ext}"
+                    )
+                    dest = out_path / schema.name / name / filename
+                    _write_df_direct(df, fmt, dest, json_mode)
+                    remote_sub = f"{schema.name}/{name}/{filename}"
+                    click.echo(f"  [{fmt}] {dest}")
+                    written.append((dest, remote_sub))
 
     return written
 
 
-def _append_csv(datasets: dict, out_path: Path) -> None:
-    import pandas as pd
-    csv_dir = out_path / "csv"
-    csv_dir.mkdir(parents=True, exist_ok=True)
+def _append_csv(datasets: dict, out_path: Path, dataset_name: str) -> None:
     for name, df in datasets.items():
-        path = csv_dir / f"{name}.csv"
+        table_dir = out_path / dataset_name / name
+        table_dir.mkdir(parents=True, exist_ok=True)
+        path = table_dir / f"{name}.csv"
         df.to_csv(path, mode="a", index=False, header=not path.exists())
         click.echo(f"  [csv/append] {path} (+{len(df)} rows)")
 
 
-def _append_json_flat(datasets: dict, out_path: Path) -> None:
-    json_dir = out_path / "json"
-    json_dir.mkdir(parents=True, exist_ok=True)
+def _append_json_flat(datasets: dict, out_path: Path, dataset_name: str) -> None:
     for name, df in datasets.items():
-        path = json_dir / f"{name}.json"
+        table_dir = out_path / dataset_name / name
+        table_dir.mkdir(parents=True, exist_ok=True)
+        path = table_dir / f"{name}.json"
         with open(path, "a", encoding="utf-8") as f:
             f.write(df.to_json(orient="records", lines=True, force_ascii=False))
         click.echo(f"  [json/append] {path} (+{len(df)} rows)")
 
 
-def _do_upload(written_files: list[Path], upload: str, bucket: str, prefix: str, credentials: str | None) -> None:
+def _do_upload(
+    written_files: list[tuple[Path, str]],
+    upload: str,
+    bucket: str,
+    prefix: str,
+    credentials: str | None,
+) -> None:
     uploader_cls = UPLOADER_REGISTRY.get(upload)
     if uploader_cls is None:
-        raise click.UsageError(f"Unknown upload target '{upload}'. Available: {list(UPLOADER_REGISTRY)}")
+        raise click.UsageError(
+            f"Unknown upload target '{upload}'. Available: {list(UPLOADER_REGISTRY)}"
+        )
     uploader = uploader_cls(credentials_path=credentials)
-    for file_path in written_files:
-        uri = uploader.upload(file_path, bucket, prefix)
+    base = prefix.rstrip("/")
+    for file_path, remote_sub in written_files:
+        blob_name = f"{base}/{remote_sub}"
+        uri = uploader.upload(file_path, bucket, blob_name)
         click.echo(f"  [upload] {uri}")
 
 
 def _do_sql(datasets: dict, db_url: str, if_exists: str, db_schema: str | None) -> None:
     from dataforge.loaders.sql_loader import SqlLoader
+
     loader = SqlLoader(db_url=db_url, if_exists=if_exists, schema=db_schema)
     for name, df in datasets.items():
         result = loader.load(name, df)
@@ -159,40 +213,97 @@ def cli():
 
 @cli.command()
 @click.option("--domain", "-d", required=True, help="Domain: ecommerce | hr | finance | custom")
-@click.option("--config", "-c", default=None, help="Path to YAML config (required for custom domain).")
-@click.option("--rows", "-r", default=None, type=int, help="Rows per table (overrides domain default).")
+@click.option(
+    "--config", "-c", default=None, help="Path to YAML config (required for custom domain)."
+)
+@click.option(
+    "--rows", "-r", default=None, type=int, help="Rows per table (overrides domain default)."
+)
 @click.option("--tables", "-t", multiple=True, help="Tables to include (repeatable). Default: all.")
 @click.option("--columns", multiple=True, help="'table:col1,col2' column filter (repeatable).")
-@click.option("--format", "-f", "formats", multiple=True, default=["csv"],
-              type=click.Choice(["csv", "json", "parquet", "avro"]),
-              help="Output format (repeatable). Default: csv.")
+@click.option(
+    "--format",
+    "-f",
+    "formats",
+    multiple=True,
+    default=["csv"],
+    type=click.Choice(["csv", "json", "parquet", "avro"]),
+    help="Output format (repeatable). Default: csv.",
+)
 @click.option("--output", "-o", default="./output", help="Output directory. Default: ./output")
-@click.option("--json-mode", "json_mode", default="flat", type=click.Choice(["flat", "nested"]),
-              help="JSON mode: flat (NDJSON) or nested. Default: flat.")
+@click.option(
+    "--json-mode",
+    "json_mode",
+    default="flat",
+    type=click.Choice(["flat", "nested"]),
+    help="JSON mode: flat (NDJSON) or nested. Default: flat.",
+)
 @click.option("--seed", default=None, type=int, help="Random seed for reproducibility.")
 # Cloud upload
-@click.option("--upload", default=None, type=click.Choice(["gcs", "s3", "azure"]),
-              help="Cloud upload destination: gcs, s3 or azure.")
+@click.option(
+    "--upload",
+    default=None,
+    type=click.Choice(["gcs", "s3", "azure"]),
+    help="Cloud upload destination: gcs, s3 or azure.",
+)
 @click.option("--bucket", default=None, help="Bucket/container name for cloud upload.")
 @click.option("--prefix", default="datasets/", help="Remote prefix/folder. Default: datasets/")
 @click.option("--credentials", default=None, help="Path to cloud credentials file.")
+@click.option(
+    "--partition-by",
+    "partition_by",
+    default=None,
+    help="Column name to partition output by (Hive-style: col=val/). Applied per table if the column exists.",
+)
 # SQL loading
-@click.option("--db-url", default=None,
-              help="SQLAlchemy connection URL. Examples: sqlite:///output.db | "
-                   "postgresql+psycopg2://user:pass@host/db")
-@click.option("--if-exists", default="replace",
-              type=click.Choice(["replace", "append", "fail"]),
-              help="Behaviour if SQL table already exists. Default: replace.")
+@click.option(
+    "--db-url",
+    default=None,
+    help="SQLAlchemy connection URL. Examples: sqlite:///output.db | "
+    "postgresql+psycopg2://user:pass@host/db",
+)
+@click.option(
+    "--if-exists",
+    default="replace",
+    type=click.Choice(["replace", "append", "fail"]),
+    help="Behaviour if SQL table already exists. Default: replace.",
+)
 @click.option("--db-schema", default=None, help="Database schema to write tables into.")
 # Recurrence
-@click.option("--recurrence", "-R", default=None, type=float,
-              help="Interval in seconds between batches. Enables recurrence mode (Ctrl+C to stop).")
-@click.option("--count", default=0, type=int,
-              help="Number of batches to run in recurrence mode. 0 = infinite. Default: 0.")
-def generate(domain, config, rows, tables, columns, formats, output, json_mode,
-             seed, upload, bucket, prefix, credentials,
-             db_url, if_exists, db_schema,
-             recurrence, count):
+@click.option(
+    "--recurrence",
+    "-R",
+    default=None,
+    type=float,
+    help="Interval in seconds between batches. Enables recurrence mode (Ctrl+C to stop).",
+)
+@click.option(
+    "--count",
+    default=0,
+    type=int,
+    help="Number of batches to run in recurrence mode. 0 = infinite. Default: 0.",
+)
+def generate(
+    domain,
+    config,
+    rows,
+    tables,
+    columns,
+    formats,
+    output,
+    json_mode,
+    seed,
+    upload,
+    bucket,
+    prefix,
+    credentials,
+    partition_by,
+    db_url,
+    if_exists,
+    db_schema,
+    recurrence,
+    count,
+):
     """Generate synthetic datasets and optionally write to files, cloud or SQL.
 
     Use --recurrence <seconds> to keep generating batches continuously.
@@ -231,8 +342,14 @@ def generate(domain, config, rows, tables, columns, formats, output, json_mode,
 
             # Arquivo
             written_files = _write_batch(
-                datasets, formats, out_path, json_mode, schema,
-                batch=batch, recurrence=is_recurrent,
+                datasets,
+                formats,
+                out_path,
+                json_mode,
+                schema,
+                batch=batch,
+                recurrence=is_recurrent,
+                partition_by=partition_by,
             )
 
             # Upload

@@ -7,15 +7,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Instala wheel e build backend
-RUN pip install --no-cache-dir pip==24.0 build wheel
+# Instala o build backend que o pyproject.toml exige
+RUN pip install --no-cache-dir --upgrade pip "poetry-core>=2.0.0,<3.0.0"
 
 # Copia apenas o necessário para resolver dependências
-COPY pyproject.toml poetry.lock ./
+COPY pyproject.toml poetry.lock README.md ./
 COPY src/ ./src/
 
-# Instala as dependências + extras diretamente via pip (sem poetry)
-RUN pip install --no-cache-dir ".[parquet,avro,sql,postgres]"
+# Instala o pacote e todos os extras necessários
+RUN pip install --no-cache-dir ".[parquet,avro,sql,postgres,gcp,aws,azure]"
 
 
 # ─── Stage 2: Final image (Python + Node) ─────────────────────────────────────
@@ -38,9 +38,9 @@ COPY src/ ./src/
 COPY schemas/ ./schemas/
 
 # ── Frontend: instala dependências (cache de layer) ──
-COPY src/dataforge/frontend/package.json src/dataforge/frontend/package-lock.json \
-     ./src/dataforge/frontend/
-RUN npm ci --prefix src/dataforge/frontend
+# Usa npm install (não npm ci) para resolver binários nativos corretos para Linux
+COPY src/dataforge/frontend/package.json ./src/dataforge/frontend/
+RUN npm install --prefix src/dataforge/frontend
 
 # ── Frontend: restante dos arquivos ──
 COPY src/dataforge/frontend/ ./src/dataforge/frontend/

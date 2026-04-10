@@ -31,6 +31,7 @@ tables:
           column: id
       aisle:
         dtype: str
+        choices: [A, B, C, D, E, F, G, H]
       rack:
         dtype: str
       shelf:
@@ -70,6 +71,7 @@ tables:
         primary_key: true
       name:
         dtype: str
+        choices: [Raw Material, Packaging, Spare Parts, Finished Goods, Office Supplies, Cleaning, Safety, Tools, Electronics, Chemicals]
       parent_id:
         dtype: int
         foreign_key:
@@ -97,15 +99,24 @@ tables:
           column: id
       unit:
         dtype: str
+        choices: [un, kg, g, L, mL, m, cm, m2, m3, cx, pc, pack, rolo, par]
       min_stock:
         dtype: int
+        min: 1
+        max: 100
       max_stock:
         dtype: int
+        min: 50
+        max: 5000
         nullable: 0.4
       reorder_point:
         dtype: int
+        min: 1
+        max: 500
       unit_cost:
         dtype: float
+        min: 0.01
+        max: 10000
       active:
         dtype: bool
 
@@ -133,6 +144,8 @@ tables:
         nullable: 0.3
       quantity:
         dtype: int
+        min: 0
+        max: 10000
       updated_at:
         dtype: date
 
@@ -151,8 +164,11 @@ tables:
           column: id
       status:
         dtype: str
+        choices: [draft, sent, confirmed, partial, received, cancelled]
       total_amount:
         dtype: float
+        min: 100
+        max: 500000
       ordered_at:
         dtype: date
       expected_delivery:
@@ -183,11 +199,17 @@ tables:
           column: id
       quantity_ordered:
         dtype: int
+        min: 1
+        max: 1000
       quantity_received:
         dtype: int
+        min: 0
+        max: 1000
         nullable: 0.4
       unit_cost:
         dtype: float
+        min: 0.01
+        max: 10000
 
   stock_movements:
     rows: 3000
@@ -207,13 +229,19 @@ tables:
           column: id
       type:
         dtype: str
+        choices: [inbound, outbound, transfer, adjustment, loss, return]
       quantity:
         dtype: int
+        min: 1
+        max: 500
       unit_cost:
         dtype: float
+        min: 0.01
+        max: 10000
         nullable: 0.3
       reference_type:
         dtype: str
+        choices: [purchase_order, sale_order, transfer_order, manual_adjustment]
         nullable: 0.4
       reference_id:
         dtype: int

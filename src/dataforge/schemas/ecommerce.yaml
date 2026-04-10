@@ -9,6 +9,7 @@ tables:
         primary_key: true
       name:
         dtype: str
+        choices: [Electronics, Clothing, Home & Kitchen, Sports, Books, Beauty, Toys, Automotive, Food & Grocery, Office Supplies]
       description:
         dtype: text
         nullable: 0.2
@@ -28,12 +29,18 @@ tables:
         nullable: 0.1
       price:
         dtype: float
+        min: 1
+        max: 5000
       stock_quantity:
         dtype: int
+        min: 0
+        max: 500
       sku:
         dtype: str
       weight_kg:
         dtype: float
+        min: 0.1
+        max: 50
         nullable: 0.3
       category_id:
         dtype: int
@@ -62,6 +69,7 @@ tables:
         dtype: city
       state:
         dtype: str
+        choices: [AC, AL, AP, AM, BA, CE, DF, ES, GO, MA, MT, MS, MG, PA, PB, PR, PE, PI, RJ, RN, RS, RO, RR, SC, SP, SE, TO]
       country:
         dtype: country
       zip_code:
@@ -83,10 +91,15 @@ tables:
           column: id
       status:
         dtype: str
+        choices: [pending, processing, shipped, delivered, cancelled, returned]
       total_amount:
         dtype: float
+        min: 1
+        max: 10000
       discount_amount:
         dtype: float
+        min: 0
+        max: 500
         nullable: 0.4
       shipping_address:
         dtype: text
@@ -115,10 +128,16 @@ tables:
           column: id
       quantity:
         dtype: int
+        min: 1
+        max: 20
       unit_price:
         dtype: float
+        min: 1
+        max: 5000
       discount_pct:
         dtype: float
+        min: 0
+        max: 0.5
         nullable: 0.5
 
   payments:
@@ -134,10 +153,14 @@ tables:
           column: id
       method:
         dtype: str
+        choices: [credit_card, debit_card, pix, boleto, bank_transfer, wallet]
       status:
         dtype: str
+        choices: [pending, paid, failed, refunded, cancelled]
       amount:
         dtype: float
+        min: 1
+        max: 10000
       paid_at:
         dtype: date
         nullable: 0.2
@@ -160,6 +183,8 @@ tables:
           column: id
       rating:
         dtype: int
+        min: 1
+        max: 5
       comment:
         dtype: text
         nullable: 0.4

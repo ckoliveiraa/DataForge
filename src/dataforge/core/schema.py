@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from dataclasses import dataclass, field
 
 
@@ -18,6 +19,9 @@ class Column:
     foreign_key: ForeignKey | None = None
     min_value: str | int | float | None = None  # for int/float: numeric; for date: "YYYY-MM-DD"
     max_value: str | int | float | None = None  # for int/float: numeric; for date: "YYYY-MM-DD"
+    choices: list[str] | None = (
+        None  # fixed set of values to sample from (overrides dtype/faker_provider)
+    )
 
 
 @dataclass

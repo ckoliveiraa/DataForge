@@ -1,5 +1,5 @@
+from dataforge.core.schema import Column, DomainSchema, ForeignKey, Table
 from dataforge.domains.base import DomainTemplate
-from dataforge.core.schema import Column, ForeignKey, Table, DomainSchema
 
 
 class EcommerceDomain(DomainTemplate):

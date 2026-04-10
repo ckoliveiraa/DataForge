@@ -26,6 +26,7 @@ export class SchemaWriter {
 
         if (c.min) colDef.min = isNaN(Number(c.min)) ? c.min : Number(c.min);
         if (c.max) colDef.max = isNaN(Number(c.max)) ? c.max : Number(c.max);
+        if (c.choices && c.choices.length > 0) colDef.choices = c.choices;
 
         if (c.isForeignKey && c.fkTable && c.fkColumn) {
           colDef.foreign_key = {

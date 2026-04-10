@@ -195,6 +195,7 @@ pyrightconfig.json
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode
 # Dataforge specific
 output/
+credentials/
 src/dataforge/frontend/node_modules/
 src/dataforge/frontend/dist/
 .claude/settings.local.json

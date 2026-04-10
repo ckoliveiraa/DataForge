@@ -16,6 +16,7 @@ tables:
         nullable: 0.2
       type:
         dtype: str
+        choices: [equipment, vehicle, infrastructure, tool, instrument, facility, IT]
       manufacturer:
         dtype: company
       model:
@@ -25,11 +26,14 @@ tables:
         dtype: str
       location:
         dtype: str
+        choices: [Plant A, Plant B, Warehouse, Office, Field, Lab, Server Room]
       purchase_date:
         dtype: date
         nullable: 0.3
       purchase_value:
         dtype: float
+        min: 500
+        max: 2000000
         nullable: 0.3
       active:
         dtype: bool
@@ -48,6 +52,7 @@ tables:
         dtype: phone
       specialization:
         dtype: str
+        choices: [electrical, mechanical, hydraulic, instrumentation, civil, IT, HVAC, welding]
       active:
         dtype: bool
 
@@ -59,6 +64,7 @@ tables:
         primary_key: true
       name:
         dtype: str
+        choices: [Preventive, Corrective, Predictive, Inspection, Calibration, Lubrication, Cleaning, Overhaul]
       description:
         dtype: text
         nullable: 0.3
@@ -91,8 +97,10 @@ tables:
         nullable: 0.2
       priority:
         dtype: str
+        choices: [low, medium, high, critical, emergency]
       status:
         dtype: str
+        choices: [open, in_progress, on_hold, waiting_parts, completed, cancelled]
       description:
         dtype: text
       failure_description:
@@ -111,15 +119,23 @@ tables:
         nullable: 0.5
       estimated_hours:
         dtype: float
+        min: 0.5
+        max: 200
         nullable: 0.3
       actual_hours:
         dtype: float
+        min: 0.5
+        max: 200
         nullable: 0.5
       labor_cost:
         dtype: float
+        min: 50
+        max: 50000
         nullable: 0.5
       total_cost:
         dtype: float
+        min: 50
+        max: 100000
         nullable: 0.5
 
   parts:
@@ -137,12 +153,19 @@ tables:
         nullable: 0.3
       unit:
         dtype: str
+        choices: [un, kg, L, m, pc, cx, par, rolo, set]
       stock_quantity:
         dtype: int
+        min: 0
+        max: 500
       min_stock:
         dtype: int
+        min: 1
+        max: 50
       unit_cost:
         dtype: float
+        min: 1
+        max: 50000
       supplier:
         dtype: company
         nullable: 0.2
@@ -165,8 +188,12 @@ tables:
           column: id
       quantity:
         dtype: int
+        min: 1
+        max: 50
       unit_cost:
         dtype: float
+        min: 1
+        max: 50000
 
   preventive_plans:
     rows: 100
@@ -186,6 +213,8 @@ tables:
           column: id
       frequency_days:
         dtype: int
+        min: 1
+        max: 365
       last_execution:
         dtype: date
         nullable: 0.3

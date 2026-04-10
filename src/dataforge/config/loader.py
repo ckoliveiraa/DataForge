@@ -13,10 +13,7 @@ def load_schema(config_path: Path, base_schema: DomainSchema | None = None) -> D
     with open(config_path, encoding="utf-8") as f:
         raw = yaml.safe_load(f)
 
-    if base_schema is not None:
-        schema = _merge_with_base(raw, base_schema)
-    else:
-        schema = _parse_schema(raw)
+    schema = _merge_with_base(raw, base_schema) if base_schema is not None else _parse_schema(raw)
 
     _validate_fks(schema)
     return schema
@@ -34,21 +31,27 @@ def _parse_schema(raw: dict) -> DomainSchema:
                     ref_table=fk_conf["table"],
                     ref_column=fk_conf["column"],
                 )
-            columns.append(Column(
-                name=cname,
-                dtype=cconf.get("dtype", "str"),
-                faker_provider=cconf.get("faker_provider"),
-                nullable=float(cconf.get("nullable", 0.0)),
-                primary_key=bool(cconf.get("primary_key", False)),
-                foreign_key=fk,
-                min_value=cconf.get("min"),
-                max_value=cconf.get("max"),
-            ))
-        tables.append(Table(
-            name=tname,
-            columns=columns,
-            default_rows=int(tconf.get("rows", 1000)),
-        ))
+            raw_choices = cconf.get("choices")
+            columns.append(
+                Column(
+                    name=cname,
+                    dtype=cconf.get("dtype", "str"),
+                    faker_provider=cconf.get("faker_provider"),
+                    nullable=float(cconf.get("nullable", 0.0)),
+                    primary_key=bool(cconf.get("primary_key", False)),
+                    foreign_key=fk,
+                    min_value=cconf.get("min"),
+                    max_value=cconf.get("max"),
+                    choices=[str(v) for v in raw_choices] if raw_choices else None,
+                )
+            )
+        tables.append(
+            Table(
+                name=tname,
+                columns=columns,
+                default_rows=int(tconf.get("rows", 1000)),
+            )
+        )
     return DomainSchema(name=raw.get("domain", "custom"), tables=tables)
 
 
@@ -74,13 +77,13 @@ def _merge_with_base(raw: dict, base: DomainSchema) -> DomainSchema:
                         col.min_value = conf["min"]
                     if "max" in conf:
                         col.max_value = conf["max"]
+                    if "choices" in conf:
+                        col.choices = [str(v) for v in conf["choices"]] if conf["choices"] else None
     return schema
 
 
 def _validate_fks(schema: DomainSchema) -> None:
-    table_cols: dict[str, set[str]] = {
-        t.name: {c.name for c in t.columns} for t in schema.tables
-    }
+    table_cols: dict[str, set[str]] = {t.name: {c.name for c in t.columns} for t in schema.tables}
     for table in schema.tables:
         for col in table.columns:
             if col.foreign_key:

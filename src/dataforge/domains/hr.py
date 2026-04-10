@@ -1,5 +1,5 @@
+from dataforge.core.schema import Column, DomainSchema, ForeignKey, Table
 from dataforge.domains.base import DomainTemplate
-from dataforge.core.schema import Column, ForeignKey, Table, DomainSchema
 
 
 class HrDomain(DomainTemplate):
@@ -31,7 +31,9 @@ class HrDomain(DomainTemplate):
                 Column("hire_date", "date"),
                 Column("department_id", "int", foreign_key=ForeignKey("departments", "id")),
                 Column("job_title_id", "int", foreign_key=ForeignKey("job_titles", "id")),
-                Column("manager_id", "int", foreign_key=ForeignKey("employees", "id"), nullable=0.1),
+                Column(
+                    "manager_id", "int", foreign_key=ForeignKey("employees", "id"), nullable=0.1
+                ),
             ],
             default_rows=300,
         )
