@@ -32,6 +32,7 @@ export class SchemaReader {
           fkColumn: cData.foreign_key?.column || 'id',
           min: cData.min != null ? String(cData.min) : '',
           max: cData.max != null ? String(cData.max) : '',
+          choices: Array.isArray(cData.choices) ? cData.choices.map(String) : [],
         };
       });
 

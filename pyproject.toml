@@ -40,3 +40,56 @@ packages = [{include = "dataforge", from = "src"}]
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+ruff = ">=0.4"
+taskipy = ">=1.12"
+pre-commit = ">=3.7"
+pytest = ">=8.0"
+pytest-cov = ">=5.0"
+
+[tool.taskipy.tasks]
+lint   = "ruff check src/"
+fmt    = "ruff format src/"
+check  = "ruff format src/ --check && ruff check src/"
+test   = "pytest tests/ -v"
+ci     = "ruff format src/ --check && ruff check src/ && pytest tests/ -v --cov=dataforge --cov-report=term-missing"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v"
+
+[tool.coverage.run]
+source = ["src/dataforge"]
+omit = ["src/dataforge/frontend/*"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+
+[tool.ruff]
+line-length = 100
+src = ["src"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+    "TID", # flake8-tidy-imports
+]
+ignore = [
+    "E501",  # line too long — já controlado pelo formatter
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["dataforge"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"

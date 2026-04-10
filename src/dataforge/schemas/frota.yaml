@@ -15,29 +15,42 @@ tables:
         dtype: str
       brand:
         dtype: str
+        choices: [Volkswagen, Fiat, Chevrolet, Ford, Renault, Toyota, Hyundai, Mercedes-Benz, Volvo, Scania, Iveco, MAN]
       model:
         dtype: str
       year:
         dtype: int
+        min: 2000
+        max: 2025
       color:
         dtype: str
+        choices: [white, black, silver, gray, red, blue, green, yellow, orange, brown]
       type:
         dtype: str
+        choices: [car, truck, van, motorcycle, bus, pickup, minivan]
       fuel_type:
         dtype: str
+        choices: [gasoline, ethanol, diesel, flex, electric, hybrid, CNG]
       capacity_kg:
         dtype: float
+        min: 500
+        max: 30000
         nullable: 0.4
       odometer_km:
         dtype: float
+        min: 0
+        max: 500000
       status:
         dtype: str
+        choices: [active, maintenance, inactive, sold, reserved]
       active:
         dtype: bool
       acquisition_date:
         dtype: date
       acquisition_value:
         dtype: float
+        min: 30000
+        max: 800000
         nullable: 0.3
 
   drivers:
@@ -54,8 +67,11 @@ tables:
         dtype: str
       cnh_category:
         dtype: str
+        choices: [A, B, AB, C, D, E, ACC]
       cnh_expiry:
         dtype: date
+        min: today
+        max: 5y
       phone:
         dtype: phone
       email:
@@ -86,13 +102,20 @@ tables:
         dtype: city
       purpose:
         dtype: str
+        choices: [delivery, collection, client_visit, transfer, maintenance, administrative]
       odometer_start:
         dtype: float
+        min: 0
+        max: 500000
       odometer_end:
         dtype: float
+        min: 0
+        max: 500000
         nullable: 0.2
       distance_km:
         dtype: float
+        min: 1
+        max: 5000
         nullable: 0.2
       departure_at:
         dtype: date
@@ -101,6 +124,7 @@ tables:
         nullable: 0.3
       status:
         dtype: str
+        choices: [scheduled, in_progress, completed, cancelled, delayed]
       notes:
         dtype: text
         nullable: 0.6
@@ -123,14 +147,23 @@ tables:
           column: id
       fuel_type:
         dtype: str
+        choices: [gasoline, ethanol, diesel, flex, electric, hybrid, CNG]
       liters:
         dtype: float
+        min: 5
+        max: 300
       price_per_liter:
         dtype: float
+        min: 3
+        max: 10
       total_cost:
         dtype: float
+        min: 20
+        max: 3000
       odometer_km:
         dtype: float
+        min: 0
+        max: 500000
       station_name:
         dtype: company
         nullable: 0.3
@@ -150,12 +183,17 @@ tables:
           column: id
       type:
         dtype: str
+        choices: [preventive, corrective, predictive, inspection, recall]
       description:
         dtype: text
       odometer_km:
         dtype: float
+        min: 0
+        max: 500000
       cost:
         dtype: float
+        min: 50
+        max: 50000
       supplier:
         dtype: company
         nullable: 0.3
@@ -163,6 +201,8 @@ tables:
         dtype: date
       next_due_km:
         dtype: float
+        min: 1000
+        max: 600000
         nullable: 0.5
       next_due_date:
         dtype: date
@@ -181,6 +221,7 @@ tables:
           column: id
       type:
         dtype: str
+        choices: [CRLV, IPVA, insurance, inspection, license, permit]
       document_number:
         dtype: str
         nullable: 0.2
@@ -191,9 +232,12 @@ tables:
         nullable: 0.3
       cost:
         dtype: float
+        min: 50
+        max: 20000
         nullable: 0.4
       status:
         dtype: str
+        choices: [valid, expired, pending, cancelled]
 
   fines:
     rows: 200
@@ -218,11 +262,16 @@ tables:
         dtype: text
       amount:
         dtype: float
+        min: 88
+        max: 2934
       points:
         dtype: int
+        min: 1
+        max: 7
       infraction_date:
         dtype: date
       due_date:
         dtype: date
       status:
         dtype: str
+        choices: [pending, paid, contested, cancelled, overdue]

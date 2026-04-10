@@ -10,6 +10,7 @@ export type Column = {
   fkColumn: string;
   min: string;
   max: string;
+  choices: string[];
 };
 
 export type Table = {

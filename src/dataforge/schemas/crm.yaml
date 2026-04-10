@@ -14,8 +14,10 @@ tables:
         nullable: 0.2
       industry:
         dtype: str
+        choices: [Technology, Finance, Healthcare, Retail, Manufacturing, Education, Logistics, Energy, Telecom, Agriculture, Real Estate, Media]
       size:
         dtype: str
+        choices: [micro, small, medium, large, enterprise]
       website:
         dtype: str
         nullable: 0.4
@@ -25,6 +27,8 @@ tables:
         dtype: country
       annual_revenue:
         dtype: float
+        min: 50000
+        max: 10000000000
         nullable: 0.5
       created_at:
         dtype: date
@@ -66,6 +70,7 @@ tables:
         primary_key: true
       name:
         dtype: str
+        choices: [New Business, Renewal, Upsell, Partnership, Enterprise]
       description:
         dtype: text
         nullable: 0.4
@@ -83,10 +88,15 @@ tables:
           column: id
       name:
         dtype: str
+        choices: [Prospecting, Qualification, Proposal, Negotiation, Closed Won, Closed Lost]
       order:
         dtype: int
+        min: 1
+        max: 10
       win_probability:
         dtype: float
+        min: 0
+        max: 1
 
   deals:
     rows: 800
@@ -117,6 +127,8 @@ tables:
         dtype: name
       amount:
         dtype: float
+        min: 1000
+        max: 5000000
         nullable: 0.3
       expected_close_date:
         dtype: date
@@ -126,6 +138,7 @@ tables:
         nullable: 0.6
       status:
         dtype: str
+        choices: [open, won, lost, abandoned, on_hold]
       created_at:
         dtype: date
 
@@ -137,6 +150,7 @@ tables:
         primary_key: true
       type:
         dtype: str
+        choices: [call, meeting, email, demo, proposal, follow_up, task]
       deal_id:
         dtype: int
         foreign_key:
@@ -163,6 +177,7 @@ tables:
         nullable: 0.4
       status:
         dtype: str
+        choices: [scheduled, completed, cancelled, no_show]
 
   tickets:
     rows: 1000
@@ -186,10 +201,13 @@ tables:
         nullable: 0.2
       priority:
         dtype: str
+        choices: [low, medium, high, critical]
       status:
         dtype: str
+        choices: [open, in_progress, waiting, resolved, closed]
       category:
         dtype: str
+        choices: [billing, technical, general, complaint, feature_request]
         nullable: 0.3
       assigned_to:
         dtype: name

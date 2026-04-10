@@ -13,10 +13,13 @@ tables:
         dtype: str
       type:
         dtype: str
+        choices: [checking, savings, investment, credit, escrow]
       currency:
         dtype: currency
       balance:
         dtype: float
+        min: -50000
+        max: 500000
       active:
         dtype: bool
       created_at:
@@ -46,6 +49,7 @@ tables:
         dtype: str
       type:
         dtype: str
+        choices: [revenue, expense, investment, transfer]
       parent_id:
         dtype: int
         foreign_key:
@@ -78,8 +82,11 @@ tables:
         nullable: 0.3
       type:
         dtype: str
+        choices: [credit, debit, transfer, reversal]
       amount:
         dtype: float
+        min: 0.01
+        max: 100000
       description:
         dtype: text
         nullable: 0.2
@@ -96,6 +103,7 @@ tables:
         nullable: 0.4
       status:
         dtype: str
+        choices: [pending, completed, cancelled, failed, processing]
 
   invoices:
     rows: 1000
@@ -107,6 +115,7 @@ tables:
         dtype: str
       type:
         dtype: str
+        choices: [NF-e, NFS-e, CT-e, NF, MDF-e]
       issuer_name:
         dtype: name
       issuer_document:
@@ -117,16 +126,23 @@ tables:
         dtype: str
       gross_amount:
         dtype: float
+        min: 1
+        max: 500000
       tax_amount:
         dtype: float
+        min: 0
+        max: 100000
       net_amount:
         dtype: float
+        min: 1
+        max: 500000
       issue_date:
         dtype: date
       due_date:
         dtype: date
       status:
         dtype: str
+        choices: [issued, cancelled, paid, pending, overdue]
 
   budgets:
     rows: 200
@@ -146,12 +162,20 @@ tables:
           column: id
       year:
         dtype: int
+        min: 2020
+        max: 2026
       month:
         dtype: int
+        min: 1
+        max: 12
       planned_amount:
         dtype: float
+        min: 1000
+        max: 500000
       actual_amount:
         dtype: float
+        min: 0
+        max: 500000
         nullable: 0.3
 
   tax_records:
@@ -162,14 +186,21 @@ tables:
         primary_key: true
       tax_type:
         dtype: str
+        choices: [IRPJ, CSLL, PIS, COFINS, ISS, ICMS, IOF, IPI, IRRF]
       reference_period:
         dtype: str
       base_amount:
         dtype: float
+        min: 1000
+        max: 1000000
       tax_rate:
         dtype: float
+        min: 0.01
+        max: 0.35
       tax_amount:
         dtype: float
+        min: 10
+        max: 350000
       due_date:
         dtype: date
       paid_at:
@@ -177,3 +208,4 @@ tables:
         nullable: 0.4
       status:
         dtype: str
+        choices: [pending, paid, overdue, contested, cancelled]

@@ -5,8 +5,8 @@ import random
 import pandas as pd
 from faker import Faker
 
-from dataforge.core.schema import DomainSchema, Table
 from dataforge.core.registry import generate_column
+from dataforge.core.schema import DomainSchema, Table
 
 
 def topological_sort(tables: list[Table]) -> list[Table]:
@@ -19,6 +19,8 @@ def topological_sort(tables: list[Table]) -> list[Table]:
         for col in table.columns:
             if col.foreign_key and col.foreign_key.ref_table != table.name:
                 dep = col.foreign_key.ref_table
+                if dep not in table_map:
+                    continue  # FK aponta para tabela fora do conjunto filtrado — ignora
                 if dep not in deps:
                     deps.add(dep)
                     in_degree[table.name] += 1
@@ -76,12 +78,27 @@ class DatasetGenerator:
             if col.foreign_key:
                 ref_key = f"{col.foreign_key.ref_table}.{col.foreign_key.ref_column}"
                 pool = pk_pool.get(ref_key, [])
-                if not pool:
-                    raise ValueError(f"FK pool empty for '{ref_key}'. Check topological order.")
-                values = random.choices(pool, k=n)
+                if pool:
+                    values = random.choices(pool, k=n)
+                else:
+                    # Tabela referenciada não está no conjunto gerado (filtrada via --tables).
+                    # Gera valores sintéticos sem constraint referencial.
+                    values = generate_column(
+                        col.dtype,
+                        col.faker_provider,
+                        self.faker,
+                        n,
+                        min_value=col.min_value,
+                        max_value=col.max_value,
+                    )
+            elif col.choices:
+                values = random.choices(col.choices, k=n)
             else:
                 values = generate_column(
-                    col.dtype, col.faker_provider, self.faker, n,
+                    col.dtype,
+                    col.faker_provider,
+                    self.faker,
+                    n,
                     min_value=col.min_value,
                     max_value=col.max_value,
                 )

@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
+
 import pandas as pd
 
 
@@ -8,8 +9,7 @@ class BaseWriter(ABC):
         self.output_dir = output_dir
 
     @abstractmethod
-    def write(self, name: str, df: pd.DataFrame) -> Path:
-        ...
+    def write(self, name: str, df: pd.DataFrame) -> Path: ...
 
     def _ensure_dir(self, subdir: str) -> Path:
         path = self.output_dir / subdir

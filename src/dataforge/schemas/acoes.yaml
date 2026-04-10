@@ -13,16 +13,20 @@ tables:
         dtype: company
       sector:
         dtype: str
+        choices: [Technology, Finance, Healthcare, Energy, Consumer Goods, Industrials, Materials, Real Estate, Utilities, Telecom, Agriculture]
       industry:
         dtype: str
       exchange:
         dtype: str
+        choices: [B3, NYSE, NASDAQ, LSE, HKEX, TSX, ASX, Euronext]
       country:
         dtype: country
       currency:
         dtype: currency
       market_cap:
         dtype: float
+        min: 1000000
+        max: 3000000000000
         nullable: 0.1
       ipo_date:
         dtype: date
@@ -43,18 +47,32 @@ tables:
           column: id
       date:
         dtype: date
+        min: -5y
+        max: today
       open_price:
         dtype: float
+        min: 1
+        max: 5000
       high_price:
         dtype: float
+        min: 1
+        max: 5000
       low_price:
         dtype: float
+        min: 1
+        max: 5000
       close_price:
         dtype: float
+        min: 1
+        max: 5000
       adj_close:
         dtype: float
+        min: 1
+        max: 5000
       volume:
         dtype: int
+        min: 1000
+        max: 100000000
 
   portfolios:
     rows: 50
@@ -92,14 +110,24 @@ tables:
           column: id
       quantity:
         dtype: int
+        min: 1
+        max: 100000
       avg_cost:
         dtype: float
+        min: 1
+        max: 5000
       current_price:
         dtype: float
+        min: 1
+        max: 5000
       current_value:
         dtype: float
+        min: 1
+        max: 50000000
       unrealized_pnl:
         dtype: float
+        min: -500000
+        max: 500000
       updated_at:
         dtype: date
 
@@ -121,19 +149,29 @@ tables:
           column: id
       type:
         dtype: str
+        choices: [buy, sell]
       quantity:
         dtype: int
+        min: 1
+        max: 10000
       price:
         dtype: float
+        min: 1
+        max: 5000
       total_amount:
         dtype: float
+        min: 10
+        max: 5000000
       fees:
         dtype: float
+        min: 0
+        max: 500
         nullable: 0.2
       traded_at:
         dtype: date
       broker:
         dtype: str
+        choices: [XP Investimentos, BTG Pactual, Clear, Rico, Avenue, Interactive Brokers, TD Ameritrade, Nuinvest]
         nullable: 0.3
 
   dividends:
@@ -149,8 +187,11 @@ tables:
           column: id
       type:
         dtype: str
+        choices: [dividend, jscp, bonification, subscription_rights, split]
       amount_per_share:
         dtype: float
+        min: 0.01
+        max: 50
       ex_date:
         dtype: date
       payment_date:
@@ -176,8 +217,12 @@ tables:
           column: id
       shares_held:
         dtype: int
+        min: 1
+        max: 100000
       total_received:
         dtype: float
+        min: 0.01
+        max: 500000
 
   company_financials:
     rows: 400
@@ -192,27 +237,48 @@ tables:
           column: id
       period:
         dtype: str
+        choices: [annual, quarterly]
       year:
         dtype: int
+        min: 2015
+        max: 2025
       quarter:
         dtype: int
+        min: 1
+        max: 4
         nullable: 0.5
       revenue:
         dtype: float
+        min: 100000
+        max: 100000000000
       net_income:
         dtype: float
+        min: -5000000000
+        max: 50000000000
       ebitda:
         dtype: float
+        min: -1000000000
+        max: 60000000000
         nullable: 0.2
       total_assets:
         dtype: float
+        min: 100000
+        max: 500000000000
       total_debt:
         dtype: float
+        min: 0
+        max: 200000000000
       equity:
         dtype: float
+        min: -10000000000
+        max: 300000000000
       eps:
         dtype: float
+        min: -20
+        max: 200
         nullable: 0.2
       pe_ratio:
         dtype: float
+        min: -50
+        max: 500
         nullable: 0.3

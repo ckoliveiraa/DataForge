@@ -1,9 +1,12 @@
 from __future__ import annotations
-from pathlib import Path
+
 import json
+from pathlib import Path
+
 import pandas as pd
+
+from dataforge.core.schema import DomainSchema
 from dataforge.writers.base import BaseWriter
-from dataforge.core.schema import DomainSchema, ForeignKey
 
 
 class JsonWriter(BaseWriter):
@@ -28,7 +31,6 @@ class JsonWriter(BaseWriter):
         if self.schema is None:
             raise ValueError("schema is required for nested JSON mode")
 
-        out_dir = self._ensure_dir("json")
         written: dict[str, Path] = {}
         embedded: set[str] = set()
 
@@ -77,7 +79,9 @@ class JsonWriter(BaseWriter):
         for root in root_tables:
             df = datasets[root]
             records = embed(root, df.to_dict(orient="records"))
-            path = out_dir / f"{root}.json"
+            table_dir = self.output_dir / root
+            table_dir.mkdir(parents=True, exist_ok=True)
+            path = table_dir / f"{root}.json"
             with open(path, "w", encoding="utf-8") as f:
                 json.dump(records, f, ensure_ascii=False, indent=2, default=str)
             written[root] = path

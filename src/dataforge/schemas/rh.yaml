@@ -9,6 +9,7 @@ tables:
         primary_key: true
       name:
         dtype: str
+        choices: [Engineering, Sales, Marketing, Finance, HR, Operations, Legal, Customer Success, Product, Data, IT, Executive]
       code:
         dtype: str
       location:
@@ -27,10 +28,15 @@ tables:
         dtype: str
       level:
         dtype: str
+        choices: [intern, junior, pleno, senior, specialist, lead, coordinator, manager, director, VP, C-level]
       min_salary:
         dtype: float
+        min: 1500
+        max: 20000
       max_salary:
         dtype: float
+        min: 2000
+        max: 60000
 
   employees:
     rows: 300
@@ -51,8 +57,12 @@ tables:
         dtype: str
       birth_date:
         dtype: date
+        min: -45y
+        max: -18y
       hire_date:
         dtype: date
+        min: -10y
+        max: today
       termination_date:
         dtype: date
         nullable: 0.8
@@ -88,6 +98,8 @@ tables:
           column: id
       amount:
         dtype: float
+        min: 1500
+        max: 60000
       currency:
         dtype: currency
       effective_date:
@@ -104,11 +116,14 @@ tables:
         primary_key: true
       name:
         dtype: str
+        choices: [Health Insurance, Dental, Vision, Life Insurance, Meal Voucher, Transport Voucher, Gym, Home Office Allowance, Stock Options, Profit Sharing]
       description:
         dtype: text
         nullable: 0.2
       monthly_value:
         dtype: float
+        min: 50
+        max: 2000
 
   employee_benefits:
     rows: 600
@@ -145,12 +160,14 @@ tables:
           column: id
       type:
         dtype: str
+        choices: [vacation, sick, maternity, paternity, personal, bereavement, study]
       start_date:
         dtype: date
       end_date:
         dtype: date
       status:
         dtype: str
+        choices: [pending, approved, rejected, cancelled]
       approved_by:
         dtype: int
         foreign_key:
@@ -171,6 +188,8 @@ tables:
         nullable: 0.2
       duration_hours:
         dtype: int
+        min: 1
+        max: 80
       instructor:
         dtype: name
       scheduled_date:
@@ -199,4 +218,6 @@ tables:
         nullable: 0.4
       score:
         dtype: float
+        min: 0
+        max: 10
         nullable: 0.5

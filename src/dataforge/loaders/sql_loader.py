@@ -27,12 +27,13 @@ class SqlLoader:
     ):
         try:
             from sqlalchemy import create_engine, text
+
             self._text = text
-        except ImportError:
+        except ImportError as err:
             raise ImportError(
                 "sqlalchemy is required for SQL loading. "
                 "Install it with: pip install 'dataforge[sql]'"
-            )
+            ) from err
 
         self.engine = create_engine(db_url)
         self.if_exists = if_exists
