@@ -53,11 +53,27 @@ const cliRunnerPlugin = () => ({
             if (partitionBy) {
               args.push('--partition-by', partitionBy);
             }
+            // Resolve credentials from the fixed credentials/ folder
+            const credentialsDir = resolve(baseDir, 'credentials');
+            const extraEnv: Record<string, string> = {};
             if (uploadTarget) {
               args.push('--upload', uploadTarget);
               if (bucket) args.push('--bucket', bucket);
               if (prefix) args.push('--prefix', prefix);
-              if (credentials) args.push('--credentials', credentials);
+
+              if (existsSync(credentialsDir)) {
+                const credFiles = readdirSync(credentialsDir);
+                if (uploadTarget === 'gcs') {
+                  const jsonFile = credFiles.find(f => f.endsWith('.json'));
+                  if (jsonFile) args.push('--credentials', resolve(credentialsDir, jsonFile));
+                } else if (uploadTarget === 's3') {
+                  const awsFile = credFiles.find(f => f === 'credentials' || f.endsWith('.ini') || f.endsWith('.csv'));
+                  if (awsFile) extraEnv['AWS_SHARED_CREDENTIALS_FILE'] = resolve(credentialsDir, awsFile);
+                } else if (uploadTarget === 'azure') {
+                  const azFile = credFiles.find(f => f.endsWith('.txt') || f === 'connection_string');
+                  if (azFile) extraEnv['AZURE_STORAGE_CONNECTION_STRING'] = readFileSync(resolve(credentialsDir, azFile), 'utf-8').trim();
+                }
+              }
             }
             if (dbUrl) {
               args.push('--db-url', dbUrl);
@@ -73,13 +89,13 @@ const cliRunnerPlugin = () => ({
 
             const venvPath = resolve(baseDir, '.venv', 'Scripts', 'python.exe');
             const pyExec = existsSync(venvPath) ? venvPath : 'python';
-            
+
             console.log('Running python', [pyExec, ...args].join(' '));
 
             // Run process
-            const pythonProcess = spawn(pyExec, args, { 
-              cwd: baseDir, 
-              env: { ...process.env, PYTHONPATH: resolve(baseDir, 'src') } 
+            const pythonProcess = spawn(pyExec, args, {
+              cwd: baseDir,
+              env: { ...process.env, PYTHONPATH: resolve(baseDir, 'src'), ...extraEnv }
             });
             
             let output = '';
