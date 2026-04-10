@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pyenv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node
+src/dataforge/frontend/node_modules/
+src/dataforge/frontend/dist/
+
+# Output gerado
+output/
+
+# Git / IDE
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Claude
+.claude/
+
+# OS
+*.log
+.DS_Store
+Thumbs.db
