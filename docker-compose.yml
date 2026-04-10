@@ -14,8 +14,11 @@ services:
       - ./src/schemas:/app/src/schemas
       # Output persistido no host
       - ./output:/app/output
-      # Hot reload do código Python
+      # Hot reload do código Python e frontend
       - ./src/dataforge:/app/src/dataforge
+      # Volume anônimo protege o node_modules Linux instalado no build
+      # (impede que o mount acima sobrescreva com binários Windows do host)
+      - frontend_node_modules:/app/src/dataforge/frontend/node_modules
     environment:
       - PYTHONPATH=/app/src
     restart: unless-stopped
@@ -31,10 +34,14 @@ services:
       - ./src/schemas:/app/src/schemas
       - ./output:/app/output
       - ./src/dataforge:/app/src/dataforge
+      - cli_node_modules:/app/src/dataforge/frontend/node_modules
     environment:
       - PYTHONPATH=/app/src
-    # Sobrescreve o CMD padrão — não inicia servidor, aguarda comandos
     entrypoint: ["dataset-gen"]
     command: ["--help"]
     profiles:
       - cli
+
+volumes:
+  frontend_node_modules:
+  cli_node_modules:
