@@ -1,0 +1,11 @@
+domain: hr
+
+tables:
+  employees:
+    rows: 100
+  departments:
+    rows: 8
+  job_titles:
+    rows: 12
+  salaries:
+    rows: 100

@@ -1,0 +1,195 @@
+domain: manutencao
+
+tables:
+  assets:
+    rows: 200
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      tag:
+        dtype: str
+      name:
+        dtype: str
+      description:
+        dtype: text
+        nullable: 0.2
+      type:
+        dtype: str
+      manufacturer:
+        dtype: company
+      model:
+        dtype: str
+        nullable: 0.1
+      serial_number:
+        dtype: str
+      location:
+        dtype: str
+      purchase_date:
+        dtype: date
+        nullable: 0.3
+      purchase_value:
+        dtype: float
+        nullable: 0.3
+      active:
+        dtype: bool
+
+  technicians:
+    rows: 30
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      name:
+        dtype: name
+      email:
+        dtype: email
+      phone:
+        dtype: phone
+      specialization:
+        dtype: str
+      active:
+        dtype: bool
+
+  maintenance_types:
+    rows: 15
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      name:
+        dtype: str
+      description:
+        dtype: text
+        nullable: 0.3
+      is_preventive:
+        dtype: bool
+
+  work_orders:
+    rows: 800
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      code:
+        dtype: str
+      asset_id:
+        dtype: int
+        foreign_key:
+          table: assets
+          column: id
+      maintenance_type_id:
+        dtype: int
+        foreign_key:
+          table: maintenance_types
+          column: id
+      technician_id:
+        dtype: int
+        foreign_key:
+          table: technicians
+          column: id
+        nullable: 0.2
+      priority:
+        dtype: str
+      status:
+        dtype: str
+      description:
+        dtype: text
+      failure_description:
+        dtype: text
+        nullable: 0.5
+      requested_at:
+        dtype: date
+      scheduled_at:
+        dtype: date
+        nullable: 0.3
+      started_at:
+        dtype: date
+        nullable: 0.4
+      completed_at:
+        dtype: date
+        nullable: 0.5
+      estimated_hours:
+        dtype: float
+        nullable: 0.3
+      actual_hours:
+        dtype: float
+        nullable: 0.5
+      labor_cost:
+        dtype: float
+        nullable: 0.5
+      total_cost:
+        dtype: float
+        nullable: 0.5
+
+  parts:
+    rows: 300
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      code:
+        dtype: str
+      name:
+        dtype: str
+      description:
+        dtype: text
+        nullable: 0.3
+      unit:
+        dtype: str
+      stock_quantity:
+        dtype: int
+      min_stock:
+        dtype: int
+      unit_cost:
+        dtype: float
+      supplier:
+        dtype: company
+        nullable: 0.2
+
+  work_order_parts:
+    rows: 1200
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      work_order_id:
+        dtype: int
+        foreign_key:
+          table: work_orders
+          column: id
+      part_id:
+        dtype: int
+        foreign_key:
+          table: parts
+          column: id
+      quantity:
+        dtype: int
+      unit_cost:
+        dtype: float
+
+  preventive_plans:
+    rows: 100
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      asset_id:
+        dtype: int
+        foreign_key:
+          table: assets
+          column: id
+      maintenance_type_id:
+        dtype: int
+        foreign_key:
+          table: maintenance_types
+          column: id
+      frequency_days:
+        dtype: int
+      last_execution:
+        dtype: date
+        nullable: 0.3
+      next_execution:
+        dtype: date
+      active:
+        dtype: bool

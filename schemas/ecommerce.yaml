@@ -1,0 +1,15 @@
+domain: ecommerce
+
+# Override default row counts and column behaviour.
+# Only fields listed here are changed; everything else keeps the domain default.
+tables:
+  customers:
+    rows: 200
+  products:
+    rows: 50
+  orders:
+    rows: 500
+  order_items:
+    rows: 1500
+  categories:
+    rows: 10

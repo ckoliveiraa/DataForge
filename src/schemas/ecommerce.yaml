@@ -1,0 +1,167 @@
+domain: ecommerce
+
+tables:
+  categories:
+    rows: 20
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      name:
+        dtype: str
+      description:
+        dtype: text
+        nullable: 0.2
+      slug:
+        dtype: str
+
+  products:
+    rows: 200
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      name:
+        dtype: str
+      description:
+        dtype: text
+        nullable: 0.1
+      price:
+        dtype: float
+      stock_quantity:
+        dtype: int
+      sku:
+        dtype: str
+      weight_kg:
+        dtype: float
+        nullable: 0.3
+      category_id:
+        dtype: int
+        foreign_key:
+          table: categories
+          column: id
+      active:
+        dtype: bool
+      created_at:
+        dtype: date
+
+  customers:
+    rows: 500
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      name:
+        dtype: name
+      email:
+        dtype: email
+      phone:
+        dtype: phone
+        nullable: 0.1
+      city:
+        dtype: city
+      state:
+        dtype: str
+      country:
+        dtype: country
+      zip_code:
+        dtype: str
+        nullable: 0.2
+      created_at:
+        dtype: date
+
+  orders:
+    rows: 1000
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      customer_id:
+        dtype: int
+        foreign_key:
+          table: customers
+          column: id
+      status:
+        dtype: str
+      total_amount:
+        dtype: float
+      discount_amount:
+        dtype: float
+        nullable: 0.4
+      shipping_address:
+        dtype: text
+        nullable: 0.1
+      ordered_at:
+        dtype: date
+      delivered_at:
+        dtype: date
+        nullable: 0.3
+
+  order_items:
+    rows: 3000
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      order_id:
+        dtype: int
+        foreign_key:
+          table: orders
+          column: id
+      product_id:
+        dtype: int
+        foreign_key:
+          table: products
+          column: id
+      quantity:
+        dtype: int
+      unit_price:
+        dtype: float
+      discount_pct:
+        dtype: float
+        nullable: 0.5
+
+  payments:
+    rows: 1000
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      order_id:
+        dtype: int
+        foreign_key:
+          table: orders
+          column: id
+      method:
+        dtype: str
+      status:
+        dtype: str
+      amount:
+        dtype: float
+      paid_at:
+        dtype: date
+        nullable: 0.2
+
+  reviews:
+    rows: 800
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      product_id:
+        dtype: int
+        foreign_key:
+          table: products
+          column: id
+      customer_id:
+        dtype: int
+        foreign_key:
+          table: customers
+          column: id
+      rating:
+        dtype: int
+      comment:
+        dtype: text
+        nullable: 0.4
+      created_at:
+        dtype: date

@@ -1,0 +1,36 @@
+domain: custom
+
+# Full custom schema example — no base domain is used.
+tables:
+  authors:
+    rows: 50
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      name:
+        dtype: name
+      email:
+        dtype: email
+      country:
+        dtype: country
+
+  books:
+    rows: 200
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      title:
+        dtype: str
+      genre:
+        dtype: str
+      price:
+        dtype: float
+      published_at:
+        dtype: date
+      author_id:
+        dtype: int
+        foreign_key:
+          table: authors
+          column: id

@@ -1,0 +1,202 @@
+domain: hr
+
+tables:
+  departments:
+    rows: 12
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      name:
+        dtype: str
+      code:
+        dtype: str
+      location:
+        dtype: city
+      cost_center:
+        dtype: str
+        nullable: 0.2
+
+  job_titles:
+    rows: 30
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      title:
+        dtype: str
+      level:
+        dtype: str
+      min_salary:
+        dtype: float
+      max_salary:
+        dtype: float
+
+  employees:
+    rows: 300
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      first_name:
+        dtype: name
+      last_name:
+        dtype: name
+      email:
+        dtype: email
+      phone:
+        dtype: phone
+        nullable: 0.1
+      cpf:
+        dtype: str
+      birth_date:
+        dtype: date
+      hire_date:
+        dtype: date
+      termination_date:
+        dtype: date
+        nullable: 0.8
+      department_id:
+        dtype: int
+        foreign_key:
+          table: departments
+          column: id
+      job_title_id:
+        dtype: int
+        foreign_key:
+          table: job_titles
+          column: id
+      manager_id:
+        dtype: int
+        foreign_key:
+          table: employees
+          column: id
+        nullable: 0.15
+      active:
+        dtype: bool
+
+  salaries:
+    rows: 400
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      employee_id:
+        dtype: int
+        foreign_key:
+          table: employees
+          column: id
+      amount:
+        dtype: float
+      currency:
+        dtype: currency
+      effective_date:
+        dtype: date
+      end_date:
+        dtype: date
+        nullable: 0.3
+
+  benefits:
+    rows: 20
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      name:
+        dtype: str
+      description:
+        dtype: text
+        nullable: 0.2
+      monthly_value:
+        dtype: float
+
+  employee_benefits:
+    rows: 600
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      employee_id:
+        dtype: int
+        foreign_key:
+          table: employees
+          column: id
+      benefit_id:
+        dtype: int
+        foreign_key:
+          table: benefits
+          column: id
+      start_date:
+        dtype: date
+      end_date:
+        dtype: date
+        nullable: 0.5
+
+  leave_requests:
+    rows: 500
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      employee_id:
+        dtype: int
+        foreign_key:
+          table: employees
+          column: id
+      type:
+        dtype: str
+      start_date:
+        dtype: date
+      end_date:
+        dtype: date
+      status:
+        dtype: str
+      approved_by:
+        dtype: int
+        foreign_key:
+          table: employees
+          column: id
+        nullable: 0.3
+
+  trainings:
+    rows: 50
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      title:
+        dtype: str
+      description:
+        dtype: text
+        nullable: 0.2
+      duration_hours:
+        dtype: int
+      instructor:
+        dtype: name
+      scheduled_date:
+        dtype: date
+
+  employee_trainings:
+    rows: 800
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      employee_id:
+        dtype: int
+        foreign_key:
+          table: employees
+          column: id
+      training_id:
+        dtype: int
+        foreign_key:
+          table: trainings
+          column: id
+      completed:
+        dtype: bool
+      completion_date:
+        dtype: date
+        nullable: 0.4
+      score:
+        dtype: float
+        nullable: 0.5

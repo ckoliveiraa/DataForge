@@ -1,0 +1,218 @@
+domain: acoes
+
+tables:
+  companies:
+    rows: 100
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      ticker:
+        dtype: str
+      name:
+        dtype: company
+      sector:
+        dtype: str
+      industry:
+        dtype: str
+      exchange:
+        dtype: str
+      country:
+        dtype: country
+      currency:
+        dtype: currency
+      market_cap:
+        dtype: float
+        nullable: 0.1
+      ipo_date:
+        dtype: date
+        nullable: 0.2
+      active:
+        dtype: bool
+
+  stock_prices:
+    rows: 50000
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      company_id:
+        dtype: int
+        foreign_key:
+          table: companies
+          column: id
+      date:
+        dtype: date
+      open_price:
+        dtype: float
+      high_price:
+        dtype: float
+      low_price:
+        dtype: float
+      close_price:
+        dtype: float
+      adj_close:
+        dtype: float
+      volume:
+        dtype: int
+
+  portfolios:
+    rows: 50
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      name:
+        dtype: str
+      owner_name:
+        dtype: name
+      description:
+        dtype: text
+        nullable: 0.4
+      created_at:
+        dtype: date
+      currency:
+        dtype: currency
+
+  positions:
+    rows: 500
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      portfolio_id:
+        dtype: int
+        foreign_key:
+          table: portfolios
+          column: id
+      company_id:
+        dtype: int
+        foreign_key:
+          table: companies
+          column: id
+      quantity:
+        dtype: int
+      avg_cost:
+        dtype: float
+      current_price:
+        dtype: float
+      current_value:
+        dtype: float
+      unrealized_pnl:
+        dtype: float
+      updated_at:
+        dtype: date
+
+  trades:
+    rows: 2000
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      portfolio_id:
+        dtype: int
+        foreign_key:
+          table: portfolios
+          column: id
+      company_id:
+        dtype: int
+        foreign_key:
+          table: companies
+          column: id
+      type:
+        dtype: str
+      quantity:
+        dtype: int
+      price:
+        dtype: float
+      total_amount:
+        dtype: float
+      fees:
+        dtype: float
+        nullable: 0.2
+      traded_at:
+        dtype: date
+      broker:
+        dtype: str
+        nullable: 0.3
+
+  dividends:
+    rows: 1000
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      company_id:
+        dtype: int
+        foreign_key:
+          table: companies
+          column: id
+      type:
+        dtype: str
+      amount_per_share:
+        dtype: float
+      ex_date:
+        dtype: date
+      payment_date:
+        dtype: date
+      currency:
+        dtype: currency
+
+  portfolio_dividends:
+    rows: 800
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      portfolio_id:
+        dtype: int
+        foreign_key:
+          table: portfolios
+          column: id
+      dividend_id:
+        dtype: int
+        foreign_key:
+          table: dividends
+          column: id
+      shares_held:
+        dtype: int
+      total_received:
+        dtype: float
+
+  company_financials:
+    rows: 400
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      company_id:
+        dtype: int
+        foreign_key:
+          table: companies
+          column: id
+      period:
+        dtype: str
+      year:
+        dtype: int
+      quarter:
+        dtype: int
+        nullable: 0.5
+      revenue:
+        dtype: float
+      net_income:
+        dtype: float
+      ebitda:
+        dtype: float
+        nullable: 0.2
+      total_assets:
+        dtype: float
+      total_debt:
+        dtype: float
+      equity:
+        dtype: float
+      eps:
+        dtype: float
+        nullable: 0.2
+      pe_ratio:
+        dtype: float
+        nullable: 0.3

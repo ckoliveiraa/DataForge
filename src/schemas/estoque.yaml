@@ -1,0 +1,225 @@
+domain: estoque
+
+tables:
+  warehouses:
+    rows: 10
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      name:
+        dtype: str
+      code:
+        dtype: str
+      address:
+        dtype: text
+      city:
+        dtype: city
+      active:
+        dtype: bool
+
+  locations:
+    rows: 200
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      warehouse_id:
+        dtype: int
+        foreign_key:
+          table: warehouses
+          column: id
+      aisle:
+        dtype: str
+      rack:
+        dtype: str
+      shelf:
+        dtype: str
+      active:
+        dtype: bool
+
+  suppliers:
+    rows: 80
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      name:
+        dtype: company
+      document:
+        dtype: str
+      contact_name:
+        dtype: name
+        nullable: 0.3
+      email:
+        dtype: email
+      phone:
+        dtype: phone
+      city:
+        dtype: city
+      country:
+        dtype: country
+      active:
+        dtype: bool
+
+  item_categories:
+    rows: 25
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      name:
+        dtype: str
+      parent_id:
+        dtype: int
+        foreign_key:
+          table: item_categories
+          column: id
+        nullable: 0.6
+
+  items:
+    rows: 500
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      code:
+        dtype: str
+      name:
+        dtype: str
+      description:
+        dtype: text
+        nullable: 0.2
+      category_id:
+        dtype: int
+        foreign_key:
+          table: item_categories
+          column: id
+      unit:
+        dtype: str
+      min_stock:
+        dtype: int
+      max_stock:
+        dtype: int
+        nullable: 0.4
+      reorder_point:
+        dtype: int
+      unit_cost:
+        dtype: float
+      active:
+        dtype: bool
+
+  stock_balances:
+    rows: 1000
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      item_id:
+        dtype: int
+        foreign_key:
+          table: items
+          column: id
+      warehouse_id:
+        dtype: int
+        foreign_key:
+          table: warehouses
+          column: id
+      location_id:
+        dtype: int
+        foreign_key:
+          table: locations
+          column: id
+        nullable: 0.3
+      quantity:
+        dtype: int
+      updated_at:
+        dtype: date
+
+  purchase_orders:
+    rows: 300
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      code:
+        dtype: str
+      supplier_id:
+        dtype: int
+        foreign_key:
+          table: suppliers
+          column: id
+      status:
+        dtype: str
+      total_amount:
+        dtype: float
+      ordered_at:
+        dtype: date
+      expected_delivery:
+        dtype: date
+        nullable: 0.3
+      received_at:
+        dtype: date
+        nullable: 0.5
+      notes:
+        dtype: text
+        nullable: 0.6
+
+  purchase_order_items:
+    rows: 800
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      purchase_order_id:
+        dtype: int
+        foreign_key:
+          table: purchase_orders
+          column: id
+      item_id:
+        dtype: int
+        foreign_key:
+          table: items
+          column: id
+      quantity_ordered:
+        dtype: int
+      quantity_received:
+        dtype: int
+        nullable: 0.4
+      unit_cost:
+        dtype: float
+
+  stock_movements:
+    rows: 3000
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      item_id:
+        dtype: int
+        foreign_key:
+          table: items
+          column: id
+      warehouse_id:
+        dtype: int
+        foreign_key:
+          table: warehouses
+          column: id
+      type:
+        dtype: str
+      quantity:
+        dtype: int
+      unit_cost:
+        dtype: float
+        nullable: 0.3
+      reference_type:
+        dtype: str
+        nullable: 0.4
+      reference_id:
+        dtype: int
+        nullable: 0.4
+      moved_at:
+        dtype: date
+      notes:
+        dtype: text
+        nullable: 0.7

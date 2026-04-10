@@ -1,0 +1,228 @@
+domain: frota
+
+tables:
+  vehicles:
+    rows: 100
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      plate:
+        dtype: str
+      renavam:
+        dtype: str
+      chassis:
+        dtype: str
+      brand:
+        dtype: str
+      model:
+        dtype: str
+      year:
+        dtype: int
+      color:
+        dtype: str
+      type:
+        dtype: str
+      fuel_type:
+        dtype: str
+      capacity_kg:
+        dtype: float
+        nullable: 0.4
+      odometer_km:
+        dtype: float
+      status:
+        dtype: str
+      active:
+        dtype: bool
+      acquisition_date:
+        dtype: date
+      acquisition_value:
+        dtype: float
+        nullable: 0.3
+
+  drivers:
+    rows: 60
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      name:
+        dtype: name
+      cpf:
+        dtype: str
+      cnh_number:
+        dtype: str
+      cnh_category:
+        dtype: str
+      cnh_expiry:
+        dtype: date
+      phone:
+        dtype: phone
+      email:
+        dtype: email
+        nullable: 0.2
+      active:
+        dtype: bool
+
+  trips:
+    rows: 2000
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      vehicle_id:
+        dtype: int
+        foreign_key:
+          table: vehicles
+          column: id
+      driver_id:
+        dtype: int
+        foreign_key:
+          table: drivers
+          column: id
+      origin:
+        dtype: city
+      destination:
+        dtype: city
+      purpose:
+        dtype: str
+      odometer_start:
+        dtype: float
+      odometer_end:
+        dtype: float
+        nullable: 0.2
+      distance_km:
+        dtype: float
+        nullable: 0.2
+      departure_at:
+        dtype: date
+      arrival_at:
+        dtype: date
+        nullable: 0.3
+      status:
+        dtype: str
+      notes:
+        dtype: text
+        nullable: 0.6
+
+  fuel_records:
+    rows: 1500
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      vehicle_id:
+        dtype: int
+        foreign_key:
+          table: vehicles
+          column: id
+      driver_id:
+        dtype: int
+        foreign_key:
+          table: drivers
+          column: id
+      fuel_type:
+        dtype: str
+      liters:
+        dtype: float
+      price_per_liter:
+        dtype: float
+      total_cost:
+        dtype: float
+      odometer_km:
+        dtype: float
+      station_name:
+        dtype: company
+        nullable: 0.3
+      fueled_at:
+        dtype: date
+
+  vehicle_maintenances:
+    rows: 500
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      vehicle_id:
+        dtype: int
+        foreign_key:
+          table: vehicles
+          column: id
+      type:
+        dtype: str
+      description:
+        dtype: text
+      odometer_km:
+        dtype: float
+      cost:
+        dtype: float
+      supplier:
+        dtype: company
+        nullable: 0.3
+      performed_at:
+        dtype: date
+      next_due_km:
+        dtype: float
+        nullable: 0.5
+      next_due_date:
+        dtype: date
+        nullable: 0.5
+
+  vehicle_documents:
+    rows: 200
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      vehicle_id:
+        dtype: int
+        foreign_key:
+          table: vehicles
+          column: id
+      type:
+        dtype: str
+      document_number:
+        dtype: str
+        nullable: 0.2
+      issue_date:
+        dtype: date
+      expiry_date:
+        dtype: date
+        nullable: 0.3
+      cost:
+        dtype: float
+        nullable: 0.4
+      status:
+        dtype: str
+
+  fines:
+    rows: 200
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      vehicle_id:
+        dtype: int
+        foreign_key:
+          table: vehicles
+          column: id
+      driver_id:
+        dtype: int
+        foreign_key:
+          table: drivers
+          column: id
+        nullable: 0.3
+      infraction_code:
+        dtype: str
+      description:
+        dtype: text
+      amount:
+        dtype: float
+      points:
+        dtype: int
+      infraction_date:
+        dtype: date
+      due_date:
+        dtype: date
+      status:
+        dtype: str

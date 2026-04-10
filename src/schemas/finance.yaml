@@ -1,0 +1,179 @@
+domain: finance
+
+tables:
+  accounts:
+    rows: 500
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      account_number:
+        dtype: str
+      name:
+        dtype: str
+      type:
+        dtype: str
+      currency:
+        dtype: currency
+      balance:
+        dtype: float
+      active:
+        dtype: bool
+      created_at:
+        dtype: date
+
+  cost_centers:
+    rows: 20
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      code:
+        dtype: str
+      name:
+        dtype: str
+      description:
+        dtype: text
+        nullable: 0.3
+
+  budget_categories:
+    rows: 30
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      name:
+        dtype: str
+      type:
+        dtype: str
+      parent_id:
+        dtype: int
+        foreign_key:
+          table: budget_categories
+          column: id
+        nullable: 0.5
+
+  transactions:
+    rows: 5000
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      account_id:
+        dtype: int
+        foreign_key:
+          table: accounts
+          column: id
+      category_id:
+        dtype: int
+        foreign_key:
+          table: budget_categories
+          column: id
+        nullable: 0.2
+      cost_center_id:
+        dtype: int
+        foreign_key:
+          table: cost_centers
+          column: id
+        nullable: 0.3
+      type:
+        dtype: str
+      amount:
+        dtype: float
+      description:
+        dtype: text
+        nullable: 0.2
+      reference:
+        dtype: str
+        nullable: 0.4
+      transaction_date:
+        dtype: date
+      due_date:
+        dtype: date
+        nullable: 0.3
+      paid_at:
+        dtype: date
+        nullable: 0.4
+      status:
+        dtype: str
+
+  invoices:
+    rows: 1000
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      invoice_number:
+        dtype: str
+      type:
+        dtype: str
+      issuer_name:
+        dtype: name
+      issuer_document:
+        dtype: str
+      recipient_name:
+        dtype: name
+      recipient_document:
+        dtype: str
+      gross_amount:
+        dtype: float
+      tax_amount:
+        dtype: float
+      net_amount:
+        dtype: float
+      issue_date:
+        dtype: date
+      due_date:
+        dtype: date
+      status:
+        dtype: str
+
+  budgets:
+    rows: 200
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      cost_center_id:
+        dtype: int
+        foreign_key:
+          table: cost_centers
+          column: id
+      category_id:
+        dtype: int
+        foreign_key:
+          table: budget_categories
+          column: id
+      year:
+        dtype: int
+      month:
+        dtype: int
+      planned_amount:
+        dtype: float
+      actual_amount:
+        dtype: float
+        nullable: 0.3
+
+  tax_records:
+    rows: 300
+    columns:
+      id:
+        dtype: int_seq
+        primary_key: true
+      tax_type:
+        dtype: str
+      reference_period:
+        dtype: str
+      base_amount:
+        dtype: float
+      tax_rate:
+        dtype: float
+      tax_amount:
+        dtype: float
+      due_date:
+        dtype: date
+      paid_at:
+        dtype: date
+        nullable: 0.4
+      status:
+        dtype: str
