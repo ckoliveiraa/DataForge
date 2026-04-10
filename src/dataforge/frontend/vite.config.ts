@@ -176,6 +176,8 @@ const cliRunnerPlugin = () => ({
 export default defineConfig({
   plugins: [react(), cliRunnerPlugin()],
   server: {
+    host: '0.0.0.0',  // Required for Docker
+    port: 5173,
     fs: {
       allow: ['../schemas', '.']
     }

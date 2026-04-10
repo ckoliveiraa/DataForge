@@ -1,0 +1,47 @@
+services:
+
+  # ── Frontend + CLI integrado ──────────────────────────────────────────────
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dataforge-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      # Schemas editáveis sem rebuild
+      - ./schemas:/app/schemas
+      - ./src/schemas:/app/src/schemas
+      # Output persistido no host
+      - ./output:/app/output
+      # Hot reload do código Python e frontend
+      - ./src/dataforge:/app/src/dataforge
+      # Volume anônimo protege o node_modules Linux instalado no build
+      # (impede que o mount acima sobrescreva com binários Windows do host)
+      - frontend_node_modules:/app/src/dataforge/frontend/node_modules
+    environment:
+      - PYTHONPATH=/app/src
+    restart: unless-stopped
+
+  # ── CLI standalone (uso via docker compose run) ───────────────────────────
+  cli:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dataforge-cli
+    volumes:
+      - ./schemas:/app/schemas
+      - ./src/schemas:/app/src/schemas
+      - ./output:/app/output
+      - ./src/dataforge:/app/src/dataforge
+      - cli_node_modules:/app/src/dataforge/frontend/node_modules
+    environment:
+      - PYTHONPATH=/app/src
+    entrypoint: ["dataset-gen"]
+    command: ["--help"]
+    profiles:
+      - cli
+
+volumes:
+  frontend_node_modules:
+  cli_node_modules:
