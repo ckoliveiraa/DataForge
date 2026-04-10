@@ -72,20 +72,10 @@ jobs:
           if [ -n "$EXISTING" ]; then
             echo "PR #$EXISTING already exists for $BRANCH — skipping."
           else
-            BODY="## Automated PR
-
-Opened automatically after CI passed on \`${BRANCH}\`.
-
-**Commit:** ${SHA}
-
-### Checklist
-- [x] Lint passed
-- [x] Tests passed
-- [ ] Manual review"
-
+            printf '## Automated PR\n\nOpened automatically after CI passed on `%s`.\n\n**Commit:** %s\n\n### Checklist\n- [x] Lint passed\n- [x] Tests passed\n- [ ] Manual review\n' "$BRANCH" "$SHA" > /tmp/pr_body.md
             gh pr create \
               --base main \
               --head "$BRANCH" \
               --title "feat: merge ${BRANCH} into main" \
-              --body "$BODY"
+              --body-file /tmp/pr_body.md
           fi
