@@ -7,7 +7,7 @@ RANGE_SUPPORTED_DTYPES = {"int", "float", "date"}
 
 FAKER_REGISTRY: dict[str, callable] = {
     "uuid": lambda f, n, **kw: [f.uuid4() for _ in range(n)],
-    "int_seq": lambda f, n, **kw: list(range(1, n + 1)),
+    "int_seq": lambda f, n, seq_start=1, **kw: list(range(seq_start, seq_start + n)),
     "int": lambda f, n, min_value=0, max_value=100_000, **kw: [
         f.random_int(min=int(min_value), max=int(max_value)) for _ in range(n)
     ],
@@ -49,6 +49,7 @@ def generate_column(
     n: int,
     min_value=None,
     max_value=None,
+    seq_start: int = 1,
 ) -> list:
     if faker_provider:
         provider_fn = getattr(faker_instance, faker_provider, None)
@@ -57,9 +58,11 @@ def generate_column(
     fn = FAKER_REGISTRY.get(dtype)
     if fn is None:
         raise ValueError(f"Unknown dtype '{dtype}'. Available: {list(FAKER_REGISTRY)}")
-    kwargs = {}
+    kwargs: dict = {}
     if min_value is not None:
         kwargs["min_value"] = min_value
     if max_value is not None:
         kwargs["max_value"] = max_value
+    if dtype == "int_seq":
+        kwargs["seq_start"] = seq_start
     return fn(faker_instance, n, **kwargs)

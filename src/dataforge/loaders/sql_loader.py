@@ -40,6 +40,10 @@ class SqlLoader:
         self.schema = schema
         self.chunksize = chunksize
 
+        if schema:
+            with self.engine.begin() as conn:
+                conn.execute(text(f'CREATE SCHEMA IF NOT EXISTS "{schema}"'))
+
     def load(self, name: str, df: pd.DataFrame) -> str:
         """Insere o DataFrame na tabela `name`. Retorna mensagem de confirmação."""
         df.to_sql(

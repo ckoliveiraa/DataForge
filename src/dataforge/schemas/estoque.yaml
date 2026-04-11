@@ -9,8 +9,10 @@ tables:
         primary_key: true
       name:
         dtype: str
+        faker_provider: company
       code:
         dtype: str
+        faker_provider: bothify
       address:
         dtype: text
       city:
@@ -34,8 +36,10 @@ tables:
         choices: [A, B, C, D, E, F, G, H]
       rack:
         dtype: str
+        choices: ["01", "02", "03", "04", "05", "06", "07", "08", "09", "10"]
       shelf:
         dtype: str
+        choices: [A1, A2, B1, B2, C1, C2, D1, D2]
       active:
         dtype: bool
 
@@ -49,6 +53,7 @@ tables:
         dtype: company
       document:
         dtype: str
+        faker_provider: bothify
       contact_name:
         dtype: name
         nullable: 0.3
@@ -87,8 +92,10 @@ tables:
         primary_key: true
       code:
         dtype: str
+        faker_provider: bothify
       name:
         dtype: str
+        faker_provider: catch_phrase
       description:
         dtype: text
         nullable: 0.2
@@ -157,6 +164,7 @@ tables:
         primary_key: true
       code:
         dtype: str
+        faker_provider: bothify
       supplier_id:
         dtype: int
         foreign_key:

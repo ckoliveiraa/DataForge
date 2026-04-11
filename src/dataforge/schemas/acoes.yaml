@@ -9,6 +9,7 @@ tables:
         primary_key: true
       ticker:
         dtype: str
+        faker_provider: lexify
       name:
         dtype: company
       sector:
@@ -16,6 +17,7 @@ tables:
         choices: [Technology, Finance, Healthcare, Energy, Consumer Goods, Industrials, Materials, Real Estate, Utilities, Telecom, Agriculture]
       industry:
         dtype: str
+        choices: [Software, Banking, Pharmaceuticals, Oil & Gas, Retail, Semiconductors, Aerospace, Mining, Insurance, Automotive, Telecom Services, Food & Beverage]
       exchange:
         dtype: str
         choices: [B3, NYSE, NASDAQ, LSE, HKEX, TSX, ASX, Euronext]
@@ -82,6 +84,7 @@ tables:
         primary_key: true
       name:
         dtype: str
+        faker_provider: catch_phrase
       owner_name:
         dtype: name
       description:

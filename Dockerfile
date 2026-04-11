@@ -7,14 +7,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Instala o build backend que o pyproject.toml exige
+# Instala o build backend exigido pelo pyproject.toml
 RUN pip install --no-cache-dir --upgrade pip "poetry-core>=2.0.0,<3.0.0"
 
-# Copia apenas o necessário para resolver dependências
-COPY pyproject.toml poetry.lock README.md ./
+# Copia apenas o necessário para instalar dependências (aproveita cache de layer)
+COPY pyproject.toml README.md ./
 COPY src/ ./src/
 
-# Instala o pacote e todos os extras necessários
+# Instala o pacote com todos os extras necessários
 RUN pip install --no-cache-dir ".[parquet,avro,sql,postgres,gcp,aws,azure]"
 
 
@@ -29,24 +29,27 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl \
     && apt-get install -y --no-install-recommends nodejs \
     && rm -rf /var/lib/apt/lists/*
 
-# ── Copia pacotes Python instalados do stage anterior ──
+# Copia pacotes Python e entry-point do stage de build
 COPY --from=python-build /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=python-build /usr/local/bin/dataset-gen /usr/local/bin/dataset-gen
 
-# ── Source Python ──
+# Copia código-fonte Python, schemas e pyproject.toml (lido pelo vite.config.ts)
 COPY src/ ./src/
-COPY schemas/ ./schemas/
+COPY pyproject.toml ./
 
-# ── Frontend: instala dependências (cache de layer) ──
-# Usa npm install (não npm ci) para resolver binários nativos corretos para Linux
+# Frontend: instala dependências em layer separado (cache)
+# Usa npm install em vez de npm ci para gerar binários nativos Linux corretamente
 COPY src/dataforge/frontend/package.json ./src/dataforge/frontend/
 RUN npm install --prefix src/dataforge/frontend
 
-# ── Frontend: restante dos arquivos ──
-COPY src/dataforge/frontend/ ./src/dataforge/frontend/
+# Frontend: copia o restante dos arquivos (sem sobrescrever node_modules)
+COPY src/dataforge/frontend/index.html ./src/dataforge/frontend/
+COPY src/dataforge/frontend/vite.config.ts ./src/dataforge/frontend/
+COPY src/dataforge/frontend/tsconfig*.json ./src/dataforge/frontend/
+COPY src/dataforge/frontend/src/ ./src/dataforge/frontend/src/
 
 # Pasta de output persistida via volume
-RUN mkdir -p /app/output
+RUN mkdir -p /app/output /app/credentials
 
 EXPOSE 5173
 

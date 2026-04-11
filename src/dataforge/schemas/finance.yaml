@@ -9,8 +9,10 @@ tables:
         primary_key: true
       account_number:
         dtype: str
+        faker_provider: bban
       name:
         dtype: str
+        faker_provider: catch_phrase
       type:
         dtype: str
         choices: [checking, savings, investment, credit, escrow]
@@ -33,8 +35,10 @@ tables:
         primary_key: true
       code:
         dtype: str
+        faker_provider: bothify
       name:
         dtype: str
+        faker_provider: catch_phrase
       description:
         dtype: text
         nullable: 0.3
@@ -47,6 +51,7 @@ tables:
         primary_key: true
       name:
         dtype: str
+        faker_provider: catch_phrase
       type:
         dtype: str
         choices: [revenue, expense, investment, transfer]
@@ -92,6 +97,7 @@ tables:
         nullable: 0.2
       reference:
         dtype: str
+        faker_provider: bothify
         nullable: 0.4
       transaction_date:
         dtype: date
@@ -113,6 +119,7 @@ tables:
         primary_key: true
       invoice_number:
         dtype: str
+        faker_provider: bothify
       type:
         dtype: str
         choices: [NF-e, NFS-e, CT-e, NF, MDF-e]
@@ -120,10 +127,12 @@ tables:
         dtype: name
       issuer_document:
         dtype: str
+        faker_provider: bothify
       recipient_name:
         dtype: name
       recipient_document:
         dtype: str
+        faker_provider: bothify
       gross_amount:
         dtype: float
         min: 1
@@ -189,6 +198,7 @@ tables:
         choices: [IRPJ, CSLL, PIS, COFINS, ISS, ICMS, IOF, IPI, IRRF]
       reference_period:
         dtype: str
+        choices: ["2023-01", "2023-02", "2023-03", "2023-04", "2023-05", "2023-06", "2023-07", "2023-08", "2023-09", "2023-10", "2023-11", "2023-12", "2024-01", "2024-02", "2024-03", "2024-04", "2024-05", "2024-06", "2024-07", "2024-08", "2024-09", "2024-10", "2024-11", "2024-12"]
       base_amount:
         dtype: float
         min: 1000

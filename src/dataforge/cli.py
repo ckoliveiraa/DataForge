@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import sys
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import click
@@ -85,6 +85,69 @@ def _write_df_direct(df, fmt: str, dest: Path, json_mode: str = "flat") -> None:
             fastavro.writer(f, schema, records)
 
 
+def _parse_increments(specs: tuple[str, ...]) -> list[dict]:
+    """Parse '--increment table:column:step[:unit]' specs.
+    unit: days (default) | hours | weeks | months | years | value (numeric)
+    """
+    result = []
+    for spec in specs:
+        parts = spec.split(":")
+        if len(parts) < 3:
+            raise click.UsageError(
+                f"Invalid --increment '{spec}'. Expected: table:column:step[:unit]"
+            )
+        table, column, step_str = parts[0].strip(), parts[1].strip(), parts[2].strip()
+        unit = parts[3].strip() if len(parts) > 3 else "days"
+        try:
+            step = float(step_str)
+        except ValueError:
+            raise click.UsageError(f"Invalid step '{step_str}' in --increment '{spec}'.") from None
+        result.append({"table": table, "column": column, "step": step, "unit": unit})
+    return result
+
+
+def _apply_increments(datasets: dict, increments: list[dict], batch_index: int) -> dict:
+    """Shift column values by step * batch_index for each increment spec."""
+    import pandas as pd
+
+    for inc in increments:
+        table, column, step, unit = inc["table"], inc["column"], inc["step"], inc["unit"]
+        if table not in datasets or column not in datasets[table].columns:
+            continue
+        df = datasets[table]
+        offset = step * batch_index
+
+        if unit == "value":
+            df[column] = pd.to_numeric(df[column], errors="coerce") + offset
+        else:
+            td_kwargs: dict = {
+                "days": {"days": offset},
+                "hours": {"hours": offset},
+                "weeks": {"weeks": offset},
+                "months": {"days": round(offset * 30.44)},
+                "years": {"days": round(offset * 365.25)},
+            }.get(unit, {"days": offset})
+            delta = timedelta(**td_kwargs)
+            df[column] = pd.to_datetime(df[column], errors="coerce") + delta
+            df[column] = df[column].dt.strftime("%Y-%m-%d")
+
+        datasets[table] = df
+    return datasets
+
+
+def _parse_partition_by(partition_by: tuple[str, ...]) -> dict[str, str]:
+    """Converte lista de 'table:column' ou 'column' em {table: column}.
+    Entradas sem ':' aplicam a coluna a todas as tabelas (chave '*')."""
+    result: dict[str, str] = {}
+    for spec in partition_by:
+        if ":" in spec:
+            table, col = spec.split(":", 1)
+            result[table.strip()] = col.strip()
+        else:
+            result["*"] = spec.strip()
+    return result
+
+
 def _write_batch(
     datasets: dict,
     formats: tuple[str, ...],
@@ -93,10 +156,10 @@ def _write_batch(
     schema,
     batch: int,
     recurrence: bool,
-    partition_by: str | None = None,
+    partition_map: dict[str, str] | None = None,
 ) -> list[tuple[Path, str]]:
     """Escreve um batch de datasets. Retorna lista de (local_path, remote_sub) onde
-    remote_sub é o caminho relativo ao prefix: 'table_name/[col=val/]filename.ext'."""
+    remote_sub é o caminho relativo ao prefix: 'dataset/table_name/[col=val/]filename.ext'."""
     written: list[tuple[Path, str]] = []
 
     for fmt in set(formats):
@@ -112,30 +175,33 @@ def _write_batch(
                 written.append((path, f"{schema.name}/{name}/{path.name}"))
 
         elif fmt == "json" and recurrence and batch > 1:
-            _append_json_flat(datasets, out_path, schema.name)
-            for name in datasets:
-                path = out_path / schema.name / name / f"{name}.json"
-                written.append((path, f"{schema.name}/{name}/{path.name}"))
+            paths = _append_json_flat(datasets, out_path, schema.name, partition_map)
+            for p, remote_sub in paths:
+                written.append((p, remote_sub))
 
         elif fmt == "csv" and recurrence and batch > 1:
-            _append_csv(datasets, out_path, schema.name)
-            for name in datasets:
-                path = out_path / schema.name / name / f"{name}.csv"
-                written.append((path, f"{schema.name}/{name}/{path.name}"))
+            paths = _append_csv(datasets, out_path, schema.name, partition_map)
+            for p, remote_sub in paths:
+                written.append((p, remote_sub))
 
         else:
             ts = datetime.now().strftime("%Y%m%d_%H%M%S")
 
             for name, df in datasets.items():
+                # Resolve coluna de partição para esta tabela
+                partition_by = None
+                if partition_map:
+                    partition_by = partition_map.get(name) or partition_map.get("*")
+
                 if partition_by and partition_by in df.columns:
                     # Escrita particionada: uma subpasta por valor da coluna
+                    appendable = fmt in ("csv", "json")
                     for val, group in df.groupby(partition_by):
                         safe_val = str(val).replace("/", "-").replace(" ", "_")
-                        filename = (
-                            f"{name}{ext}"
-                            if not (recurrence and batch > 1)
-                            else f"{name}_{ts}{ext}"
-                        )
+                        if recurrence and not appendable:
+                            filename = f"{name}_{ts}{ext}"
+                        else:
+                            filename = f"{name}{ext}"
                         dest = (
                             out_path / schema.name / name / f"{partition_by}={safe_val}" / filename
                         )
@@ -145,9 +211,13 @@ def _write_batch(
                         written.append((dest, remote_sub))
                 else:
                     # Escrita normal: pasta por tabela
-                    filename = (
-                        f"{name}{ext}" if not (recurrence and batch > 1) else f"{name}_{ts}{ext}"
-                    )
+                    # CSV/JSON: mesmo nome (batch 1 cria, batch 2+ não chega aqui — vai p/ append)
+                    # Parquet/Avro: sempre timestamp em recorrência para não sobrescrever batch anterior
+                    appendable = fmt in ("csv", "json")
+                    if recurrence and not appendable:
+                        filename = f"{name}_{ts}{ext}"
+                    else:
+                        filename = f"{name}{ext}"
                     dest = out_path / schema.name / name / filename
                     _write_df_direct(df, fmt, dest, json_mode)
                     remote_sub = f"{schema.name}/{name}/{filename}"
@@ -157,23 +227,70 @@ def _write_batch(
     return written
 
 
-def _append_csv(datasets: dict, out_path: Path, dataset_name: str) -> None:
+def _append_csv(
+    datasets: dict,
+    out_path: Path,
+    dataset_name: str,
+    partition_map: dict[str, str] | None = None,
+) -> list[tuple[Path, str]]:
+    written: list[tuple[Path, str]] = []
     for name, df in datasets.items():
-        table_dir = out_path / dataset_name / name
-        table_dir.mkdir(parents=True, exist_ok=True)
-        path = table_dir / f"{name}.csv"
-        df.to_csv(path, mode="a", index=False, header=not path.exists())
-        click.echo(f"  [csv/append] {path} (+{len(df)} rows)")
+        partition_by = (
+            (partition_map.get(name) or partition_map.get("*")) if partition_map else None
+        )
+        if partition_by and partition_by in df.columns:
+            for val, group in df.groupby(partition_by):
+                safe_val = str(val).replace("/", "-").replace(" ", "_")
+                dest_dir = out_path / dataset_name / name / f"{partition_by}={safe_val}"
+                dest_dir.mkdir(parents=True, exist_ok=True)
+                path = dest_dir / f"{name}.csv"
+                group.to_csv(path, mode="a", index=False, header=not path.exists())
+                click.echo(f"  [csv/append] {path} (+{len(group)} rows)")
+                written.append(
+                    (path, f"{dataset_name}/{name}/{partition_by}={safe_val}/{path.name}")
+                )
+        else:
+            dest_dir = out_path / dataset_name / name
+            dest_dir.mkdir(parents=True, exist_ok=True)
+            path = dest_dir / f"{name}.csv"
+            df.to_csv(path, mode="a", index=False, header=not path.exists())
+            click.echo(f"  [csv/append] {path} (+{len(df)} rows)")
+            written.append((path, f"{dataset_name}/{name}/{path.name}"))
+    return written
 
 
-def _append_json_flat(datasets: dict, out_path: Path, dataset_name: str) -> None:
+def _append_json_flat(
+    datasets: dict,
+    out_path: Path,
+    dataset_name: str,
+    partition_map: dict[str, str] | None = None,
+) -> list[tuple[Path, str]]:
+    written: list[tuple[Path, str]] = []
     for name, df in datasets.items():
-        table_dir = out_path / dataset_name / name
-        table_dir.mkdir(parents=True, exist_ok=True)
-        path = table_dir / f"{name}.json"
-        with open(path, "a", encoding="utf-8") as f:
-            f.write(df.to_json(orient="records", lines=True, force_ascii=False))
-        click.echo(f"  [json/append] {path} (+{len(df)} rows)")
+        partition_by = (
+            (partition_map.get(name) or partition_map.get("*")) if partition_map else None
+        )
+        if partition_by and partition_by in df.columns:
+            for val, group in df.groupby(partition_by):
+                safe_val = str(val).replace("/", "-").replace(" ", "_")
+                dest_dir = out_path / dataset_name / name / f"{partition_by}={safe_val}"
+                dest_dir.mkdir(parents=True, exist_ok=True)
+                path = dest_dir / f"{name}.json"
+                with open(path, "a", encoding="utf-8") as f:
+                    f.write(group.to_json(orient="records", lines=True, force_ascii=False))
+                click.echo(f"  [json/append] {path} (+{len(group)} rows)")
+                written.append(
+                    (path, f"{dataset_name}/{name}/{partition_by}={safe_val}/{path.name}")
+                )
+        else:
+            dest_dir = out_path / dataset_name / name
+            dest_dir.mkdir(parents=True, exist_ok=True)
+            path = dest_dir / f"{name}.json"
+            with open(path, "a", encoding="utf-8") as f:
+                f.write(df.to_json(orient="records", lines=True, force_ascii=False))
+            click.echo(f"  [json/append] {path} (+{len(df)} rows)")
+            written.append((path, f"{dataset_name}/{name}/{path.name}"))
+    return written
 
 
 def _do_upload(
@@ -252,8 +369,8 @@ def cli():
 @click.option(
     "--partition-by",
     "partition_by",
-    default=None,
-    help="Column name to partition output by (Hive-style: col=val/). Applied per table if the column exists.",
+    multiple=True,
+    help="Partition output Hive-style. Use 'column' (all tables) or 'table:column' (per table). Repeatable.",
 )
 # SQL loading
 @click.option(
@@ -283,6 +400,16 @@ def cli():
     type=int,
     help="Number of batches to run in recurrence mode. 0 = infinite. Default: 0.",
 )
+@click.option(
+    "--increment",
+    multiple=True,
+    help=(
+        "Shift a column's values by step × batch_index. "
+        "Format: table:column:step[:unit]. "
+        "Units: days (default), hours, weeks, months, years, value. "
+        "Example: orders:created_at:1:days  or  sales:amount:100:value"
+    ),
+)
 def generate(
     domain,
     config,
@@ -303,6 +430,7 @@ def generate(
     db_schema,
     recurrence,
     count,
+    increment,
 ):
     """Generate synthetic datasets and optionally write to files, cloud or SQL.
 
@@ -327,6 +455,7 @@ def generate(
         click.echo("-" * 60)
 
     batch = 0
+    seq_offsets: dict[str, int] = {}  # tracks cumulative rows per table for int_seq continuity
     try:
         while True:
             batch += 1
@@ -337,8 +466,19 @@ def generate(
 
             # Seed incremental por batch para dados sempre diferentes
             batch_seed = (seed + batch - 1) if seed is not None else None
-            generator = DatasetGenerator(schema, rows=rows, seed=batch_seed)
+            generator = DatasetGenerator(
+                schema, rows=rows, seed=batch_seed, seq_offsets=seq_offsets
+            )
             datasets = generator.generate()
+
+            # Apply column increments (shift values by step × batch_index)
+            increment_specs = _parse_increments(increment) if increment else []
+            if increment_specs:
+                datasets = _apply_increments(datasets, increment_specs, batch - 1)
+
+            # Atualiza offset de sequência para o próximo batch
+            for tname, df in datasets.items():
+                seq_offsets[tname] = seq_offsets.get(tname, 0) + len(df)
 
             # Arquivo
             written_files = _write_batch(
@@ -349,7 +489,7 @@ def generate(
                 schema,
                 batch=batch,
                 recurrence=is_recurrent,
-                partition_by=partition_by,
+                partition_map=_parse_partition_by(partition_by) if partition_by else None,
             )
 
             # Upload
@@ -383,9 +523,10 @@ def generate(
 
 @cli.command("list-domains")
 def list_domains():
-    """List available built-in domains."""
-    for name in DOMAIN_REGISTRY:
-        click.echo(f"  {name}")
+    """List available schema YAMLs."""
+    schemas_dir = Path(__file__).parent / "schemas"
+    for f in sorted(schemas_dir.glob("*.yaml")):
+        click.echo(f"  {f.stem}")
 
 
 @cli.command("schema-info")

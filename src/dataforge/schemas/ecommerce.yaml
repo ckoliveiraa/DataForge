@@ -15,6 +15,7 @@ tables:
         nullable: 0.2
       slug:
         dtype: str
+        faker_provider: slug
 
   products:
     rows: 200
@@ -24,6 +25,7 @@ tables:
         primary_key: true
       name:
         dtype: str
+        faker_provider: catch_phrase
       description:
         dtype: text
         nullable: 0.1
@@ -37,6 +39,7 @@ tables:
         max: 500
       sku:
         dtype: str
+        faker_provider: bothify
       weight_kg:
         dtype: float
         min: 0.1
@@ -74,6 +77,7 @@ tables:
         dtype: country
       zip_code:
         dtype: str
+        faker_provider: postcode
         nullable: 0.2
       created_at:
         dtype: date
