@@ -28,7 +28,7 @@ def tmp_output(tmp_path):
 def test_list_domains(runner):
     result = runner.invoke(cli, ["list-domains"])
     assert result.exit_code == 0
-    for domain in ("ecommerce", "hr", "finance"):
+    for domain in ("ecommerce", "rh", "finance"):
         assert domain in result.output
 
 
