@@ -9,15 +9,19 @@ tables:
         primary_key: true
       plate:
         dtype: str
+        faker_provider: license_plate
       renavam:
         dtype: str
+        faker_provider: numerify
       chassis:
         dtype: str
+        faker_provider: bothify
       brand:
         dtype: str
         choices: [Volkswagen, Fiat, Chevrolet, Ford, Renault, Toyota, Hyundai, Mercedes-Benz, Volvo, Scania, Iveco, MAN]
       model:
         dtype: str
+        choices: [Gol, Palio, Onix, HB20, Creta, Corolla, Hilux, Sprinter, Actros, R450, Daily, TGX]
       year:
         dtype: int
         min: 2000
@@ -63,15 +67,17 @@ tables:
         dtype: name
       cpf:
         dtype: str
+        faker_provider: numerify
       cnh_number:
         dtype: str
+        faker_provider: numerify
       cnh_category:
         dtype: str
         choices: [A, B, AB, C, D, E, ACC]
       cnh_expiry:
         dtype: date
         min: today
-        max: 5y
+        max: +5y
       phone:
         dtype: phone
       email:
@@ -224,6 +230,7 @@ tables:
         choices: [CRLV, IPVA, insurance, inspection, license, permit]
       document_number:
         dtype: str
+        faker_provider: bothify
         nullable: 0.2
       issue_date:
         dtype: date
@@ -258,6 +265,7 @@ tables:
         nullable: 0.3
       infraction_code:
         dtype: str
+        choices: ["501-00", "518-71", "544-00", "554-00", "604-02", "604-20", "621-00", "659-50", "703-40", "736-10"]
       description:
         dtype: text
       amount:

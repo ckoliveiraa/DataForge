@@ -11,6 +11,7 @@ tables:
         dtype: company
       document:
         dtype: str
+        faker_provider: bothify
         nullable: 0.2
       industry:
         dtype: str
@@ -19,7 +20,7 @@ tables:
         dtype: str
         choices: [micro, small, medium, large, enterprise]
       website:
-        dtype: str
+        dtype: url
         nullable: 0.4
       city:
         dtype: city
@@ -46,9 +47,11 @@ tables:
           column: id
         nullable: 0.3
       first_name:
-        dtype: name
+        dtype: str
+        faker_provider: first_name
       last_name:
-        dtype: name
+        dtype: str
+        faker_provider: last_name
       email:
         dtype: email
       phone:
@@ -56,6 +59,7 @@ tables:
         nullable: 0.2
       job_title:
         dtype: str
+        faker_provider: job
         nullable: 0.3
       active:
         dtype: bool
@@ -106,6 +110,7 @@ tables:
         primary_key: true
       title:
         dtype: str
+        faker_provider: catch_phrase
       company_id:
         dtype: int
         foreign_key:
@@ -165,6 +170,7 @@ tables:
         nullable: 0.3
       subject:
         dtype: str
+        faker_provider: sentence
       notes:
         dtype: text
         nullable: 0.4
@@ -187,6 +193,7 @@ tables:
         primary_key: true
       subject:
         dtype: str
+        faker_provider: sentence
       contact_id:
         dtype: int
         foreign_key:

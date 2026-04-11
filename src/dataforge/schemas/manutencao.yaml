@@ -9,8 +9,10 @@ tables:
         primary_key: true
       tag:
         dtype: str
+        faker_provider: bothify
       name:
         dtype: str
+        faker_provider: catch_phrase
       description:
         dtype: text
         nullable: 0.2
@@ -21,9 +23,11 @@ tables:
         dtype: company
       model:
         dtype: str
+        faker_provider: bothify
         nullable: 0.1
       serial_number:
         dtype: str
+        faker_provider: bothify
       location:
         dtype: str
         choices: [Plant A, Plant B, Warehouse, Office, Field, Lab, Server Room]
@@ -79,6 +83,7 @@ tables:
         primary_key: true
       code:
         dtype: str
+        faker_provider: bothify
       asset_id:
         dtype: int
         foreign_key:
@@ -146,8 +151,10 @@ tables:
         primary_key: true
       code:
         dtype: str
+        faker_provider: bothify
       name:
         dtype: str
+        faker_provider: catch_phrase
       description:
         dtype: text
         nullable: 0.3

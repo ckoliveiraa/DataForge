@@ -1,4 +1,4 @@
-domain: hr
+domain: rh
 
 tables:
   departments:
@@ -12,10 +12,12 @@ tables:
         choices: [Engineering, Sales, Marketing, Finance, HR, Operations, Legal, Customer Success, Product, Data, IT, Executive]
       code:
         dtype: str
+        faker_provider: bothify
       location:
         dtype: city
       cost_center:
         dtype: str
+        faker_provider: bothify
         nullable: 0.2
 
   job_titles:
@@ -26,6 +28,7 @@ tables:
         primary_key: true
       title:
         dtype: str
+        faker_provider: job
       level:
         dtype: str
         choices: [intern, junior, pleno, senior, specialist, lead, coordinator, manager, director, VP, C-level]
@@ -45,9 +48,11 @@ tables:
         dtype: int_seq
         primary_key: true
       first_name:
-        dtype: name
+        dtype: str
+        faker_provider: first_name
       last_name:
-        dtype: name
+        dtype: str
+        faker_provider: last_name
       email:
         dtype: email
       phone:
@@ -55,6 +60,7 @@ tables:
         nullable: 0.1
       cpf:
         dtype: str
+        faker_provider: numerify
       birth_date:
         dtype: date
         min: -45y
@@ -183,6 +189,7 @@ tables:
         primary_key: true
       title:
         dtype: str
+        faker_provider: catch_phrase
       description:
         dtype: text
         nullable: 0.2
