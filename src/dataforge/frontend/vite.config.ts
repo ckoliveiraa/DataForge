@@ -16,7 +16,18 @@ const cliRunnerPlugin = () => ({
   name: 'cli-runner',
   configureServer(server: any) {
     server.middlewares.use(async (req: any, res: any, next: any) => {
+      if (req.url === '/api/capabilities' && req.method === 'GET') {
+        res.setHeader('Content-Type', 'application/json')
+        res.end(JSON.stringify({ browseFolder: process.platform === 'win32' }))
+        return
+      }
+
       if (req.url === '/api/browse-folder' && req.method === 'GET') {
+        if (process.platform !== 'win32') {
+          res.setHeader('Content-Type', 'application/json')
+          res.end(JSON.stringify({ path: '', unsupported: true }))
+          return
+        }
         if (browseInProgress) {
           res.setHeader('Content-Type', 'application/json')
           res.end(JSON.stringify({ path: '' }))
@@ -72,7 +83,7 @@ const cliRunnerPlugin = () => ({
         req.on('end', () => {
           try {
             const data = JSON.parse(body);
-            const { yamlStr, formats, outputDir, uploadTarget, bucket, prefix, partitionByTable, jsonMode, seed, dbUrl, ifExists, dbSchema, recurrence, count, credentials, rows, tables: tablesToInclude, columns: columnsToInclude, increments } = data;
+            const { yamlStr, formats, outputDir, uploadTarget, bucket, prefix, partitionByTable, jsonMode, seed, dbUrl, ifExists, dbSchema, recurrence, count, credentials, rows, tables: tablesToInclude, columns: columnsToInclude, increments, cloudCreds } = data;
 
             const baseDir = resolve(__dirname, '../../../');
             // Cloud and database-only runs use a temp dir that is cleaned up after
@@ -114,7 +125,7 @@ const cliRunnerPlugin = () => ({
                 if (col) args.push('--partition-by', `${table}:${col}`);
               }
             }
-            // Resolve credentials from the fixed credentials/ folder
+            // Resolve credentials: UI input takes priority, falls back to credentials/ folder
             const credentialsDir = resolve(baseDir, 'credentials');
             const extraEnv: Record<string, string> = {};
             if (uploadTarget) {
@@ -122,16 +133,35 @@ const cliRunnerPlugin = () => ({
               if (bucket?.trim()) args.push('--bucket', bucket.trim());
               if (prefix?.trim()) args.push('--prefix', prefix.trim());
 
-              if (existsSync(credentialsDir)) {
-                const credFiles = readdirSync(credentialsDir);
-                if (uploadTarget === 'gcs') {
-                  const jsonFile = credFiles.find(f => f.endsWith('.json'));
+              const creds = cloudCreds ?? {};
+
+              if (uploadTarget === 'gcs') {
+                if (creds.gcsJson?.trim()) {
+                  // Write JSON key to temp file
+                  const tempGcsKey = join(tmpdir(), `df_gcs_key_${Date.now()}.json`);
+                  writeFileSync(tempGcsKey, creds.gcsJson.trim(), 'utf-8');
+                  args.push('--credentials', tempGcsKey);
+                } else if (existsSync(credentialsDir)) {
+                  const jsonFile = readdirSync(credentialsDir).find(f => f.endsWith('.json'));
                   if (jsonFile) args.push('--credentials', resolve(credentialsDir, jsonFile));
-                } else if (uploadTarget === 's3') {
-                  const awsFile = credFiles.find(f => f === 'credentials' || f.endsWith('.ini') || f.endsWith('.csv'));
+                }
+              } else if (uploadTarget === 's3') {
+                if (creds.s3AccessKey?.trim() && creds.s3SecretKey?.trim()) {
+                  // Write AWS credentials file to temp
+                  const tempAwsCreds = join(tmpdir(), `df_aws_creds_${Date.now()}.ini`);
+                  const awsContent = `[default]\naws_access_key_id = ${creds.s3AccessKey.trim()}\naws_secret_access_key = ${creds.s3SecretKey.trim()}\n`;
+                  writeFileSync(tempAwsCreds, awsContent, 'utf-8');
+                  extraEnv['AWS_SHARED_CREDENTIALS_FILE'] = tempAwsCreds;
+                  if (creds.s3Region?.trim()) extraEnv['AWS_DEFAULT_REGION'] = creds.s3Region.trim();
+                } else if (existsSync(credentialsDir)) {
+                  const awsFile = readdirSync(credentialsDir).find(f => f === 'credentials' || f.endsWith('.ini') || f.endsWith('.csv'));
                   if (awsFile) extraEnv['AWS_SHARED_CREDENTIALS_FILE'] = resolve(credentialsDir, awsFile);
-                } else if (uploadTarget === 'azure') {
-                  const azFile = credFiles.find(f => f.endsWith('.txt') || f === 'connection_string');
+                }
+              } else if (uploadTarget === 'azure') {
+                if (creds.azureConnStr?.trim()) {
+                  extraEnv['AZURE_STORAGE_CONNECTION_STRING'] = creds.azureConnStr.trim();
+                } else if (existsSync(credentialsDir)) {
+                  const azFile = readdirSync(credentialsDir).find(f => f.endsWith('.txt') || f === 'connection_string');
                   if (azFile) extraEnv['AZURE_STORAGE_CONNECTION_STRING'] = readFileSync(resolve(credentialsDir, azFile), 'utf-8').trim();
                 }
               }
@@ -680,6 +710,64 @@ DATASET DESCRIPTION:
             res.end(JSON.stringify({ error: e.message || String(e) }));
           }
         });
+        return;
+      }
+
+      // ── Credentials profiles ──────────────────────────────────────────────
+      const profilesPath = resolve(resolve(__dirname, '../../../'), 'credentials', 'profiles.json')
+
+      const readProfiles = (): Record<string, any> => {
+        try { return JSON.parse(readFileSync(profilesPath, 'utf-8')); } catch { return {}; }
+      }
+      const writeProfiles = (data: Record<string, any>) => {
+        mkdirSync(resolve(profilesPath, '..'), { recursive: true });
+        writeFileSync(profilesPath, JSON.stringify(data, null, 2), 'utf-8');
+      }
+
+      if (req.url === '/api/credential-profiles' && req.method === 'GET') {
+        const profiles = readProfiles();
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(Object.keys(profiles).map(name => ({ name, provider: profiles[name].provider }))));
+        return;
+      }
+
+      if (req.url === '/api/credential-profiles' && req.method === 'POST') {
+        let body = '';
+        req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
+        req.on('end', () => {
+          try {
+            const { name, provider, creds } = JSON.parse(body);
+            if (!name?.trim()) { res.statusCode = 400; res.end(JSON.stringify({ error: 'Name is required.' })); return; }
+            const profiles = readProfiles();
+            profiles[name.trim()] = { provider, creds };
+            writeProfiles(profiles);
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ success: true }));
+          } catch (e: any) {
+            res.statusCode = 500;
+            res.end(JSON.stringify({ error: e.message }));
+          }
+        });
+        return;
+      }
+
+      const credProfileMatch = req.url?.match(/^\/api\/credential-profiles\/(.+)$/);
+      if (credProfileMatch && req.method === 'DELETE') {
+        const name = decodeURIComponent(credProfileMatch[1]);
+        const profiles = readProfiles();
+        delete profiles[name];
+        writeProfiles(profiles);
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ success: true }));
+        return;
+      }
+
+      if (credProfileMatch && req.method === 'GET') {
+        const name = decodeURIComponent(credProfileMatch[1]);
+        const profiles = readProfiles();
+        if (!profiles[name]) { res.statusCode = 404; res.end(JSON.stringify({ error: 'Not found' })); return; }
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(profiles[name]));
         return;
       }
 

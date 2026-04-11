@@ -1,6 +1,6 @@
 # Dataforge
 
-Ferramenta para geração de datasets sintéticos **relacionais** com integridade referencial garantida. Disponível via interface visual no navegador e via linha de comando (CLI). Ideal para testar pipelines de dados, popular bancos de desenvolvimento e criar fixtures para modelos dbt — sem usar dados sensíveis.
+Ferramenta para geração de datasets sintéticos **relacionais** com integridade referencial garantida. Disponível via **interface visual no navegador** e via **linha de comando (CLI)**. Suporta múltiplos formatos de saída (CSV, JSON, Parquet, Avro), carga direta em bancos SQL (PostgreSQL, MySQL, SQLite) e upload automático para nuvem (GCS, S3, Azure). Ideal para testar pipelines de dados, popular bancos de desenvolvimento, criar fixtures para modelos dbt e gerar dados de demonstração — sem usar dados sensíveis.
 
 ---
 
@@ -71,10 +71,12 @@ A interface visual roda em `http://localhost:5173` e é a forma principal de uso
 - **Save as Default** — salva o schema no servidor (`src/dataforge/schemas/`) para reutilização futura
 - **Run Generator** — executa o CLI diretamente da interface com configuração visual completa:
   - Formatos de saída (CSV, JSON, Parquet, Avro) e modo JSON (flat/nested)
-  - Destino: **local**, **nuvem** (GCS, S3, Azure) ou **banco de dados** (PostgreSQL, MySQL, SQLite) com teste de conexão e conexões salvas
+  - Destino: **local** (com seletor de pasta nativo no Windows), **nuvem** (GCS, S3, Azure) ou **banco de dados** (PostgreSQL, MySQL, SQLite) com teste de conexão e conexões salvas
+  - Credenciais cloud inseridas diretamente na UI (GCS JSON, S3 Access Key/Secret, Azure Connection String) com suporte a **perfis salvos** — salve e carregue credenciais por nome sem precisar de arquivos externos
   - Particionamento Hive-style por tabela
   - Modo recorrente, seed e incrementos de coluna
   - Logs de execução em tempo real com botão de parada
+  - Botão **? Help** com referência de todos os campos
 
 O diagrama é atualizado em tempo real e mostra as relações entre tabelas com setas representando FKs.
 
@@ -361,12 +363,30 @@ docker compose run --rm cli generate -d ecommerce -f parquet --partition-by "ord
 
 ## Upload em nuvem
 
-Coloque o arquivo de credenciais na pasta `credentials/` do projeto (ela é montada no container em `/app/credentials/`).
+Há duas formas de fornecer credenciais cloud ao Dataforge:
+
+### Opção 1 — Interface Visual (recomendada)
+
+Na seção **Destination → Cloud** do Run Generator, insira as credenciais diretamente na UI:
+
+| Provider | Campos |
+|----------|--------|
+| Google Cloud Storage | JSON completo da Service Account |
+| Amazon S3 | Access Key ID, Secret Access Key e Region |
+| Azure Blob Storage | Connection String |
+
+Clique em **Save credentials** para salvar um perfil nomeado localmente (`credentials/profiles.json`). Perfis salvos aparecem no topo da seção Cloud e podem ser carregados com um clique.
+
+> **Nota:** o seletor de pasta (📁) no destino Local só funciona quando o Dataforge roda localmente no Windows. No Docker, digite o caminho manualmente (ex: `/app/output/dados`).
+
+### Opção 2 — Arquivo na pasta `credentials/`
+
+Coloque o arquivo de credenciais na pasta `credentials/` do projeto (ela é montada no container em `/app/credentials/`). As credenciais da UI têm prioridade; a pasta serve de fallback.
 
 ### Google Cloud Storage
 
 ```bash
-# Usando arquivo de service account
+# Via arquivo de service account (fallback)
 docker compose run --rm cli generate -d ecommerce -f parquet \
   --upload gcs \
   --bucket meu-bucket \
@@ -377,10 +397,11 @@ docker compose run --rm cli generate -d ecommerce -f parquet \
 ### Amazon S3
 
 ```bash
-# Autenticação via variáveis de ambiente no docker-compose ou inline
+# Via variáveis de ambiente
 docker compose run --rm \
   -e AWS_ACCESS_KEY_ID=... \
   -e AWS_SECRET_ACCESS_KEY=... \
+  -e AWS_DEFAULT_REGION=us-east-1 \
   cli generate -d hr -f csv \
   --upload s3 \
   --bucket meu-bucket \

@@ -615,6 +615,43 @@ export default function App() {
 
   const [showRunPanel, setShowRunPanel] = useState(false);
   const [showRunHelp, setShowRunHelp] = useState(false);
+  const [canBrowseFolder, setCanBrowseFolder] = useState(false);
+  const [credProfiles, setCredProfiles] = useState<{ name: string; provider: string }[]>([]);
+  const [saveCredName, setSaveCredName] = useState('');
+  const [showSaveCredInput, setShowSaveCredInput] = useState(false);
+
+  React.useEffect(() => {
+    fetch('/api/capabilities').then(r => r.json()).then(d => setCanBrowseFolder(!!d.browseFolder)).catch(() => {});
+    fetchCredProfiles();
+  }, []);
+
+  const fetchCredProfiles = () => {
+    fetch('/api/credential-profiles').then(r => r.json()).then(setCredProfiles).catch(() => {});
+  };
+
+  const handleSaveCredProfile = async () => {
+    const name = saveCredName.trim();
+    if (!name) return;
+    await fetch('/api/credential-profiles', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, provider: runConfig.uploadTarget, creds: runConfig.cloudCreds }),
+    });
+    setSaveCredName('');
+    setShowSaveCredInput(false);
+    fetchCredProfiles();
+  };
+
+  const handleLoadCredProfile = async (name: string) => {
+    const res = await fetch(`/api/credential-profiles/${encodeURIComponent(name)}`);
+    const profile = await res.json();
+    setRunConfig(r => ({ ...r, uploadTarget: profile.provider, cloudCreds: profile.creds }));
+  };
+
+  const handleDeleteCredProfile = async (name: string) => {
+    await fetch(`/api/credential-profiles/${encodeURIComponent(name)}`, { method: 'DELETE' });
+    fetchCredProfiles();
+  };
   const [runConfig, setRunConfig] = useState<{
     formats: string[],
     destination: 'local' | 'cloud' | 'database',
@@ -634,6 +671,13 @@ export default function App() {
     tablesToInclude: string[],
     columnsFilter: string,
     increments: Array<{ table: string; column: string; step: string; unit: string }>,
+    cloudCreds: {
+      gcsJson: string,
+      s3AccessKey: string,
+      s3SecretKey: string,
+      s3Region: string,
+      azureConnStr: string,
+    },
   }>({
     formats: ['csv'],
     destination: 'local' as 'local' | 'cloud' | 'database',
@@ -653,6 +697,13 @@ export default function App() {
     tablesToInclude: [],
     columnsFilter: '',
     increments: [],
+    cloudCreds: {
+      gcsJson: '',
+      s3AccessKey: '',
+      s3SecretKey: '',
+      s3Region: 'us-east-1',
+      azureConnStr: '',
+    },
   });
   const [runLogs, setRunLogs] = useState('');
   const [isRunning, setIsRunning] = useState(false);
@@ -688,6 +739,7 @@ export default function App() {
           tables: runConfig.tablesToInclude.length > 0 ? runConfig.tablesToInclude : undefined,
           columns: runConfig.columnsFilter.trim() ? runConfig.columnsFilter.trim().split('\n').filter(Boolean) : undefined,
           increments: runConfig.increments.filter(i => i.table && i.column && i.step !== ''),
+          cloudCreds: runConfig.destination === 'cloud' ? runConfig.cloudCreds : undefined,
         })
       });
 
@@ -1297,7 +1349,7 @@ export default function App() {
                     <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Output Directory</label>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                       <input type="text" value={runConfig.outputDir} onChange={e => setRunConfig(r => ({...r, outputDir: e.target.value}))} style={{ flex: 1, padding: '0.5rem' }} placeholder="e.g. output" />
-                      <button
+                      {canBrowseFolder && <button
                         onClick={async (e) => {
                           const btn = e.currentTarget;
                           if (btn.disabled) return;
@@ -1316,7 +1368,7 @@ export default function App() {
                         style={{ padding: '0.5rem 0.75rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.07)', color: '#94a3b8', cursor: 'pointer', fontSize: '1rem', whiteSpace: 'nowrap' }}
                       >
                         📁
-                      </button>
+                      </button>}
                     </div>
                   </div>
                 )}
@@ -1324,6 +1376,29 @@ export default function App() {
                 {/* Cloud */}
                 {runConfig.destination === 'cloud' && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+
+                    {/* Saved credential profiles */}
+                    {credProfiles.filter(p => p.provider === runConfig.uploadTarget).length > 0 && (
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '0.4rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Saved Credentials</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                          {credProfiles.filter(p => p.provider === runConfig.uploadTarget).map(p => (
+                            <div key={p.name} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.04)', borderRadius: '6px', padding: '0.4rem 0.6rem', border: '1px solid rgba(255,255,255,0.08)' }}>
+                              <button type="button" onClick={() => handleLoadCredProfile(p.name)}
+                                style={{ flex: 1, background: 'none', border: 'none', color: '#e2e8f0', fontSize: '0.82rem', cursor: 'pointer', textAlign: 'left', padding: 0 }}>
+                                {p.name}
+                                <span style={{ marginLeft: '0.5rem', color: '#475569', fontSize: '0.72rem' }}>{p.provider.toUpperCase()}</span>
+                              </button>
+                              <button type="button" onClick={() => handleDeleteCredProfile(p.name)}
+                                style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '0.85rem', padding: '0 0.2rem' }}
+                                title="Remove">✕</button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Provider */}
                     <div>
                       <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Provider</label>
                       <select value={runConfig.uploadTarget} onChange={e => setRunConfig(r => ({...r, uploadTarget: e.target.value}))} style={{ width: '100%', padding: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px' }}>
@@ -1332,6 +1407,8 @@ export default function App() {
                         <option value="azure" style={{color: 'black'}}>Azure Blob Storage</option>
                       </select>
                     </div>
+
+                    {/* Bucket + Prefix */}
                     <div style={{ display: 'flex', gap: '1rem' }}>
                       <div style={{ flex: 1 }}>
                         <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Bucket / Container</label>
@@ -1342,9 +1419,76 @@ export default function App() {
                         <input type="text" value={runConfig.prefix} onChange={e => setRunConfig(r => ({...r, prefix: e.target.value}))} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. datasets/" />
                       </div>
                     </div>
-                    <p style={{ margin: 0, fontSize: '0.75rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                      <span style={{ color: '#10b981' }}>✓</span> Credentials auto-loaded from <code style={{ color: '#94a3b8' }}>credentials/</code>
-                    </p>
+
+                    {/* Credentials — per provider */}
+                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '0.75rem' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                        <p style={{ margin: 0, fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.06em', color: '#475569' }}>Credentials</p>
+                        {showSaveCredInput ? (
+                          <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                            <input
+                              type="text"
+                              value={saveCredName}
+                              onChange={e => setSaveCredName(e.target.value)}
+                              onKeyDown={e => { if (e.key === 'Enter') handleSaveCredProfile(); if (e.key === 'Escape') setShowSaveCredInput(false); }}
+                              placeholder="Profile name..."
+                              autoFocus
+                              style={{ padding: '0.25rem 0.5rem', fontSize: '0.78rem', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '5px', color: 'white', width: '130px' }}
+                            />
+                            <button type="button" onClick={handleSaveCredProfile}
+                              style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem', background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '5px', color: '#10b981', cursor: 'pointer' }}>
+                              Save
+                            </button>
+                            <button type="button" onClick={() => setShowSaveCredInput(false)}
+                              style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '0.85rem' }}>✕</button>
+                          </div>
+                        ) : (
+                          <button type="button" onClick={() => setShowSaveCredInput(true)}
+                            style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '0.75rem', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>
+                            Save credentials
+                          </button>
+                        )}
+                      </div>
+
+                      {runConfig.uploadTarget === 'gcs' && (
+                        <div>
+                          <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Service Account JSON</label>
+                          <textarea
+                            value={runConfig.cloudCreds.gcsJson}
+                            onChange={e => setRunConfig(r => ({...r, cloudCreds: {...r.cloudCreds, gcsJson: e.target.value}}))}
+                            rows={5}
+                            placeholder={'{\n  "type": "service_account",\n  "project_id": "...",\n  ...\n}'}
+                            style={{ width: '100%', padding: '0.5rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: 'white', resize: 'vertical', fontSize: '0.78rem', fontFamily: 'monospace', boxSizing: 'border-box' }}
+                          />
+                        </div>
+                      )}
+
+                      {runConfig.uploadTarget === 's3' && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                          <div style={{ display: 'flex', gap: '0.75rem' }}>
+                            <div style={{ flex: 1 }}>
+                              <label style={{ display: 'block', marginBottom: '0.4rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Access Key ID</label>
+                              <input type="text" value={runConfig.cloudCreds.s3AccessKey} onChange={e => setRunConfig(r => ({...r, cloudCreds: {...r.cloudCreds, s3AccessKey: e.target.value}}))} style={{ width: '100%', padding: '0.5rem', boxSizing: 'border-box' }} placeholder="AKIA..." />
+                            </div>
+                            <div style={{ flex: 1 }}>
+                              <label style={{ display: 'block', marginBottom: '0.4rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Secret Access Key</label>
+                              <input type="password" value={runConfig.cloudCreds.s3SecretKey} onChange={e => setRunConfig(r => ({...r, cloudCreds: {...r.cloudCreds, s3SecretKey: e.target.value}}))} style={{ width: '100%', padding: '0.5rem', boxSizing: 'border-box' }} placeholder="••••••••" />
+                            </div>
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <label style={{ display: 'block', marginBottom: '0.4rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Region</label>
+                            <input type="text" value={runConfig.cloudCreds.s3Region} onChange={e => setRunConfig(r => ({...r, cloudCreds: {...r.cloudCreds, s3Region: e.target.value}}))} style={{ width: '100%', padding: '0.5rem', boxSizing: 'border-box' }} placeholder="us-east-1" />
+                          </div>
+                        </div>
+                      )}
+
+                      {runConfig.uploadTarget === 'azure' && (
+                        <div>
+                          <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Connection String</label>
+                          <input type="password" value={runConfig.cloudCreds.azureConnStr} onChange={e => setRunConfig(r => ({...r, cloudCreds: {...r.cloudCreds, azureConnStr: e.target.value}}))} style={{ width: '100%', padding: '0.5rem', boxSizing: 'border-box' }} placeholder="DefaultEndpointsProtocol=https;AccountName=...;AccountKey=...;EndpointSuffix=core.windows.net" />
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -1690,9 +1834,24 @@ export default function App() {
                 }
               </div>
 
+              {(() => {
+                const validationError =
+                  runConfig.destination === 'cloud' && !runConfig.bucket.trim()
+                    ? 'Bucket / Container is required for cloud upload.'
+                    : null;
+                return validationError ? (
+                  <p style={{ margin: '0 0 0.5rem', fontSize: '0.78rem', color: '#f87171', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    ⚠ {validationError}
+                  </p>
+                ) : null;
+              })()}
+
+              {(() => {
+                const disabled = isRunning || (runConfig.destination === 'cloud' && !runConfig.bucket.trim());
+                return (
               <div style={{ display: 'flex', gap: '0.6rem' }}>
-                <button className="btn-primary" onClick={handleRunCli} disabled={isRunning}
-                  style={{ flex: 1, padding: '0.75rem', background: '#10b981', borderColor: '#10b981', fontSize: '1rem', opacity: isRunning ? 0.5 : 1, cursor: isRunning ? 'not-allowed' : 'pointer' }}>
+                <button className="btn-primary" onClick={handleRunCli} disabled={disabled}
+                  style={{ flex: 1, padding: '0.75rem', background: '#10b981', borderColor: '#10b981', fontSize: '1rem', opacity: disabled ? 0.5 : 1, cursor: disabled ? 'not-allowed' : 'pointer' }}>
                   {isRunning ? 'Running…' : 'Execute Dataforge CLI'}
                 </button>
                 {isRunning && (
@@ -1702,6 +1861,8 @@ export default function App() {
                   </button>
                 )}
               </div>
+                );
+              })()}
             </div>
           </div>
         </div>
