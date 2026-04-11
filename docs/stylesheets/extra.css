@@ -1,0 +1,105 @@
+/* ──────────────────────────────────────────────
+   Dataforge — paleta extraída do logo
+   Azul marinho escuro : #1e3d5c  (texto "forge", bordas)
+   Azul médio          : #2166a8  (engrenagem)
+   Ciano               : #00bcd4  (nós, setas, cubo)
+   Fundo claro         : #e8f5fb
+   ────────────────────────────────────────────── */
+
+:root {
+  --df-navy:  #1e3d5c;
+  --df-blue:  #2166a8;
+  --df-cyan:  #00bcd4;
+  --df-light: #e8f5fb;
+}
+
+/* ── Primary (navbar, cabeçalhos, sidebar ativa) ── */
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color:        #1e3d5c;
+  --md-primary-fg-color--light: #2166a8;
+  --md-primary-fg-color--dark:  #132840;
+  --md-primary-bg-color:        #ffffff;
+
+  --md-accent-fg-color:         #00bcd4;
+  --md-accent-fg-color--transparent: rgba(0, 188, 212, 0.1);
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color:        #00bcd4;
+  --md-primary-fg-color--light: #38d0e4;
+  --md-primary-fg-color--dark:  #0096a8;
+  --md-accent-fg-color:         #00bcd4;
+}
+
+/* ── Navbar ── */
+.md-header {
+  background: linear-gradient(135deg, #1e3d5c 0%, #2166a8 100%);
+  box-shadow: 0 2px 8px rgba(30, 61, 92, 0.25);
+}
+
+/* Logo na navbar com tamanho ajustado */
+.md-header__button.md-logo img {
+  height: 36px;
+  width: auto;
+}
+
+/* ── Título da página inicial ── */
+.md-typeset h1 {
+  color: var(--df-navy);
+  font-weight: 700;
+}
+
+/* ── Links ── */
+.md-typeset a {
+  color: var(--df-blue);
+}
+.md-typeset a:hover {
+  color: var(--df-cyan);
+}
+
+/* ── Admonitions com a cor ciano ── */
+.md-typeset .admonition.tip,
+.md-typeset details.tip {
+  border-color: var(--df-cyan);
+}
+.md-typeset .tip > .admonition-title,
+.md-typeset .tip > summary {
+  background-color: rgba(0, 188, 212, 0.12);
+}
+.md-typeset .tip > .admonition-title::before,
+.md-typeset .tip > summary::before {
+  background-color: var(--df-cyan);
+}
+
+/* ── Blocos de código — borda esquerda ciano ── */
+.md-typeset pre > code {
+  border-left: 3px solid var(--df-cyan);
+}
+
+/* ── Sidebar — item ativo ── */
+.md-nav__link--active {
+  color: var(--df-cyan) !important;
+  font-weight: 600;
+}
+
+/* ── Tabs de navegação ── */
+.md-tabs__link--active,
+.md-tabs__link:hover {
+  color: var(--df-cyan) !important;
+}
+
+/* ── Tabelas — cabeçalho ── */
+.md-typeset table:not([class]) th {
+  background-color: var(--df-navy);
+  color: #ffffff;
+}
+
+/* ── Botão de busca ── */
+.md-search__input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ── Footer ── */
+.md-footer {
+  background: var(--df-navy);
+}

@@ -1,0 +1,90 @@
+site_name: Dataforge
+site_description: Gerador de datasets sintéticos relacionais para engenharia de dados
+site_author: Carlos Oliveira
+site_url: https://carlos-oliveira.github.io/dataforge/
+repo_name: dataforge
+repo_url: https://github.com/carlos-oliveira/dataforge
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  language: pt
+  logo: assets/logo-icon.png
+  favicon: assets/favicon.png
+  palette:
+    - scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Mudar para modo escuro
+    - scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Mudar para modo claro
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.footer
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+  icon:
+    repo: fontawesome/brands/github
+
+extra_css:
+  - stylesheets/extra.css
+
+plugins:
+  - search:
+      lang: pt
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+  - md_in_html
+  - toc:
+      permalink: true
+
+nav:
+  - Início: index.md
+  - Primeiros Passos:
+      - Instalação: getting-started/installation.md
+      - Quickstart: getting-started/quickstart.md
+  - Uso:
+      - Interface Visual: usage/frontend.md
+      - CLI - Referência: usage/cli.md
+      - Domínios Prontos: usage/domains.md
+      - Schemas Customizados: usage/schemas.md
+      - Tipos de Dados: usage/data-types.md
+  - Avançado:
+      - Modo Recorrente: advanced/recurrence.md
+      - Upload para Nuvem: advanced/cloud-upload.md
+      - Carga em Banco SQL: advanced/sql-loading.md
+      - Particionamento: advanced/partitioning.md
+  - Desenvolvimento:
+      - Arquitetura: development/architecture.md
+      - Contribuindo: development/contributing.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/carlos-oliveira/dataforge

@@ -1,431 +1,250 @@
 # Dataforge
 
-Ferramenta CLI em Python para geração de datasets sintéticos **relacionais** destinados a estudos e aplicações de engenharia de dados. Suporta múltiplos formatos de saída, upload em nuvem e carga direta em bancos SQL.
+Ferramenta para geração de datasets sintéticos **relacionais** com integridade referencial garantida. Disponível via interface visual no navegador e via linha de comando (CLI). Ideal para testar pipelines de dados, popular bancos de desenvolvimento e criar fixtures para modelos dbt — sem usar dados sensíveis.
 
 ---
 
 ## Sumário
 
-- [Visão Geral](#visão-geral)
-- [Instalação](#instalação)
-- [Estrutura do Projeto](#estrutura-do-projeto)
-- [Domínios Disponíveis](#domínios-disponíveis)
-- [Formatos de Saída](#formatos-de-saída)
-- [Upload em Nuvem](#upload-em-nuvem)
-- [Carga em Banco SQL](#carga-em-banco-sql)
-- [Uso do CLI](#uso-do-cli)
-- [Schema YAML Customizado](#schema-yaml-customizado)
+- [Pré-requisitos](#pré-requisitos)
+- [Instalação e início rápido](#instalação-e-início-rápido)
+- [Interface Visual](#interface-visual)
+- [Usando o CLI via Docker](#usando-o-cli-via-docker)
+- [Domínios prontos](#domínios-prontos)
+- [Schema YAML customizado](#schema-yaml-customizado)
+- [Tipos de dados disponíveis](#tipos-de-dados-disponíveis-dtype)
+- [Formatos de saída](#formatos-de-saída)
+- [Upload em nuvem](#upload-em-nuvem)
+- [Carga em banco SQL](#carga-em-banco-sql)
 - [Reprodutibilidade](#reprodutibilidade)
 - [Integridade Referencial](#integridade-referencial)
+- [Instalação alternativa sem Docker](#instalação-alternativa-sem-docker)
 
 ---
 
-## Visão Geral
+## Pré-requisitos
 
-O **Dataforge** cria conjuntos de dados com integridade referencial garantida — chaves estrangeiras (FKs) sempre apontam para valores que existem na tabela pai. É ideal para:
-
-- Testar pipelines de ingestão (GCS → BigQuery, S3 → Redshift, etc.)
-- Desenvolver e validar modelos dbt
-- Popular bancos de dados de desenvolvimento e homologação
-- Estudar formatos de armazenamento (CSV, JSON, Parquet, Avro)
-- Simular cargas de trabalho de engenharia de dados sem dados sensíveis
+Apenas **Docker** e **Docker Compose** instalados na máquina. Nenhuma instalação de Python, Node.js ou dependências adicionais é necessária.
 
 ---
 
-## Instalação
+## Instalação e início rápido
 
 ```bash
 git clone <repo-url>
 cd Dataforge
 
-# Apenas saída local (CSV/JSON)
-poetry install
-
-# Com extras específicos
-poetry install -E gcp      # Google Cloud Storage
-poetry install -E aws      # Amazon S3
-poetry install -E azure    # Azure Blob Storage
-poetry install -E parquet  # Parquet (PyArrow)
-poetry install -E avro     # Avro (fastavro)
-poetry install -E sql      # Bancos SQL (SQLAlchemy)
-poetry install -E postgres # PostgreSQL
-poetry install -E mysql    # MySQL
+# Sobe o frontend (interface visual) em segundo plano
+docker compose up --build -d
 ```
 
-### Dependências por funcionalidade
+Após o build (alguns minutos na primeira vez), acesse no navegador:
 
-| Extra | Pacotes instalados | Uso |
-|-------|--------------------|-----|
-| *(base)* | `click`, `faker`, `pandas`, `pyyaml` | CSV e JSON local |
-| `gcp` | `google-cloud-storage` | Upload para GCS |
-| `aws` | `boto3` | Upload para S3 |
-| `azure` | `azure-storage-blob` | Upload para Azure Blob |
-| `parquet` | `pyarrow` | Formato Parquet |
-| `avro` | `fastavro` | Formato Avro |
-| `sql` | `sqlalchemy` | SQLite, e qualquer banco via driver |
-| `postgres` | `sqlalchemy`, `psycopg2-binary` | PostgreSQL |
-| `mysql` | `sqlalchemy`, `pymysql` | MySQL / MariaDB |
-| `mssql` | `sqlalchemy`, `pyodbc` | SQL Server |
+```
+http://localhost:5173
+```
+
+### Estrutura de pastas no host
+
+Após subir o container, três pastas ficam mapeadas entre o container e o seu computador:
+
+| Pasta | Uso |
+|-------|-----|
+| `output/` | Arquivos gerados pelo CLI aparecem aqui |
+| `credentials/` | Coloque aqui os arquivos de credenciais de nuvem (JSON do GCP, etc.) |
+| `src/dataforge/schemas/` | Schemas YAML customizados — edite aqui sem rebuildar a imagem |
 
 ---
 
-## Estrutura do Projeto
+## Interface Visual
 
-```
-Dataforge/
-├── src/dataforge/
-│   ├── cli.py                      # Entrypoint: comando dataset-gen
-│   ├── core/
-│   │   ├── schema.py               # Dataclasses: Column, ForeignKey, Table, DomainSchema
-│   │   ├── generator.py            # Ordenação topológica + geração com FK íntegra
-│   │   └── registry.py             # Mapeamento dtype -> callable Faker
-│   ├── domains/
-│   │   ├── base.py                 # Classe abstrata DomainTemplate
-│   │   ├── ecommerce.py            # Domínio e-commerce (5 tabelas)
-│   │   ├── hr.py                   # Domínio RH (4 tabelas)
-│   │   └── finance.py              # Domínio financeiro (4 tabelas)
-│   ├── writers/
-│   │   ├── base.py                 # Classe abstrata BaseWriter
-│   │   ├── csv_writer.py
-│   │   ├── json_writer.py          # Modos: flat (NDJSON) e nested
-│   │   ├── parquet_writer.py       # PyArrow, compressão Snappy
-│   │   └── avro_writer.py          # fastavro, schema inferido do DataFrame
-│   ├── uploaders/
-│   │   ├── base.py                 # Classe abstrata BaseUploader
-│   │   ├── gcs_uploader.py         # Google Cloud Storage
-│   │   ├── s3_uploader.py          # Amazon S3
-│   │   └── azure_uploader.py       # Azure Blob Storage
-│   ├── loaders/
-│   │   └── sql_loader.py           # SQLAlchemy: df.to_sql() para qualquer banco
-│   └── config/
-│       └── loader.py               # Carrega YAML + merge com domínio base + validação FK
-├── schemas/
-│   ├── ecommerce.yaml              # Override do domínio ecommerce
-│   ├── hr.yaml                     # Override do domínio hr
-│   └── custom_example.yaml         # Template para domínio 100% customizado
-├── schema_builder.py               # Gerador interativo de schemas YAML
-├── output/                         # Pasta padrão de saída (gitignored)
-└── pyproject.toml
-```
+A interface visual roda em `http://localhost:5173` e permite criar e editar schemas sem escrever YAML manualmente.
+
+### O que é possível fazer
+
+- **Criar tabelas** — defina nome e quantidade de linhas
+- **Adicionar colunas** — escolha o `dtype`, configure `min`/`max`, marque como `primary_key` ou `nullable`
+- **Definir chaves estrangeiras (FKs)** — conecte colunas de uma tabela a outra arrastando no diagrama
+- **Usar templates de domínios prontos** — carregue um schema de e-commerce, RH ou financeiro como ponto de partida
+- **Navegar no catálogo de Faker** — veja exemplos de todos os `faker_provider` disponíveis antes de aplicar
+- **Exportar YAML** — baixe o schema gerado para usar com o CLI ou salvar em `schemas/`
+- **Importar YAML** — carregue um schema existente para editar visualmente
+
+O diagrama é atualizado em tempo real e mostra as relações entre tabelas com setas representando FKs.
 
 ---
 
-## Domínios Disponíveis
+## Usando o CLI via Docker
 
-### E-commerce (`--domain ecommerce`)
+O CLI (`dataset-gen`) é executado via `docker compose run`. Os arquivos gerados aparecem na pasta `output/` do host.
 
-| Tabela | Colunas principais | FK para |
-|--------|--------------------|---------|
-| `categories` | id, name, description | — |
-| `customers` | id, name, email, phone, city, country, created_at | — |
-| `products` | id, name, price, stock_quantity, category_id | `categories.id` |
-| `orders` | id, customer_id, status, total_amount, ordered_at | `customers.id` |
-| `order_items` | id, order_id, product_id, quantity, unit_price | `orders.id`, `products.id` |
-
-### RH (`--domain hr`)
-
-| Tabela | Colunas principais | FK para |
-|--------|--------------------|---------|
-| `departments` | id, name, location | — |
-| `job_titles` | id, title, level | — |
-| `employees` | id, name, email, hire_date, department_id, job_title_id, manager_id | `departments.id`, `job_titles.id`, `employees.id` |
-| `salaries` | id, employee_id, amount, currency, effective_date | `employees.id` |
-
-### Financeiro (`--domain finance`)
-
-| Tabela | Colunas principais | FK para |
-|--------|--------------------|---------|
-| `customers` | id, name, email, country, created_at | — |
-| `categories` | id, name, type | — |
-| `accounts` | id, customer_id, iban, currency, balance, opened_at | `customers.id` |
-| `transactions` | id, account_id, category_id, amount, type, description, transacted_at | `accounts.id`, `categories.id` |
-
----
-
-## Formatos de Saída
-
-| Flag | Formato | Dependência |
-|------|---------|-------------|
-| `--format csv` | CSV — UTF-8, sem índice | *(base)* |
-| `--format json` | JSON — NDJSON ou nested | *(base)* |
-| `--format parquet` | Parquet — compressão Snappy | `poetry install -E parquet` |
-| `--format avro` | Avro — schema inferido automaticamente | `poetry install -E avro` |
-
-Múltiplos formatos podem ser combinados na mesma execução:
+### Comandos de referência rápida
 
 ```bash
-dataset-gen generate -d ecommerce -f csv -f json -f parquet -f avro
+# Ver todos os domínios disponíveis
+docker compose run --rm cli list-domains
+
+# Ver tabelas e colunas de um domínio
+docker compose run --rm cli schema-info ecommerce
+
+# Ver todos os flags disponíveis
+docker compose run --rm cli generate --help
 ```
 
-### Layout de saída
-
-```
-output/
-├── csv/
-├── json/
-├── parquet/
-└── avro/
-```
-
-### Modos JSON
-
-**Flat (padrão)** — uma linha por registro (NDJSON), compatível com BigQuery:
-```json
-{"id": 1, "customer_id": 42, "total_amount": 189.90, "ordered_at": "2024-03-15"}
-{"id": 2, "customer_id": 17, "total_amount": 55.00, "ordered_at": "2024-03-16"}
-```
-
-**Nested** — filhos aninhados dentro dos pais, ideal para BigQuery com `RECORD/REPEATED`:
-```json
-{
-  "id": 42,
-  "name": "Ana Lima",
-  "orders": [
-    {"id": 1, "total_amount": 189.90, "order_items": [{"product_id": 5, "quantity": 2}]}
-  ]
-}
-```
-
----
-
-## Upload em Nuvem
-
-### Google Cloud Storage
+### Exemplos práticos
 
 ```bash
-# Autenticação
-gcloud auth application-default login
-# ou
-export GOOGLE_APPLICATION_CREDENTIALS="/path/to/service-account.json"
+# Gerar o domínio ecommerce em CSV (padrão)
+docker compose run --rm cli generate -d ecommerce
 
-# Upload
-dataset-gen generate -d ecommerce -f parquet \
-  --upload gcs --bucket meu-bucket --prefix raw/ecommerce/
-# Resultado: gs://meu-bucket/raw/ecommerce/customers.parquet
+# Gerar 500 linhas por tabela em CSV e Parquet
+docker compose run --rm cli generate -d ecommerce -r 500 -f csv -f parquet
+
+# Gerar apenas tabelas específicas
+docker compose run --rm cli generate -d hr -t employees -t departments -f csv
+
+# Usar um schema YAML customizado (salvo em src/dataforge/schemas/)
+docker compose run --rm cli generate -d custom -c /app/src/dataforge/schemas/transacoes.yaml -f csv
+
+# Gerar em modo recorrente (um batch a cada 30 segundos)
+docker compose run --rm cli generate -d finance -f json -R 30
+
+# Gerar 10 batches com intervalo de 60 segundos entre cada um
+docker compose run --rm cli generate -d ecommerce -f parquet -R 60 --count 10
 ```
 
-### Amazon S3
+Os arquivos são salvos em `output/<domínio>/<tabela>/` na máquina host.
 
-```bash
-# Autenticação via ~/.aws/credentials ou variáveis de ambiente
-export AWS_ACCESS_KEY_ID="..."
-export AWS_SECRET_ACCESS_KEY="..."
+### Referência de flags — `generate`
 
-# Upload
-dataset-gen generate -d hr -f csv \
-  --upload s3 --bucket meu-bucket --prefix data/hr/
-# Resultado: s3://meu-bucket/data/hr/employees.csv
-```
-
-### Azure Blob Storage
-
-```bash
-# Autenticação via connection string
-export AZURE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=https;..."
-
-# Upload
-dataset-gen generate -d finance -f parquet \
-  --upload azure --bucket meu-container --prefix datasets/finance/
-# Resultado: az://meu-container/datasets/finance/transactions.parquet
-```
-
-> Os arquivos gerados são **mantidos localmente** após o upload.
-
----
-
-## Carga em Banco SQL
-
-Use `--db-url` com uma connection string SQLAlchemy para carregar os dados diretamente em um banco.
-
-### Bancos suportados
-
-| Banco | URL de exemplo | Driver |
-|-------|---------------|--------|
-| SQLite | `sqlite:///output/dados.db` | *(sem extra)* |
-| PostgreSQL | `postgresql+psycopg2://user:pass@host:5432/db` | `poetry install -E postgres` |
-| MySQL | `mysql+pymysql://user:pass@host:3306/db` | `poetry install -E mysql` |
-| SQL Server | `mssql+pyodbc://user:pass@host/db?driver=ODBC+Driver+17+for+SQL+Server` | `poetry install -E mssql` |
-
-### Exemplos
-
-```bash
-# SQLite — sem dependências extras
-dataset-gen generate -d ecommerce -r 500 \
-  --db-url sqlite:///output/ecommerce.db
-
-# PostgreSQL
-dataset-gen generate -d hr -r 1000 \
-  --db-url "postgresql+psycopg2://user:pass@localhost:5432/mydb"
-
-# MySQL
-dataset-gen generate -d finance \
-  --db-url "mysql+pymysql://user:pass@localhost:3306/mydb"
-
-# Append em vez de substituir a tabela
-dataset-gen generate -d finance \
-  --db-url sqlite:///finance.db --if-exists append
-
-# Schema específico (PostgreSQL)
-dataset-gen generate -d hr \
-  --db-url "postgresql+psycopg2://user:pass@host/db" \
-  --db-schema staging
-
-# Combinar arquivo + SQL na mesma execução
-dataset-gen generate -d ecommerce -f csv -f parquet \
-  --db-url sqlite:///output/ecommerce.db
-```
-
-### Flags SQL
-
-| Flag | Default | Descrição |
-|------|---------|-----------|
-| `--db-url` | — | Connection string SQLAlchemy |
-| `--if-exists` | `replace` | O que fazer se a tabela existir: `replace`, `append` ou `fail` |
-| `--db-schema` | — | Schema do banco onde as tabelas serão criadas |
-
----
-
-## Uso do CLI
-
-### Referência completa — `dataset-gen generate`
-
-| Flag | Atalho | Default | Descrição |
-|------|--------|---------|-----------|
+| Flag | Atalho | Padrão | Descrição |
+|------|--------|--------|-----------|
 | `--domain` | `-d` | — | Domínio: `ecommerce`, `hr`, `finance`, `custom` |
 | `--config` | `-c` | — | Caminho para YAML (obrigatório se `--domain custom`) |
 | `--rows` | `-r` | por tabela | Número de linhas por tabela |
 | `--tables` | `-t` | todas | Tabelas a incluir (repetível) |
 | `--columns` | | todas | `"tabela:col1,col2"` — filtro de colunas (repetível) |
 | `--format` | `-f` | `csv` | `csv`, `json`, `parquet` ou `avro` (repetível) |
-| `--output` | `-o` | `./output` | Diretório de saída local |
-| `--json-mode` | | `flat` | Modo JSON: `flat` ou `nested` |
+| `--output` | `-o` | `./output` | Diretório de saída dentro do container |
+| `--json-mode` | | `flat` | Modo JSON: `flat` (NDJSON) ou `nested` |
 | `--seed` | | — | Seed para geração reproduzível |
-| `--upload` | | — | `gcs`, `s3` ou `azure` |
+| `--partition-by` | | — | Particionamento Hive-style: `coluna` ou `tabela:coluna` (repetível) |
+| `--upload` | | — | Destino de upload: `gcs`, `s3` ou `azure` |
 | `--bucket` | | — | Nome do bucket/container de destino |
 | `--prefix` | | `datasets/` | Prefixo/pasta dentro do bucket |
-| `--credentials` | | — | Caminho para arquivo de credenciais de nuvem |
+| `--credentials` | | — | Caminho para arquivo de credenciais (dentro do container) |
 | `--db-url` | | — | Connection string SQLAlchemy para carga SQL |
-| `--if-exists` | | `replace` | `replace`, `append` ou `fail` |
+| `--if-exists` | | `replace` | O que fazer se a tabela SQL já existir: `replace`, `append` ou `fail` |
 | `--db-schema` | | — | Schema do banco de destino |
-
-### Exemplos
-
-```bash
-# Utilitários
-dataset-gen list-domains
-dataset-gen schema-info ecommerce
-
-# Geração básica
-dataset-gen generate -d ecommerce
-dataset-gen generate -d ecommerce -r 500 -f csv -f json -o ./data
-
-# Filtros
-dataset-gen generate -d ecommerce -t customers -t orders -f csv
-dataset-gen generate -d ecommerce \
-  --columns "customers:id,email,country" \
-  --columns "orders:id,customer_id,total_amount" -f csv
-
-# Formatos
-dataset-gen generate -d hr -f parquet
-dataset-gen generate -d finance -f avro -r 5000
-dataset-gen generate -d ecommerce -f json --json-mode nested -r 200
-
-# Domínio customizado
-dataset-gen generate -d custom -c ./schemas/custom_example.yaml -f csv -f parquet
-
-# Upload em nuvem
-dataset-gen generate -d finance -f parquet \
-  --upload gcs --bucket meu-bucket --prefix raw/finance/
-
-# Carga SQL
-dataset-gen generate -d ecommerce -r 500 \
-  --db-url sqlite:///output/ecommerce.db
-
-# Tudo junto: arquivo + nuvem + SQL
-dataset-gen generate -d hr -r 1000 -f csv -f parquet \
-  --upload gcs --bucket meu-bucket --prefix hr/ \
-  --db-url "postgresql+psycopg2://user:pass@localhost/db"
-
-# Reprodutibilidade
-dataset-gen generate -d finance --seed 42 -f csv
-```
+| `--recurrence` | `-R` | — | Intervalo em segundos entre batches (modo contínuo) |
+| `--count` | | `0` | Número de batches no modo recorrente (0 = infinito) |
 
 ---
 
-## Schema YAML Customizado
+## Domínios prontos
 
-Use `--domain custom --config seu_schema.yaml` para definir qualquer modelo relacional, ou `--domain ecommerce --config override.yaml` para ajustar apenas partes de um domínio existente.
+Use `--domain <nome>` para gerar um conjunto de tabelas relacionais pré-configurado.
 
-Para criar um schema interativamente:
+### E-commerce (`-d ecommerce`)
 
-```bash
-python schema_builder.py
-```
+| Tabela | Linhas padrão | FK para |
+|--------|---------------|---------|
+| `categories` | 20 | — |
+| `customers` | 500 | — |
+| `products` | 200 | `categories.id` |
+| `orders` | 1000 | `customers.id` |
+| `order_items` | 3000 | `orders.id`, `products.id` |
+| `payments` | 1000 | `orders.id` |
+| `reviews` | 800 | `products.id`, `customers.id` |
 
-### Tipos de dados disponíveis (`dtype`)
+### RH (`-d hr`)
 
-| dtype | Descrição |
-|-------|-----------|
-| `int_seq` | Inteiro sequencial (1, 2, 3...) — ideal para PKs |
-| `uuid` | UUID v4 — PK como string |
-| `int` | Inteiro aleatório |
-| `float` | Float aleatório |
-| `str` | Palavra genérica |
-| `bool` | Booleano |
-| `date` | Data (últimos 3 anos) |
-| `email` | Endereço de e-mail |
-| `name` | Nome completo |
-| `phone` | Número de telefone |
-| `address` | Endereço completo |
-| `city` | Cidade |
-| `country` | País |
-| `company` | Nome de empresa |
-| `text` | Frase/sentença |
-| `url` | URL |
-| `currency` | Código de moeda (ex: BRL, USD) |
-| `iban` | IBAN bancário |
+| Tabela | Linhas padrão | FK para |
+|--------|---------------|---------|
+| `departments` | — | — |
+| `job_titles` | — | — |
+| `employees` | — | `departments.id`, `job_titles.id`, `employees.id` |
+| `salaries` | — | `employees.id` |
 
-Qualquer provider do Faker pode ser usado via `faker_provider: nome_do_provider`.
+### Financeiro (`-d finance`)
 
-### Exemplo — domínio customizado
+| Tabela | Linhas padrão | FK para |
+|--------|---------------|---------|
+| `customers` | — | — |
+| `categories` | — | — |
+| `accounts` | — | `customers.id` |
+| `transactions` | — | `accounts.id`, `categories.id` |
+
+Schemas YAML de exemplo para cada domínio estão em `src/dataforge/schemas/`.
+
+---
+
+## Schema YAML customizado
+
+Crie um arquivo `.yaml` em `src/dataforge/schemas/` e use `--domain custom --config /app/src/dataforge/schemas/seu_arquivo.yaml`.
+
+### Estrutura mínima
 
 ```yaml
-domain: custom
+domain: meu_dominio
 
 tables:
-  authors:
+  autores:
     rows: 50
     columns:
       id:
         dtype: int_seq
         primary_key: true
-      name:
+      nome:
         dtype: name
       email:
         dtype: email
-      country:
-        dtype: country
 
-  books:
+  livros:
     rows: 200
     columns:
       id:
         dtype: int_seq
         primary_key: true
-      title:
+      titulo:
         dtype: str
-      price:
+      preco:
         dtype: float
-      published_at:
+        min: 10
+        max: 300
+      publicado_em:
         dtype: date
-      author_id:
+        min: "2000-01-01"
+        max: "today"
+      autor_id:
         dtype: int
         foreign_key:
-          table: authors
+          table: autores
           column: id
+      ativo:
+        dtype: bool
+      descricao:
+        dtype: text
+        nullable: 0.3
 ```
 
+### Campos suportados por coluna
+
+| Campo | Tipo | Descrição |
+|-------|------|-----------|
+| `dtype` | string | Tipo de dado (ver tabela abaixo) |
+| `primary_key` | bool | Marca a coluna como chave primária |
+| `nullable` | float (0–1) | Proporção de valores nulos (ex: `0.2` = 20% nulos) |
+| `min` | number / string | Valor mínimo para `int`, `float` ou `date` |
+| `max` | number / string | Valor máximo para `int`, `float` ou `date` |
+| `foreign_key.table` | string | Tabela referenciada |
+| `foreign_key.column` | string | Coluna referenciada |
+| `faker_provider` | string | Qualquer método do Faker (ex: `postcode`, `iban`) |
+| `choices` | lista | Lista de valores fixos para sortear |
+
 ### Override de domínio existente
+
+Para ajustar apenas o número de linhas de um domínio pronto:
 
 ```yaml
 domain: ecommerce
@@ -442,24 +261,228 @@ tables:
 
 ---
 
-## Reprodutibilidade
+## Tipos de dados disponíveis (`dtype`)
 
-Use `--seed <número>` para gerar o mesmo dataset em execuções diferentes:
+| dtype | Descrição | Suporta `min`/`max` |
+|-------|-----------|---------------------|
+| `int_seq` | Inteiro sequencial (1, 2, 3...) — ideal para PKs | Não |
+| `uuid` | UUID v4 | Não |
+| `int` | Inteiro aleatório | Sim (padrão: 0–100000) |
+| `float` | Float com 2 casas decimais | Sim (padrão: 0–10000) |
+| `str` | Palavra genérica | Não |
+| `bool` | Booleano | Não |
+| `date` | Data aleatória | Sim (padrão: últimos 3 anos até hoje) |
+| `name` | Nome completo | Não |
+| `email` | Endereço de e-mail | Não |
+| `phone` | Número de telefone | Não |
+| `address` | Endereço completo | Não |
+| `city` | Cidade | Não |
+| `country` | País | Não |
+| `company` | Nome de empresa | Não |
+| `text` | Frase/sentença | Não |
+| `url` | URL | Não |
+| `currency` | Código de moeda (ex: BRL, USD) | Não |
+| `iban` | IBAN bancário | Não |
+
+Para qualquer método do Faker não listado acima, use `faker_provider: nome_do_metodo`.
+
+### Exemplos com range de valores
+
+```yaml
+# Inteiro entre 1 e 5 (ex: rating)
+rating:
+  dtype: int
+  min: 1
+  max: 5
+
+# Float entre 0.0 e 1.0 (ex: percentual de desconto)
+desconto:
+  dtype: float
+  min: 0
+  max: 1
+
+# Data entre 2020 e hoje
+data_contrato:
+  dtype: date
+  min: "2020-01-01"
+  max: "today"
+
+# Data dos últimos 6 meses (notação relativa do Faker)
+data_recente:
+  dtype: date
+  min: "-6m"
+  max: "today"
+```
+
+---
+
+## Formatos de saída
+
+| Flag | Formato | Notas |
+|------|---------|-------|
+| `-f csv` | CSV UTF-8 | Padrão |
+| `-f json` | JSON linha a linha (NDJSON) | Use `--json-mode nested` para aninhar filhos dentro dos pais |
+| `-f parquet` | Parquet com compressão Snappy | — |
+| `-f avro` | Avro com schema inferido | — |
+
+Múltiplos formatos na mesma execução:
 
 ```bash
-dataset-gen generate -d finance --seed 42 -f csv -o ./run1
-dataset-gen generate -d finance --seed 42 -f csv -o ./run2
+docker compose run --rm cli generate -d ecommerce -f csv -f json -f parquet
+```
 
-diff run1/csv/transactions.csv run2/csv/transactions.csv  # sem diferenças
+Layout de saída:
+
+```
+output/
+└── ecommerce/
+    ├── customers/
+    │   └── customers.csv
+    ├── orders/
+    │   └── orders.csv
+    └── ...
+```
+
+### Particionamento Hive-style
+
+```bash
+# Particionar todas as tabelas pela coluna "created_at"
+docker compose run --rm cli generate -d ecommerce -f parquet --partition-by created_at
+
+# Particionar tabela específica
+docker compose run --rm cli generate -d ecommerce -f parquet --partition-by "orders:status"
+```
+
+---
+
+## Upload em nuvem
+
+Coloque o arquivo de credenciais na pasta `credentials/` do projeto (ela é montada no container em `/app/credentials/`).
+
+### Google Cloud Storage
+
+```bash
+# Usando arquivo de service account
+docker compose run --rm cli generate -d ecommerce -f parquet \
+  --upload gcs \
+  --bucket meu-bucket \
+  --prefix raw/ecommerce/ \
+  --credentials /app/credentials/service-account.json
+```
+
+### Amazon S3
+
+```bash
+# Autenticação via variáveis de ambiente no docker-compose ou inline
+docker compose run --rm \
+  -e AWS_ACCESS_KEY_ID=... \
+  -e AWS_SECRET_ACCESS_KEY=... \
+  cli generate -d hr -f csv \
+  --upload s3 \
+  --bucket meu-bucket \
+  --prefix data/hr/
+```
+
+### Azure Blob Storage
+
+```bash
+docker compose run --rm \
+  -e AZURE_STORAGE_CONNECTION_STRING="DefaultEndpointsProtocol=https;..." \
+  cli generate -d finance -f parquet \
+  --upload azure \
+  --bucket meu-container \
+  --prefix datasets/finance/
+```
+
+Os arquivos são mantidos localmente em `output/` mesmo após o upload.
+
+---
+
+## Carga em banco SQL
+
+Use `--db-url` com uma connection string SQLAlchemy para carregar os dados diretamente em um banco.
+
+| Banco | Exemplo de URL |
+|-------|---------------|
+| SQLite | `sqlite:////app/output/dados.db` |
+| PostgreSQL | `postgresql+psycopg2://user:pass@host:5432/db` |
+| MySQL | `mysql+pymysql://user:pass@host:3306/db` |
+| SQL Server | `mssql+pyodbc://user:pass@host/db?driver=ODBC+Driver+17+for+SQL+Server` |
+
+```bash
+# SQLite — arquivo criado em output/ no host
+docker compose run --rm cli generate -d ecommerce -r 500 \
+  --db-url sqlite:////app/output/ecommerce.db
+
+# PostgreSQL
+docker compose run --rm cli generate -d hr -r 1000 \
+  --db-url "postgresql+psycopg2://user:pass@host:5432/mydb"
+
+# Append em vez de substituir
+docker compose run --rm cli generate -d finance \
+  --db-url sqlite:////app/output/finance.db --if-exists append
+
+# Schema específico (PostgreSQL)
+docker compose run --rm cli generate -d hr \
+  --db-url "postgresql+psycopg2://user:pass@host/db" \
+  --db-schema staging
+
+# Arquivo + SQL na mesma execução
+docker compose run --rm cli generate -d ecommerce -f csv -f parquet \
+  --db-url sqlite:////app/output/ecommerce.db
+```
+
+---
+
+## Reprodutibilidade
+
+Use `--seed` para gerar o mesmo dataset em execuções diferentes:
+
+```bash
+docker compose run --rm cli generate -d finance --seed 42 -f csv -o /app/output/run1
+docker compose run --rm cli generate -d finance --seed 42 -f csv -o /app/output/run2
+
+# Os arquivos em run1/ e run2/ serão idênticos
 ```
 
 ---
 
 ## Integridade Referencial
 
-O gerador garante que todas as FKs são válidas através de um pipeline em dois passos:
+O gerador garante que todas as FKs são válidas em dois passos:
 
-1. **Ordenação topológica** (algoritmo de Kahn) — tabelas pai são sempre geradas antes dos filhos
-2. **Pool de PKs** — após gerar cada tabela, seus PKs ficam disponíveis; colunas FK amostram desse pool via `random.choices` (com reposição, permitindo múltiplos filhos por pai)
+1. **Ordenação topológica** — tabelas pai são sempre geradas antes das tabelas filhas
+2. **Pool de PKs** — após gerar cada tabela, seus PKs ficam disponíveis; colunas FK amostram desse pool (com reposição, permitindo múltiplos filhos por pai)
 
-Caso especial: FKs auto-referenciadas (ex: `employees.manager_id -> employees.id`) são preenchidas após a geração da própria tabela, garantindo que o pool já exista.
+FKs auto-referenciadas (ex: `employees.manager_id -> employees.id`) são preenchidas após a geração da própria tabela.
+
+---
+
+## Instalação alternativa sem Docker
+
+Para quem preferir instalar diretamente com Poetry (requer Python 3.12+ e Poetry instalados):
+
+```bash
+git clone <repo-url>
+cd Dataforge
+
+# Instalação base (CSV e JSON)
+poetry install
+
+# Com todos os extras
+poetry install -E "parquet avro sql postgres gcp aws azure"
+```
+
+| Extra | Funcionalidade |
+|-------|---------------|
+| `parquet` | Formato Parquet |
+| `avro` | Formato Avro |
+| `sql` | SQLite e bancos via SQLAlchemy |
+| `postgres` | PostgreSQL |
+| `mysql` | MySQL / MariaDB |
+| `mssql` | SQL Server |
+| `gcp` | Google Cloud Storage |
+| `aws` | Amazon S3 |
+| `azure` | Azure Blob Storage |
+
+Após instalar, use `dataset-gen` diretamente no terminal no lugar de `docker compose run --rm cli`.

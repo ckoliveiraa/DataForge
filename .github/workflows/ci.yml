@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches-ignore: ["main"]
+    branches-ignore: []   # runs on all branches including main
   pull_request:
     branches: ["main"]
 
@@ -53,7 +53,7 @@ jobs:
     name: Open PR to main
     runs-on: ubuntu-latest
     needs: test
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref_name != 'main'
     permissions:
       pull-requests: write
       contents: read
@@ -68,14 +68,82 @@ jobs:
         run: |
           BRANCH="${{ github.ref_name }}"
           SHA="${{ github.sha }}"
+          VERSION=$(grep -m1 '^version' pyproject.toml | sed 's/.*"\(.*\)"/\1/')
           EXISTING=$(gh pr list --head "$BRANCH" --base main --json number --jq '.[0].number')
           if [ -n "$EXISTING" ]; then
             echo "PR #$EXISTING already exists for $BRANCH — skipping."
           else
-            printf '## Automated PR\n\nOpened automatically after CI passed on `%s`.\n\n**Commit:** %s\n\n### Checklist\n- [x] Lint passed\n- [x] Tests passed\n- [ ] Manual review\n' "$BRANCH" "$SHA" > /tmp/pr_body.md
+            printf '## Automated PR\n\nOpened automatically after CI passed on `%s`.\n\n**Version:** `%s`\n**Commit:** %s\n\n### Checklist\n- [x] Lint passed\n- [x] Tests passed\n- [ ] Manual review\n' "$BRANCH" "$VERSION" "$SHA" > /tmp/pr_body.md
             gh pr create \
               --base main \
               --head "$BRANCH" \
-              --title "feat: merge ${BRANCH} into main" \
+              --title "feat: merge ${BRANCH} into main (v${VERSION})" \
               --body-file /tmp/pr_body.md
           fi
+
+  docs:
+    name: Deploy Docs
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref_name == 'main'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install MkDocs
+        run: pip install mkdocs mkdocs-material
+
+      - name: Deploy to GitHub Pages
+        run: mkdocs gh-deploy --force
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push' && github.ref_name == 'main'
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read version from pyproject.toml
+        id: version
+        run: |
+          VERSION=$(grep -m1 '^version' pyproject.toml | sed 's/.*"\(.*\)"/\1/')
+          echo "value=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Check if tag already exists
+        id: tag_check
+        run: |
+          if git ls-remote --tags origin "refs/tags/${{ steps.version.outputs.tag }}" | grep -q .; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create git tag
+        if: steps.tag_check.outputs.exists == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "${{ steps.version.outputs.tag }}"
+          git push origin "${{ steps.version.outputs.tag }}"
+
+      - name: Create GitHub Release
+        if: steps.tag_check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ steps.version.outputs.tag }}" \
+            --title "Dataforge ${{ steps.version.outputs.tag }}" \
+            --generate-notes

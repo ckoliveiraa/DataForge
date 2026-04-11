@@ -3,7 +3,7 @@ import dagre from 'dagre';
 import ReactFlow, { Background, Controls, ConnectionLineType, useNodesState, useEdgesState, MarkerType } from 'reactflow';
 import type { Edge, Node } from 'reactflow';
 import 'reactflow/dist/style.css';
-import { Plus, Download, FileJson, Upload, Trash2, Key, Link as LinkIcon, X, Network, Play, BookOpen, Search } from 'lucide-react';
+import { Plus, Download, FileJson, Upload, Trash2, Key, Link as LinkIcon, X, Network, Play, BookOpen, Search, Sparkles } from 'lucide-react';
 
 const FAKER_CATALOG: { category: string; color: string; methods: { name: string; example: string }[] }[] = [
   { category: 'Person', color: '#60a5fa', methods: [
@@ -210,9 +210,9 @@ export default function App() {
       setGeneratedYaml('');
       setSelectedTableId(null);
     } catch (err: any) {
-      alert("Error loading YAML schema: " + err.message);
+      showConfirm('Error loading schema', err.message || String(err), () => {});
     }
-    
+
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -380,9 +380,204 @@ export default function App() {
 
   const allFakerMethods = FAKER_CATALOG.flatMap(c => c.methods.map(m => ({ ...m, category: c.category, color: c.color })));
 
+  const [dbTestStatus, setDbTestStatus] = useState<'idle' | 'testing' | 'ok' | 'error'>('idle');
+  const [dbTestError, setDbTestError] = useState('');
+  const [dbAdvanced, setDbAdvanced] = useState(false);
+  const [showDbPassword, setShowDbPassword] = useState(false);
+  const [dbForm, setDbForm] = useState({
+    type: 'postgresql',
+    host: '',
+    port: '5432',
+    database: '',
+    user: '',
+    password: '',
+  });
+
+  const DB_PORT_DEFAULTS: Record<string, string> = { postgresql: '5432', mysql: '3306', sqlite: '' };
+
+  type SavedConn = { name: string; form: typeof dbForm; advancedUrl: string; advanced: boolean };
+  const SAVED_CONNS_KEY = 'dataforge_saved_connections';
+  const loadSavedConns = (): SavedConn[] => {
+    try { return JSON.parse(localStorage.getItem(SAVED_CONNS_KEY) || '[]'); } catch { return []; }
+  };
+  const [savedConns, setSavedConns] = useState<SavedConn[]>(loadSavedConns);
+  const [saveConnName, setSaveConnName] = useState('');
+  const [showSaveInput, setShowSaveInput] = useState(false);
+
+  const persistSavedConns = (conns: SavedConn[]) => {
+    localStorage.setItem(SAVED_CONNS_KEY, JSON.stringify(conns));
+    setSavedConns(conns);
+  };
+
+  const handleSaveConn = () => {
+    const name = saveConnName.trim();
+    if (!name) return;
+    const entry: SavedConn = { name, form: { ...dbForm }, advancedUrl: runConfig.dbUrl, advanced: dbAdvanced };
+    const existing = savedConns.filter(c => c.name !== name);
+    persistSavedConns([entry, ...existing]);
+    setSaveConnName('');
+    setShowSaveInput(false);
+  };
+
+  const handleLoadConn = (conn: SavedConn) => {
+    setDbForm(conn.form);
+    setDbAdvanced(conn.advanced);
+    if (conn.advanced) setRunConfig(r => ({ ...r, dbUrl: conn.advancedUrl }));
+    setDbTestStatus('idle');
+    setDbTestError('');
+  };
+
+  const handleDeleteConn = (name: string) => {
+    persistSavedConns(savedConns.filter(c => c.name !== name));
+  };
+
+  const buildDbUrl = (form: typeof dbForm): string => {
+    if (form.type === 'sqlite') return `sqlite:///${form.database || 'output.db'}`;
+    if (!form.host || !form.database) return '';
+    const driver = form.type === 'mysql' ? 'mysql+pymysql' : 'postgresql+psycopg2';
+    const creds = form.user ? `${encodeURIComponent(form.user)}:${encodeURIComponent(form.password)}@` : '';
+    const port = form.port ? `:${form.port}` : '';
+    return `${driver}://${creds}${form.host}${port}/${form.database}`;
+  };
+
+  const computedDbUrl = dbAdvanced ? runConfig.dbUrl : buildDbUrl(dbForm);
+
+  const handleTestDbConnection = async () => {
+    setDbTestStatus('testing');
+    setDbTestError('');
+    try {
+      const res = await fetch('/api/test-db-connection', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dbUrl: computedDbUrl }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setDbTestStatus('ok');
+      } else {
+        setDbTestStatus('error');
+        setDbTestError(data.error || 'Connection failed.');
+      }
+    } catch (e: any) {
+      setDbTestStatus('error');
+      setDbTestError(e.message || String(e));
+    }
+  };
+
   const [saveModal, setSaveModal] = useState(false);
   const [saveName, setSaveName] = useState('');
   const [saveError, setSaveError] = useState('');
+
+  // Generic confirm dialog
+  const [confirmModal, setConfirmModal] = useState<{ title: string; message: string; onConfirm: () => void } | null>(null);
+  const showConfirm = (title: string, message: string, onConfirm: () => void) => setConfirmModal({ title, message, onConfirm });
+
+  const AI_KEY_STORAGE = 'dataforge_ai_config';
+  const loadAiConfig = () => {
+    try { return JSON.parse(localStorage.getItem(AI_KEY_STORAGE) || '{}'); } catch { return {}; }
+  };
+
+  const AI_PROVIDERS = [
+    { key: 'anthropic', label: 'Anthropic',   color: '#f59e0b', keyPlaceholder: 'sk-ant-api03-…',  modelPlaceholder: 'e.g. claude-3-5-haiku-20241022' },
+    { key: 'openai',    label: 'OpenAI',       color: '#10b981', keyPlaceholder: 'sk-…',            modelPlaceholder: 'e.g. gpt-4o-mini' },
+    { key: 'google',    label: 'Google',       color: '#60a5fa', keyPlaceholder: 'AIza…',           modelPlaceholder: 'e.g. gemini-2.0-flash' },
+    { key: 'groq',      label: 'Groq',         color: '#f472b6', keyPlaceholder: 'gsk_…',           modelPlaceholder: 'e.g. llama-3.3-70b-versatile' },
+    { key: 'mistral',   label: 'Mistral',      color: '#a78bfa', keyPlaceholder: 'xxxxxxxx…',       modelPlaceholder: 'e.g. mistral-small-latest' },
+    { key: 'together',  label: 'Together AI',  color: '#34d399', keyPlaceholder: 'xxxxxxxx…',       modelPlaceholder: 'e.g. meta-llama/Llama-3.3-70B-Instruct-Turbo' },
+    { key: 'ollama',    label: 'Ollama',        color: '#94a3b8', keyPlaceholder: '',               modelPlaceholder: 'e.g. llama3.2' },
+  ] as const;
+
+  const AI_DEFAULT_PROMPT = `E-commerce with 4 tables:
+- customers: full name, email, phone, city, country, registration date
+- products: name, category (Electronics/Clothing/Books/Home/Sports), price (10–2000), stock quantity
+- orders: linked to customer, order date (last 2 years), status (pending/processing/shipped/delivered/cancelled), total amount
+- order_items: linked to order and product, quantity (1–10), unit price`;
+
+  const [aiModal, setAiModal] = useState(false);
+  const [aiProvider, setAiProvider] = useState<string>(() => loadAiConfig().provider || 'anthropic');
+  const [aiApiKeys, setAiApiKeys] = useState<Record<string, string>>(() => loadAiConfig().apiKeys || {});
+  const [aiModels, setAiModels] = useState<Record<string, string>>(() => loadAiConfig().models || {});
+  const [aiAvailableModels, setAiAvailableModels] = useState<Record<string, string[]>>({});
+  const [aiModelsLoading, setAiModelsLoading] = useState(false);
+  const [aiModelsError, setAiModelsError] = useState('');
+  const [aiPrompt, setAiPrompt] = useState(AI_DEFAULT_PROMPT);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState('');
+
+  const currentProviderMeta = AI_PROVIDERS.find(p => p.key === aiProvider) ?? AI_PROVIDERS[0];
+  const currentApiKey = aiApiKeys[aiProvider] ?? '';
+  const currentModel = aiModels[aiProvider] ?? '';
+  const availableModels = aiAvailableModels[aiProvider] ?? [];
+
+  const handleLoadModels = async () => {
+    setAiModelsError('');
+    setAiModelsLoading(true);
+    try {
+      const res = await fetch('/api/ai-models', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ provider: aiProvider, apiKey: currentApiKey.trim() }),
+      });
+      const data = await res.json();
+      if (data.error) { setAiModelsError(data.error); return; }
+      setAiAvailableModels(prev => ({ ...prev, [aiProvider]: data.models }));
+      if (!currentModel && data.models.length > 0) {
+        setAiModels(prev => ({ ...prev, [aiProvider]: data.models[0] }));
+      }
+    } catch (e: any) {
+      setAiModelsError(e.message || String(e));
+    } finally {
+      setAiModelsLoading(false);
+    }
+  };
+
+  const handleAiGenerate = async () => {
+    setAiError('');
+    const isOllama = aiProvider === 'ollama';
+    if (!currentApiKey.trim() && !isOllama) { setAiError('API key is required.'); return; }
+    if (!aiPrompt.trim()) { setAiError('Describe the domain you want to generate.'); return; }
+    setAiLoading(true);
+    try {
+      const savedKeys = { ...aiApiKeys };
+      const savedModels = { ...aiModels };
+      if (currentApiKey.trim()) savedKeys[aiProvider] = currentApiKey.trim();
+      if (currentModel.trim()) savedModels[aiProvider] = currentModel.trim();
+      localStorage.setItem(AI_KEY_STORAGE, JSON.stringify({ provider: aiProvider, apiKeys: savedKeys, models: savedModels }));
+      const res = await fetch('/api/ai-generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ provider: aiProvider, apiKey: currentApiKey.trim(), model: currentModel.trim() || undefined, prompt: aiPrompt }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) { setAiError(data.error || 'AI generation failed.'); return; }
+      const parsed = SchemaReader.parseYaml(data.yaml);
+      setDomain(parsed.domain || 'custom');
+      const tablesWithPos = parsed.tables.map((t: Table, index: number) => ({
+        ...t,
+        position: { x: 50 + index * 320, y: 100 + (index % 3) * 220 }
+      }));
+      setTables(tablesWithPos);
+      setGeneratedYaml('');
+      setSelectedTableId(null);
+      setAiModal(false);
+      setAiPrompt(AI_DEFAULT_PROMPT);
+    } catch (e: any) {
+      setAiError(e.message || String(e));
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleDeleteDomain = () => {
+    showConfirm(
+      'Delete schema',
+      `Remove "${domain}" permanently? This cannot be undone.`,
+      async () => {
+        await fetch(`/api/schemas/${domain}`, { method: 'DELETE' });
+        window.location.reload();
+      }
+    );
+  };
 
   const handleSaveSchema = async () => {
     setSaveError('');
@@ -416,7 +611,7 @@ export default function App() {
     uploadTarget: string,
     bucket: string,
     prefix: string,
-    partitionBy: string,
+    partitionByTable: Record<string, string>,
     jsonMode: string,
     seed: string,
     dbUrl: string,
@@ -426,6 +621,7 @@ export default function App() {
     count: string,
     tablesToInclude: string[],
     columnsFilter: string,
+    increments: Array<{ table: string; column: string; step: string; unit: string }>,
   }>({
     formats: ['csv'],
     destination: 'local' as 'local' | 'cloud' | 'database',
@@ -434,7 +630,7 @@ export default function App() {
     uploadTarget: 'gcs',
     bucket: '',
     prefix: 'datasets/',
-    partitionBy: '',
+    partitionByTable: {},
     jsonMode: 'flat',
     seed: '',
     dbUrl: '',
@@ -444,13 +640,14 @@ export default function App() {
     count: '',
     tablesToInclude: [],
     columnsFilter: '',
+    increments: [],
   });
   const [runLogs, setRunLogs] = useState('');
   const [isRunning, setIsRunning] = useState(false);
 
   const handleRunCli = async () => {
     setIsRunning(true);
-    setRunLogs('Starting generation...');
+    setRunLogs('');
     try {
       const yamlStr = SchemaWriter.generateYaml(domain, tables);
       const res = await fetch('/api/run-cli', {
@@ -462,27 +659,58 @@ export default function App() {
           outputDir: runConfig.outputDir,
           rows: runConfig.rows !== '' ? parseInt(runConfig.rows) : undefined,
           uploadTarget: runConfig.destination === 'cloud' ? runConfig.uploadTarget : undefined,
-          bucket: runConfig.bucket,
-          prefix: runConfig.prefix,
-          partitionBy: runConfig.partitionBy || undefined,
+          bucket: runConfig.bucket.trim(),
+          prefix: runConfig.prefix.trim() || domain,
+          partitionByTable: Object.keys(runConfig.partitionByTable).length > 0 ? runConfig.partitionByTable : undefined,
           jsonMode: runConfig.jsonMode,
           seed: runConfig.seed !== '' ? parseInt(runConfig.seed) : undefined,
-          dbUrl: runConfig.destination === 'database' ? runConfig.dbUrl || undefined : undefined,
+          dbUrl: runConfig.destination === 'database' ? computedDbUrl || undefined : undefined,
           ifExists: runConfig.ifExists,
           dbSchema: runConfig.dbSchema || undefined,
           recurrence: runConfig.recurrence !== '' ? parseFloat(runConfig.recurrence) : undefined,
           count: runConfig.count !== '' ? parseInt(runConfig.count) : undefined,
           tables: runConfig.tablesToInclude.length > 0 ? runConfig.tablesToInclude : undefined,
           columns: runConfig.columnsFilter.trim() ? runConfig.columnsFilter.trim().split('\n').filter(Boolean) : undefined,
+          increments: runConfig.increments.filter(i => i.table && i.column && i.step !== ''),
         })
       });
-      const data = await res.json();
-      setRunLogs(`$ ${data.args}\n\n${data.output || data.error || 'Done.'}`);
+
+      if (!res.body) throw new Error('No response body');
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buf = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buf += decoder.decode(value, { stream: true });
+        // SSE lines are separated by \n\n
+        const parts = buf.split('\n\n');
+        buf = parts.pop() ?? '';
+        for (const part of parts) {
+          const line = part.startsWith('data: ') ? part.slice(6) : part;
+          if (!line.trim()) continue;
+          try {
+            const msg = JSON.parse(line);
+            if (msg.type === 'cmd' || msg.type === 'out') {
+              setRunLogs(prev => prev + msg.text);
+            } else if (msg.type === 'done') {
+              const statusLine = msg.stopped ? '\n⏹ Stopped.' : msg.success ? '\n✓ Done.' : '\n✗ Failed.';
+              setRunLogs(prev => prev + statusLine);
+              setIsRunning(false);
+            }
+          } catch {}
+        }
+      }
     } catch (e: any) {
-      setRunLogs(`Connection Error: ${e.message || String(e)}`);
-    } finally {
+      setRunLogs(prev => prev + `\nConnection Error: ${e.message || String(e)}`);
       setIsRunning(false);
     }
+  };
+
+  const handleStopCli = async () => {
+    await fetch('/api/stop-cli', { method: 'POST' });
+    setRunLogs(prev => prev + '\n⏹ Stop requested…');
   };
 
   // Sync position changes back to tables state dynamically when nodes are dragged
@@ -495,33 +723,76 @@ export default function App() {
 
   return (
     <div className="container animated" style={{ maxWidth: '100vw', padding: '1rem', height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <header style={{ marginBottom: '1rem' }}>
-        <h1 style={{ fontSize: '1.8rem' }}>Dataforge Canvas Planner</h1>
+      <header style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+        <img src="/logo-icon.png" alt="Dataforge icon" style={{ height: '52px', objectFit: 'contain' }} />
+        <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1.1 }}>
+          <span style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', fontWeight: 800, letterSpacing: '-0.02em', color: 'var(--text-main)' }}>
+            Data<span style={{ color: 'var(--primary)' }}>forge</span>
+          </span>
+          <span style={{ fontFamily: 'var(--font-body)', fontSize: '0.72rem', fontWeight: 500, letterSpacing: '0.1em', color: 'var(--text-subtle)', textTransform: 'uppercase' }}>Synthetic Dataset Generator</span>
+        </div>
+        <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-subtle)', background: 'rgba(34,211,238,0.06)', border: '1px solid rgba(34,211,238,0.12)', borderRadius: '999px', padding: '0.2rem 0.75rem', letterSpacing: '0.04em' }}>
+            v{import.meta.env.VITE_APP_VERSION}
+          </span>
+          <a href="https://github.com/ckoliveiraa/DataForge" target="_blank" rel="noopener noreferrer"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.85rem', transition: 'color var(--duration-base) var(--ease-out)' }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-main)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}>
+            <svg height="18" width="18" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
+                0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13
+                -.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66
+                .07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15
+                -.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27
+                .68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12
+                .51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48
+                0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
+            GitHub
+          </a>
+        </div>
       </header>
 
       <div className="glass-panel" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', marginBottom: '1rem' }}>
         <div style={{ flex: 1, marginRight: '2rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
              <label style={{margin: 0, paddingRight: '0.5rem'}}>Domain:</label>
              <select value={domain} onChange={handleDomainChange} style={{width: 'auto', padding: '0.5rem'}}>
                {validDomains.map((d: string) => <option key={d} value={d}>{d}</option>)}
              </select>
+             {domain !== 'custom' && (
+               <button
+                 onClick={handleDeleteDomain}
+                 className="btn-icon-danger"
+                 aria-label={`Delete schema ${domain}`}
+               >
+                 <Trash2 size={16} />
+               </button>
+             )}
           </div>
           <button className="btn-primary" onClick={addTable} style={{ padding: '0.5rem 1rem' }}>
             <Plus size={16} /> Add Table
+          </button>
+          <button
+            className="btn-accent"
+            onClick={() => { setAiError(''); setAiModal(true); }}
+            style={{ padding: '0.5rem 1rem' }}
+          >
+            <Sparkles size={16} /> AI Generate
           </button>
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           {tables.length > 0 && (
-             <button className="btn-secondary" onClick={onLayout} style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+             <button className="btn-secondary" onClick={onLayout} style={{ padding: '0.5rem 1rem' }}>
                <Network size={16} /> Auto Layout
              </button>
           )}
-          <input 
-            type="file" 
-            accept=".yaml,.yml" 
-            style={{ display: 'none' }} 
+          <input
+            type="file"
+            accept=".yaml,.yml"
+            style={{ display: 'none' }}
             ref={fileInputRef}
             onChange={handleFileUpload}
           />
@@ -534,12 +805,12 @@ export default function App() {
              </button>
           )}
           {tables.length > 0 && (
-             <button className="btn-secondary" onClick={() => { setSaveName(domain !== 'custom' ? domain : ''); setSaveError(''); setSaveModal(true); }} style={{ padding: '0.5rem 1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderColor: '#f59e0b', color: '#f59e0b' }}>
+             <button className="btn-warning" onClick={() => { setSaveName(domain !== 'custom' ? domain : ''); setSaveError(''); setSaveModal(true); }} style={{ padding: '0.5rem 1rem' }}>
                <Download size={16} /> Save as Default
              </button>
           )}
           {tables.length > 0 && (
-             <button className="btn-primary" onClick={() => setShowRunPanel(true)} style={{ padding: '0.5rem 1rem', background: '#10b981', borderColor: '#10b981', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+             <button className="btn-success" onClick={() => setShowRunPanel(true)} style={{ padding: '0.5rem 1rem' }}>
                <Play size={16} /> Run Generator
              </button>
           )}
@@ -563,14 +834,14 @@ export default function App() {
             fitView
             style={{ width: '100%', height: '100%' }}
           >
-            <Background color="#94a3b8" gap={20} size={1} />
+            <Background color="rgba(255,255,255,0.06)" gap={24} size={1} />
             <Controls />
           </ReactFlow>
 
           {generatedYaml && (
-            <div className="glass-panel animated" style={{ position: 'absolute', top: '1rem', right: '1rem', left: '1rem', zIndex: 10, maxHeight: '30vh', overflowY: 'auto', border: '1px solid rgba(59, 130, 246, 0.4)' }}>
+            <div className="glass-panel animated" style={{ position: 'absolute', top: '1rem', right: '1rem', left: '1rem', zIndex: 10, maxHeight: '30vh', overflowY: 'auto', border: '1px solid rgba(34, 211, 238, 0.25)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                <h3 style={{ margin: 0, fontSize: '1rem', color: '#60a5fa' }}>YAML Schema Configuration</h3>
+                <h3 style={{ margin: 0, fontSize: '1rem', color: 'var(--primary)', fontFamily: 'var(--font-display)' }}>YAML Schema</h3>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button className="btn-secondary" onClick={downloadYaml} style={{ padding: '0.25rem 0.75rem', fontSize: '0.8rem' }}>
                     <Download size={14} /> Download
@@ -587,23 +858,27 @@ export default function App() {
 
         {/* Edit Sidebar */}
         {selectedTable && (
-          <div className="animated" style={{ 
-            width: '400px', 
-            background: 'rgba(15, 23, 42, 0.95)', 
-            borderLeft: '1px solid rgba(148, 163, 184, 0.2)', 
-            padding: '1.5rem', 
-            height: '100%', 
+          <div className="animated" style={{
+            width: '400px',
+            background: 'rgba(7, 9, 15, 0.97)',
+            borderLeft: '1px solid rgba(255,255,255,0.07)',
+            padding: '1.5rem',
+            height: '100%',
             overflowY: 'auto',
-            backdropFilter: 'blur(12px)',
-            boxShadow: '-4px 0 15px rgba(0,0,0,0.3)'
+            backdropFilter: 'blur(20px)',
+            boxShadow: '-8px 0 32px rgba(0,0,0,0.5)'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
               <h2 style={{ fontSize: '1.25rem', margin: 0 }}>Edit Table</h2>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button onClick={() => onRemoveTable(selectedTable.id)} style={{ padding: '0.5rem', background: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>
+                <button
+                  onClick={() => onRemoveTable(selectedTable.id)}
+                  className="btn-icon-danger"
+                  aria-label="Delete table"
+                >
                   <Trash2 size={16}/>
                 </button>
-                <button onClick={() => setSelectedTableId(null)} style={{ padding: '0.5rem', background: 'transparent', color: '#94a3b8', border: 'none', cursor: 'pointer' }}>
+                <button onClick={() => setSelectedTableId(null)} className="btn-icon" aria-label="Close panel">
                   <X size={16}/>
                 </button>
               </div>
@@ -650,7 +925,11 @@ export default function App() {
                           placeholder="Column Name"
                           style={{ flex: 1, marginRight: '0.5rem', padding: '0.5rem' }}
                         />
-                        <button onClick={() => onRemoveColumn(selectedTable.id, col.id)} style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.5rem' }}>
+                        <button
+                          onClick={() => onRemoveColumn(selectedTable.id, col.id)}
+                          className="btn-icon-danger"
+                          aria-label="Remove column"
+                        >
                           <Trash2 size={16}/>
                         </button>
                       </div>
@@ -666,14 +945,19 @@ export default function App() {
                             {VALID_DTYPES.map(d => <option key={d} value={d} style={{color: '#000'}}>{d}</option>)}
                           </select>
                         </div>
-                        <div style={{ flex: 1 }}>
-                          <label style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Nullable (0-1)</label>
-                          <input 
-                            value={col.nullable} 
-                            onChange={(e) => onUpdateColumn(selectedTable.id, col.id, 'nullable', e.target.value)} 
-                            placeholder="0"
-                            style={{ padding: '0.5rem' }}
-                          />
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                          <label style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.5rem' }}>Nullable</label>
+                          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.4rem 0' }}>
+                            <input
+                              type="checkbox"
+                              checked={parseFloat(col.nullable as any) > 0}
+                              onChange={e => onUpdateColumn(selectedTable.id, col.id, 'nullable', e.target.checked ? '0.5' : '0')}
+                              style={{ width: '1rem', height: '1rem', accentColor: '#38bdf8', cursor: 'pointer' }}
+                            />
+                            <span style={{ fontSize: '0.8rem', color: parseFloat(col.nullable as any) > 0 ? '#38bdf8' : '#475569' }}>
+                              {parseFloat(col.nullable as any) > 0 ? 'Yes' : 'No'}
+                            </span>
+                          </label>
                         </div>
                       </div>
 
@@ -704,13 +988,13 @@ export default function App() {
                         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
                           <button
                             onClick={() => { onUpdateColumn(selectedTable.id, col.id, 'choices', []); }}
-                            style={{ flex: 1, padding: '0.3rem', fontSize: '0.75rem', borderRadius: '4px', border: 'none', cursor: 'pointer', background: col.choices.length === 0 ? '#3b82f6' : 'rgba(255,255,255,0.07)', color: col.choices.length === 0 ? 'white' : '#94a3b8' }}
+                            style={{ flex: 1, padding: '0.3rem', fontSize: '0.75rem', borderRadius: '4px', border: `1px solid ${col.choices.length === 0 ? 'rgba(34,211,238,0.4)' : 'transparent'}`, cursor: 'pointer', background: col.choices.length === 0 ? 'rgba(34,211,238,0.12)' : 'rgba(255,255,255,0.05)', color: col.choices.length === 0 ? 'var(--primary)' : 'var(--text-muted)' }}
                           >
                             Faker Method
                           </button>
                           <button
                             onClick={() => { onUpdateColumn(selectedTable.id, col.id, 'fakerProvider', ''); onUpdateColumn(selectedTable.id, col.id, 'choices', col.choices.length === 0 ? [''] : col.choices); }}
-                            style={{ flex: 1, padding: '0.3rem', fontSize: '0.75rem', borderRadius: '4px', border: 'none', cursor: 'pointer', background: col.choices.length > 0 ? '#8b5cf6' : 'rgba(255,255,255,0.07)', color: col.choices.length > 0 ? 'white' : '#94a3b8' }}
+                            style={{ flex: 1, padding: '0.3rem', fontSize: '0.75rem', borderRadius: '4px', border: `1px solid ${col.choices.length > 0 ? 'rgba(251,146,60,0.4)' : 'transparent'}`, cursor: 'pointer', background: col.choices.length > 0 ? 'rgba(251,146,60,0.12)' : 'rgba(255,255,255,0.05)', color: col.choices.length > 0 ? 'var(--accent)' : 'var(--text-muted)' }}
                           >
                             Custom List
                           </button>
@@ -742,7 +1026,7 @@ export default function App() {
                               <button
                                 title="Browse all faker methods"
                                 onClick={() => { setFakerSearch(''); setFakerBrowser({ tableId: selectedTable.id, colId: col.id }); }}
-                                style={{ padding: '0.4rem 0.6rem', background: 'rgba(96,165,250,0.1)', border: '1px solid rgba(96,165,250,0.3)', borderRadius: '6px', color: '#60a5fa', cursor: 'pointer', flexShrink: 0 }}>
+                                style={{ padding: '0.4rem 0.6rem', background: 'rgba(34,211,238,0.08)', border: '1px solid rgba(34,211,238,0.2)', borderRadius: '6px', color: 'var(--primary)', cursor: 'pointer', flexShrink: 0 }}>
                                 <BookOpen size={15} />
                               </button>
                             </div>
@@ -753,12 +1037,12 @@ export default function App() {
                                 : allFakerMethods.filter(m => m.name.includes(q)).slice(0, 8);
                               if (hits.length === 0) return null;
                               return (
-                                <div style={{ position: 'absolute', top: '100%', left: 0, right: '2.6rem', zIndex: 50, marginTop: '2px', background: '#1e293b', border: '1px solid rgba(148,163,184,0.2)', borderRadius: '6px', overflow: 'hidden', boxShadow: '0 8px 24px rgba(0,0,0,0.4)' }}>
+                                <div style={{ position: 'absolute', top: '100%', left: 0, right: '2.6rem', zIndex: 50, marginTop: '2px', background: 'rgba(10,13,20,0.98)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 12px 32px rgba(0,0,0,0.6)' }}>
                                   {hits.map(m => (
                                     <button key={m.name} onMouseDown={() => onUpdateColumn(selectedTable.id, col.id, 'fakerProvider', m.name)}
                                       style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', padding: '0.45rem 0.75rem', background: 'none', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.04)', cursor: 'pointer', textAlign: 'left' }}>
                                       <span style={{ fontSize: '0.65rem', background: `${m.color}22`, color: m.color, borderRadius: '3px', padding: '0.1rem 0.35rem', flexShrink: 0 }}>{m.category}</span>
-                                      <span style={{ fontSize: '0.82rem', color: '#e2e8f0', fontFamily: 'monospace' }}>{m.name}</span>
+                                      <span style={{ fontSize: '0.82rem', color: 'var(--text-main)', fontFamily: 'var(--font-mono)' }}>{m.name}</span>
                                       <span style={{ fontSize: '0.72rem', color: '#475569', marginLeft: 'auto', flexShrink: 0 }}>{m.example}</span>
                                     </button>
                                   ))}
@@ -843,18 +1127,18 @@ export default function App() {
 
       {/* Run Generator Modal */}
       {showRunPanel && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div className="glass-panel animated" style={{ width: '580px', maxWidth: '95vw', padding: '1.5rem', background: 'rgba(15, 23, 42, 0.95)', border: '1px solid rgba(148, 163, 184, 0.3)' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(6px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="glass-panel animated-scale" style={{ width: '580px', maxWidth: '95vw', padding: '1.5rem', background: 'rgba(9, 12, 20, 0.97)', border: '1px solid rgba(255,255,255,0.08)', borderTopColor: 'rgba(255,255,255,0.12)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h2 style={{ margin: 0, fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Play size={20} color="#10b981"/> Run CLI Generator</h2>
-              <button onClick={() => setShowRunPanel(false)} style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}><X size={20}/></button>
+              <h2 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Play size={18} color="var(--success)"/> Run Generator</h2>
+              <button onClick={() => setShowRunPanel(false)} className="btn-icon" aria-label="Close run panel"><X size={18}/></button>
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '70vh', overflowY: 'auto', paddingRight: '0.25rem' }}>
 
               {/* Formats + JSON mode */}
               <div style={{ borderBottom: '1px solid rgba(148,163,184,0.15)', paddingBottom: '1rem' }}>
-                <p style={{ margin: '0 0 0.75rem', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b' }}>Formato</p>
+                <p style={{ margin: '0 0 0.75rem', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b' }}>Format</p>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                   {(['csv', 'json', 'parquet', 'avro'] as const).map(fmt => {
                     const active = runConfig.formats.includes(fmt);
@@ -886,16 +1170,12 @@ export default function App() {
                     <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Rows Override <span style={{ color: '#64748b' }}>(optional)</span></label>
                     <input type="number" value={runConfig.rows} onChange={e => setRunConfig({...runConfig, rows: e.target.value})} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. 5000" min="1" />
                   </div>
-                  <div style={{ flex: 1 }}>
-                    <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Partition By <span style={{ color: '#64748b' }}>(optional)</span></label>
-                    <input type="text" value={runConfig.partitionBy} onChange={e => setRunConfig({...runConfig, partitionBy: e.target.value})} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. transacted_at" />
-                  </div>
                 </div>
               </div>
 
               {/* Destination */}
               <div style={{ borderBottom: '1px solid rgba(148,163,184,0.15)', paddingBottom: '1rem' }}>
-                <p style={{ margin: '0 0 0.75rem', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b' }}>Destino</p>
+                <p style={{ margin: '0 0 0.75rem', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b' }}>Destination</p>
                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
                   {([
                     { key: 'local', label: 'Local', color: '#60a5fa' },
@@ -942,24 +1222,209 @@ export default function App() {
                         <input type="text" value={runConfig.prefix} onChange={e => setRunConfig({...runConfig, prefix: e.target.value})} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. datasets/" />
                       </div>
                     </div>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Credentials File <span style={{ color: '#64748b' }}>(optional)</span></label>
-                      <input type="text" value={runConfig.credentials} onChange={e => setRunConfig({...runConfig, credentials: e.target.value})} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. /home/user/.gcp/key.json" />
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Local staging directory</label>
-                      <input type="text" value={runConfig.outputDir} onChange={e => setRunConfig({...runConfig, outputDir: e.target.value})} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. output" />
-                    </div>
+                    <p style={{ margin: 0, fontSize: '0.75rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <span style={{ color: '#10b981' }}>✓</span> Credentials auto-loaded from <code style={{ color: '#94a3b8' }}>credentials/</code>
+                    </p>
                   </div>
                 )}
 
                 {/* Database */}
                 {runConfig.destination === 'database' && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>DB URL</label>
-                      <input type="text" value={runConfig.dbUrl} onChange={e => setRunConfig({...runConfig, dbUrl: e.target.value})} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. postgresql://user:pass@host/db" />
+
+                    {/* Saved connections */}
+                    {savedConns.length > 0 && (
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '0.4rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Saved Connections</label>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                          {savedConns.map(conn => (
+                            <div key={conn.name} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(255,255,255,0.04)', borderRadius: '6px', padding: '0.4rem 0.6rem', border: '1px solid rgba(255,255,255,0.08)' }}>
+                              <button type="button" onClick={() => handleLoadConn(conn)}
+                                style={{ flex: 1, background: 'none', border: 'none', color: '#e2e8f0', fontSize: '0.82rem', cursor: 'pointer', textAlign: 'left', padding: 0 }}>
+                                {conn.name}
+                                <span style={{ marginLeft: '0.5rem', color: '#475569', fontSize: '0.72rem' }}>
+                                  {conn.advanced ? conn.advancedUrl.replace(/:([^:@]+)@/, ':***@') : `${conn.form.type}://${conn.form.host}/${conn.form.database}`}
+                                </span>
+                              </button>
+                              <button type="button" onClick={() => handleDeleteConn(conn.name)}
+                                style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '0.85rem', padding: '0 0.2rem', lineHeight: 1 }}
+                                title="Remove">✕</button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Toggle Advanced + Save */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      {showSaveInput ? (
+                        <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', flex: 1 }}>
+                          <input
+                            type="text"
+                            value={saveConnName}
+                            onChange={e => setSaveConnName(e.target.value)}
+                            onKeyDown={e => { if (e.key === 'Enter') handleSaveConn(); if (e.key === 'Escape') setShowSaveInput(false); }}
+                            placeholder="Connection name..."
+                            autoFocus
+                            style={{ flex: 1, padding: '0.3rem 0.5rem', fontSize: '0.8rem', background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '5px', color: 'white' }}
+                          />
+                          <button type="button" onClick={handleSaveConn}
+                            style={{ padding: '0.3rem 0.6rem', fontSize: '0.78rem', background: 'rgba(16,185,129,0.15)', border: '1px solid rgba(16,185,129,0.3)', borderRadius: '5px', color: '#10b981', cursor: 'pointer' }}>
+                            Save
+                          </button>
+                          <button type="button" onClick={() => setShowSaveInput(false)}
+                            style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '0.85rem' }}>✕</button>
+                        </div>
+                      ) : (
+                        <button type="button" onClick={() => setShowSaveInput(true)}
+                          style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '0.75rem', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}>
+                          Save connection
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => { setDbAdvanced(v => !v); setDbTestStatus('idle'); setDbTestError(''); }}
+                        style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '0.75rem', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+                      >
+                        {dbAdvanced ? 'Use form' : 'Advanced (connection string)'}
+                      </button>
                     </div>
+
+                    {!dbAdvanced ? (
+                      <>
+                        {/* DB Type */}
+                        <div>
+                          <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Database Type</label>
+                          <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            {(['postgresql', 'mysql', 'sqlite'] as const).map(t => {
+                              const active = dbForm.type === t;
+                              const colors: Record<string, string> = { postgresql: '#60a5fa', mysql: '#f59e0b', sqlite: '#a78bfa' };
+                              return (
+                                <button key={t} type="button"
+                                  onClick={() => { setDbForm(f => ({ ...f, type: t, port: DB_PORT_DEFAULTS[t] })); setDbTestStatus('idle'); }}
+                                  style={{ flex: 1, padding: '0.4rem', borderRadius: '6px', border: `1px solid ${active ? colors[t] : 'rgba(255,255,255,0.1)'}`, background: active ? `${colors[t]}18` : 'rgba(255,255,255,0.04)', color: active ? colors[t] : '#64748b', cursor: 'pointer', fontSize: '0.8rem', fontWeight: active ? 700 : 400, transition: 'all 0.15s', textTransform: 'capitalize' }}>
+                                  {t === 'postgresql' ? 'PostgreSQL' : t === 'mysql' ? 'MySQL' : 'SQLite'}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                        {/* SQLite: apenas caminho do arquivo */}
+                        {dbForm.type === 'sqlite' ? (
+                          <div>
+                            <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>File Path</label>
+                            <input type="text" value={dbForm.database}
+                              onChange={e => { setDbForm(f => ({ ...f, database: e.target.value })); setDbTestStatus('idle'); }}
+                              style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. output/data.db" />
+                          </div>
+                        ) : (
+                          <>
+                            {/* Host + Port */}
+                            <div style={{ display: 'flex', gap: '0.75rem' }}>
+                              <div style={{ flex: 3 }}>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Host</label>
+                                <input type="text" value={dbForm.host}
+                                  onChange={e => { setDbForm(f => ({ ...f, host: e.target.value })); setDbTestStatus('idle'); }}
+                                  style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. localhost" />
+                              </div>
+                              <div style={{ flex: 1 }}>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Port</label>
+                                <input type="text" value={dbForm.port}
+                                  onChange={e => { setDbForm(f => ({ ...f, port: e.target.value })); setDbTestStatus('idle'); }}
+                                  style={{ width: '100%', padding: '0.5rem' }} placeholder="5432" />
+                              </div>
+                            </div>
+
+                            {/* Database name */}
+                            <div>
+                              <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Database</label>
+                              <input type="text" value={dbForm.database}
+                                onChange={e => { setDbForm(f => ({ ...f, database: e.target.value })); setDbTestStatus('idle'); }}
+                                style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. mydb" />
+                            </div>
+
+                            {/* User + Password */}
+                            <div style={{ display: 'flex', gap: '0.75rem' }}>
+                              <div style={{ flex: 1 }}>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>User</label>
+                                <input type="text" value={dbForm.user}
+                                  onChange={e => { setDbForm(f => ({ ...f, user: e.target.value })); setDbTestStatus('idle'); }}
+                                  style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. admin" />
+                              </div>
+                              <div style={{ flex: 1 }}>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Password</label>
+                                <div style={{ position: 'relative' }}>
+                                  <input
+                                    type={showDbPassword ? 'text' : 'password'}
+                                    value={dbForm.password}
+                                    onChange={e => { setDbForm(f => ({ ...f, password: e.target.value })); setDbTestStatus('idle'); }}
+                                    style={{ width: '100%', padding: '0.5rem', paddingRight: '2.2rem', boxSizing: 'border-box' }}
+                                    placeholder="••••••••"
+                                  />
+                                  <button type="button" onClick={() => setShowDbPassword(v => !v)}
+                                    style={{ position: 'absolute', right: '0.5rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '0.85rem', padding: 0 }}>
+                                    {showDbPassword ? '🙈' : '👁'}
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </>
+                        )}
+
+                        {/* Connection string preview */}
+                        {computedDbUrl && (
+                          <div style={{ background: 'rgba(0,0,0,0.25)', borderRadius: '6px', padding: '0.5rem 0.75rem', fontSize: '0.72rem', color: '#64748b', wordBreak: 'break-all', fontFamily: 'monospace' }}>
+                            {computedDbUrl.replace(/:([^:@]+)@/, ':***@')}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      /* Advanced: connection string manual */
+                      <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Connection String</label>
+                        <input
+                          type="text"
+                          value={runConfig.dbUrl}
+                          onChange={e => { setRunConfig({...runConfig, dbUrl: e.target.value}); setDbTestStatus('idle'); setDbTestError(''); }}
+                          style={{ width: '100%', padding: '0.5rem' }}
+                          placeholder="postgresql+psycopg2://user:pass@host:5432/db"
+                        />
+                      </div>
+                    )}
+
+                    {/* Test Connection */}
+                    <div>
+                      <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                        <button
+                          type="button"
+                          onClick={handleTestDbConnection}
+                          disabled={!computedDbUrl.trim() || dbTestStatus === 'testing'}
+                          style={{
+                            padding: '0.5rem 0.85rem',
+                            borderRadius: '6px',
+                            border: '1px solid rgba(255,255,255,0.15)',
+                            background: dbTestStatus === 'ok' ? 'rgba(16,185,129,0.15)' : dbTestStatus === 'error' ? 'rgba(239,68,68,0.15)' : 'rgba(255,255,255,0.06)',
+                            color: dbTestStatus === 'ok' ? '#10b981' : dbTestStatus === 'error' ? '#ef4444' : '#94a3b8',
+                            cursor: !computedDbUrl.trim() || dbTestStatus === 'testing' ? 'not-allowed' : 'pointer',
+                            fontSize: '0.8rem',
+                            whiteSpace: 'nowrap',
+                            transition: 'all 0.15s',
+                            opacity: !computedDbUrl.trim() ? 0.5 : 1,
+                          }}
+                        >
+                          {dbTestStatus === 'testing' ? '...' : dbTestStatus === 'ok' ? '✓ Connected' : dbTestStatus === 'error' ? '✗ Failed' : 'Test Connection'}
+                        </button>
+                      </div>
+                      {dbTestStatus === 'error' && dbTestError && (
+                        <p style={{ margin: '0.35rem 0 0', fontSize: '0.78rem', color: '#f87171', wordBreak: 'break-all' }}>{dbTestError}</p>
+                      )}
+                      {dbTestStatus === 'ok' && (
+                        <p style={{ margin: '0.35rem 0 0', fontSize: '0.78rem', color: '#34d399' }}>Connection successful.</p>
+                      )}
+                    </div>
+
+                    {/* If exists + Schema */}
                     <div style={{ display: 'flex', gap: '1rem' }}>
                       <div style={{ flex: 1 }}>
                         <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>If Table Exists</label>
@@ -980,7 +1445,7 @@ export default function App() {
 
               {/* Reproducibility */}
               <div style={{ borderBottom: '1px solid rgba(148,163,184,0.15)', paddingBottom: '1rem' }}>
-                <p style={{ margin: '0 0 0.75rem', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b' }}>Reproducibilidade</p>
+                <p style={{ margin: '0 0 0.75rem', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b' }}>Reproducibility</p>
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Random Seed <span style={{ color: '#64748b' }}>(optional)</span></label>
                   <input type="number" value={runConfig.seed} onChange={e => setRunConfig({...runConfig, seed: e.target.value})} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. 42" />
@@ -1002,6 +1467,47 @@ export default function App() {
                     </div>
                   )}
                 </div>
+
+                {/* Increment — only relevant in recurrence mode */}
+                {runConfig.recurrence && (
+                  <div style={{ marginTop: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                      <label style={{ color: '#cbd5e1', fontSize: '0.85rem' }}>Column Increments <span style={{ color: '#64748b' }}>(shift values per batch)</span></label>
+                      <button type="button"
+                        onClick={() => setRunConfig({ ...runConfig, increments: [...runConfig.increments, { table: tables[0]?.name || '', column: '', step: '1', unit: 'days' }] })}
+                        style={{ padding: '0.2rem 0.6rem', background: 'rgba(96,165,250,0.12)', border: '1px solid rgba(96,165,250,0.3)', borderRadius: '5px', color: '#60a5fa', cursor: 'pointer', fontSize: '0.78rem' }}>
+                        + Add
+                      </button>
+                    </div>
+                    {runConfig.increments.map((inc, idx) => (
+                      <div key={idx} style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', marginBottom: '0.4rem' }}>
+                        <select value={inc.table} onChange={e => { const next = [...runConfig.increments]; next[idx] = { ...next[idx], table: e.target.value, column: '' }; setRunConfig({ ...runConfig, increments: next }); }}
+                          style={{ flex: '1.2', padding: '0.35rem 0.4rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: '#e2e8f0', fontSize: '0.8rem' }}>
+                          <option value="">table</option>
+                          {tables.map(t => <option key={t.id} value={t.name} style={{ color: 'black' }}>{t.name}</option>)}
+                        </select>
+                        <select value={inc.column} onChange={e => { const next = [...runConfig.increments]; next[idx] = { ...next[idx], column: e.target.value }; setRunConfig({ ...runConfig, increments: next }); }}
+                          style={{ flex: '1.5', padding: '0.35rem 0.4rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: inc.column ? '#e2e8f0' : '#475569', fontSize: '0.8rem' }}>
+                          <option value="">column</option>
+                          {(tables.find(t => t.name === inc.table)?.columns || []).map(c => <option key={c.id} value={c.name} style={{ color: 'black' }}>{c.name}</option>)}
+                        </select>
+                        <input type="number" value={inc.step} onChange={e => { const next = [...runConfig.increments]; next[idx] = { ...next[idx], step: e.target.value }; setRunConfig({ ...runConfig, increments: next }); }}
+                          style={{ width: '56px', padding: '0.35rem 0.4rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: '#e2e8f0', fontSize: '0.8rem' }} placeholder="step" />
+                        <select value={inc.unit} onChange={e => { const next = [...runConfig.increments]; next[idx] = { ...next[idx], unit: e.target.value }; setRunConfig({ ...runConfig, increments: next }); }}
+                          style={{ flex: '1', padding: '0.35rem 0.4rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: '#e2e8f0', fontSize: '0.8rem' }}>
+                          <option value="days" style={{ color: 'black' }}>days</option>
+                          <option value="hours" style={{ color: 'black' }}>hours</option>
+                          <option value="weeks" style={{ color: 'black' }}>weeks</option>
+                          <option value="months" style={{ color: 'black' }}>months</option>
+                          <option value="years" style={{ color: 'black' }}>years</option>
+                          <option value="value" style={{ color: 'black' }}>value (+N)</option>
+                        </select>
+                        <button type="button" onClick={() => { const next = runConfig.increments.filter((_, i) => i !== idx); setRunConfig({ ...runConfig, increments: next }); }}
+                          style={{ padding: '0.2rem 0.5rem', background: 'none', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '5px', color: '#f87171', cursor: 'pointer', fontSize: '0.8rem' }}>✕</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Filters */}
@@ -1032,6 +1538,33 @@ export default function App() {
                     )}
                   </div>
                 )}
+                {tables.length > 0 && (
+                  <div style={{ marginBottom: '0.75rem' }}>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Partition By <span style={{ color: '#64748b' }}>(per table — Hive-style)</span></label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                      {tables.map(t => (
+                        <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                          <span style={{ width: '120px', fontSize: '0.8rem', color: '#94a3b8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexShrink: 0 }}>{t.name}</span>
+                          <select
+                            value={runConfig.partitionByTable[t.name] || ''}
+                            onChange={e => {
+                              const col = e.target.value;
+                              const next = { ...runConfig.partitionByTable };
+                              if (col) next[t.name] = col; else delete next[t.name];
+                              setRunConfig({ ...runConfig, partitionByTable: next });
+                            }}
+                            style={{ flex: 1, padding: '0.35rem 0.5rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: runConfig.partitionByTable[t.name] ? '#e2e8f0' : '#475569', fontSize: '0.82rem' }}
+                          >
+                            <option value="">— no partition —</option>
+                            {t.columns.map(c => (
+                              <option key={c.id} value={c.name} style={{ color: 'black' }}>{c.name}</option>
+                            ))}
+                          </select>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Column Filters <span style={{ color: '#64748b' }}>(one per line: table:col1,col2)</span></label>
                   <textarea
@@ -1044,15 +1577,166 @@ export default function App() {
                 </div>
               </div>
 
-              <button className="btn-primary" onClick={handleRunCli} disabled={isRunning} style={{ width: '100%', padding: '0.75rem', marginTop: '0.5rem', background: '#10b981', borderColor: '#10b981', fontSize: '1rem' }}>
-                {isRunning ? 'Running...' : 'Execute Dataforge CLI'}
-              </button>
+              {/* Terminal output — always visible, above the run button */}
+              <div style={{ background: '#0f172a', borderRadius: '8px', border: '1px solid #1e293b', minHeight: '80px', maxHeight: '220px', overflowY: 'auto', overflowX: 'hidden', padding: '0.75rem' }}>
+                {runLogs
+                  ? <pre style={{ margin: 0, fontSize: '0.78rem', whiteSpace: 'pre-wrap', wordBreak: 'break-all', color: '#a7f3d0', fontFamily: 'monospace' }}>{runLogs}</pre>
+                  : <p style={{ margin: 0, fontSize: '0.78rem', color: '#334155', fontFamily: 'monospace' }}>Output will appear here…</p>
+                }
+              </div>
 
-              {runLogs && (
-                <div style={{ background: '#0f172a', padding: '1rem', borderRadius: '8px', border: '1px solid #334155', maxHeight: '200px', overflowY: 'auto' }}>
-                  <pre style={{ margin: 0, fontSize: '0.8rem', whiteSpace: 'pre-wrap', color: '#a7f3d0' }}>{runLogs}</pre>
-                </div>
+              <div style={{ display: 'flex', gap: '0.6rem' }}>
+                <button className="btn-primary" onClick={handleRunCli} disabled={isRunning}
+                  style={{ flex: 1, padding: '0.75rem', background: '#10b981', borderColor: '#10b981', fontSize: '1rem', opacity: isRunning ? 0.5 : 1, cursor: isRunning ? 'not-allowed' : 'pointer' }}>
+                  {isRunning ? 'Running…' : 'Execute Dataforge CLI'}
+                </button>
+                {isRunning && (
+                  <button onClick={handleStopCli}
+                    style={{ padding: '0.75rem 1.25rem', background: 'rgba(239,68,68,0.12)', border: '1px solid rgba(239,68,68,0.4)', borderRadius: '8px', color: '#f87171', fontSize: '1rem', cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                    ⏹ Stop
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Generate Domain Modal */}
+      {aiModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.75)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          onClick={() => !aiLoading && setAiModal(false)}>
+          <div style={{ width: '580px', maxWidth: '96vw', maxHeight: '92vh', overflowY: 'auto', background: 'rgba(15,23,42,0.98)', border: '1px solid rgba(139,92,246,0.35)', borderRadius: '14px', padding: '1.75rem', boxShadow: '0 24px 64px rgba(0,0,0,0.7)' }}
+            onClick={e => e.stopPropagation()}>
+
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+              <h2 style={{ margin: 0, fontSize: '1.15rem', color: '#e2e8f0', display: 'flex', alignItems: 'center', gap: '0.55rem' }}>
+                <Sparkles size={18} color="#a78bfa" /> AI Generate Domain
+              </h2>
+              <button onClick={() => !aiLoading && setAiModal(false)} style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer' }}><X size={18} /></button>
+            </div>
+            <p style={{ margin: '0 0 1.25rem', fontSize: '0.82rem', color: '#475569', lineHeight: 1.5 }}>
+              Describe the domain you need — the AI generates a full YAML schema with tables, types, and relationships.
+            </p>
+
+            {/* Provider grid */}
+            <div style={{ marginBottom: '1.1rem' }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.78rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Provider</label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.4rem' }}>
+                {AI_PROVIDERS.map(({ key, label, color }) => {
+                  const active = aiProvider === key;
+                  return (
+                    <button key={key} type="button" onClick={() => { setAiProvider(key); setAiError(''); }}
+                      style={{ padding: '0.5rem 0.3rem', borderRadius: '8px', border: `1px solid ${active ? color : 'rgba(255,255,255,0.08)'}`, background: active ? `${color}20` : 'rgba(255,255,255,0.03)', color: active ? color : '#64748b', cursor: 'pointer', fontSize: '0.8rem', fontWeight: active ? 700 : 400, transition: 'all 0.12s', textAlign: 'center' }}>
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* API Key */}
+            {aiProvider !== 'ollama' && (
+              <div style={{ marginBottom: '0.75rem' }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.78rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  API Key <span style={{ color: '#334155', textTransform: 'none', letterSpacing: 0 }}>(saved in browser)</span>
+                </label>
+                <input
+                  type="password"
+                  value={currentApiKey}
+                  onChange={e => {
+                    setAiApiKeys(prev => ({ ...prev, [aiProvider]: e.target.value }));
+                    setAiAvailableModels(prev => ({ ...prev, [aiProvider]: [] }));
+                    setAiModelsError('');
+                  }}
+                  placeholder={currentProviderMeta.keyPlaceholder}
+                  style={{ width: '100%', padding: '0.55rem 0.75rem', background: 'rgba(255,255,255,0.05)', border: `1px solid ${currentApiKey ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.1)'}`, borderRadius: '7px', color: 'white', fontSize: '0.85rem', boxSizing: 'border-box' }}
+                />
+              </div>
+            )}
+
+            {/* Model */}
+            <div style={{ marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <label style={{ fontSize: '0.78rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                  Model <span style={{ color: '#334155', textTransform: 'none', letterSpacing: 0 }}>{aiProvider === 'ollama' ? '(required)' : '(optional)'}</span>
+                </label>
+                <button type="button" onClick={handleLoadModels}
+                  disabled={aiModelsLoading || (!currentApiKey.trim() && aiProvider !== 'ollama')}
+                  style={{ background: 'none', border: '1px solid rgba(96,165,250,0.3)', borderRadius: '5px', color: '#60a5fa', cursor: 'pointer', fontSize: '0.72rem', padding: '0.2rem 0.6rem', display: 'flex', alignItems: 'center', gap: '0.35rem', opacity: (!currentApiKey.trim() && aiProvider !== 'ollama') ? 0.35 : 1, minHeight: 'unset' }}>
+                  {aiModelsLoading
+                    ? <><span style={{ display: 'inline-block', width: '10px', height: '10px', border: '1.5px solid rgba(255,255,255,0.2)', borderTopColor: '#60a5fa', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} /> Loading…</>
+                    : '⟳ Load available models'}
+                </button>
+              </div>
+
+              {availableModels.length > 0 ? (
+                <select
+                  value={currentModel}
+                  onChange={e => setAiModels(prev => ({ ...prev, [aiProvider]: e.target.value }))}
+                  style={{ width: '100%', padding: '0.55rem 0.75rem', background: 'rgba(15,23,42,0.8)', border: '1px solid rgba(255,255,255,0.18)', borderRadius: '7px', color: 'white', fontSize: '0.85rem', boxSizing: 'border-box' }}
+                >
+                  <option value="" style={{ color: 'black' }}>— select a model —</option>
+                  {availableModels.map(m => <option key={m} value={m} style={{ color: 'black' }}>{m}</option>)}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  value={currentModel}
+                  onChange={e => setAiModels(prev => ({ ...prev, [aiProvider]: e.target.value }))}
+                  placeholder={currentProviderMeta.modelPlaceholder}
+                  style={{ width: '100%', padding: '0.55rem 0.75rem', background: 'rgba(255,255,255,0.05)', border: `1px solid ${currentModel ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.1)'}`, borderRadius: '7px', color: 'white', fontSize: '0.85rem', boxSizing: 'border-box' }}
+                />
               )}
+
+              {aiModelsError && (
+                <p style={{ margin: '0.35rem 0 0', fontSize: '0.72rem', color: '#f87171' }}>{aiModelsError}</p>
+              )}
+            </div>
+
+            {/* Prompt */}
+            <div style={{ marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                <label style={{ fontSize: '0.78rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em' }}>What dataset do you need?</label>
+                <button type="button" onClick={() => setAiPrompt(AI_DEFAULT_PROMPT)}
+                  style={{ background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '0.72rem', textDecoration: 'underline', padding: 0 }}>
+                  Reset to example
+                </button>
+              </div>
+              <textarea
+                value={aiPrompt}
+                onChange={e => setAiPrompt(e.target.value)}
+                rows={7}
+                placeholder="Describe your domain in plain language — table names, columns, relationships, value ranges, categories..."
+                style={{ width: '100%', padding: '0.65rem 0.75rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '7px', color: '#e2e8f0', resize: 'vertical', fontSize: '0.84rem', lineHeight: 1.6, boxSizing: 'border-box', fontFamily: 'inherit' }}
+              />
+              <p style={{ margin: '0.4rem 0 0', fontSize: '0.72rem', color: '#334155', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+                <span style={{ color: '#475569' }}>⚙</span>
+                The YAML format specification and a reference example are automatically sent to the AI — you only need to describe the data.
+              </p>
+            </div>
+
+            {aiError && (
+              <div style={{ margin: '0 0 0.75rem', fontSize: '0.8rem', color: '#f87171', background: 'rgba(248,113,113,0.07)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: '6px', padding: '0.5rem 0.75rem' }}>{aiError}</div>
+            )}
+
+            <div style={{ display: 'flex', gap: '0.75rem' }}>
+              <button type="button" onClick={() => !aiLoading && setAiModal(false)}
+                style={{ flex: 1, padding: '0.65rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)', borderRadius: '8px', color: '#64748b', cursor: aiLoading ? 'not-allowed' : 'pointer', fontSize: '0.9rem' }}>
+                Cancel
+              </button>
+              <button type="button" onClick={handleAiGenerate} disabled={aiLoading}
+                style={{ flex: 2, padding: '0.65rem', background: aiLoading ? 'rgba(139,92,246,0.25)' : 'linear-gradient(135deg, #7c3aed, #2563eb)', border: 'none', borderRadius: '8px', color: 'white', fontWeight: 700, cursor: aiLoading ? 'not-allowed' : 'pointer', fontSize: '0.95rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                {aiLoading ? (
+                  <>
+                    <span style={{ display: 'inline-block', width: '14px', height: '14px', border: '2px solid rgba(255,255,255,0.25)', borderTopColor: 'white', borderRadius: '50%', animation: 'spin 0.7s linear infinite' }} />
+                    Generating…
+                  </>
+                ) : (
+                  <><Sparkles size={16} /> Generate Schema</>
+                )}
+              </button>
             </div>
           </div>
         </div>
@@ -1122,7 +1806,7 @@ export default function App() {
                   style={{ width: '100%', padding: '0.4rem 0.75rem 0.4rem 2rem', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(148,163,184,0.2)', borderRadius: '6px', color: 'white', fontSize: '0.875rem' }}
                 />
               </div>
-              <button onClick={() => setFakerBrowser(null)} style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', padding: '0.25rem' }}>
+              <button onClick={() => setFakerBrowser(null)} className="btn-icon" aria-label="Close browser">
                 <X size={18} />
               </button>
             </div>
@@ -1159,6 +1843,33 @@ export default function App() {
                   </div>
                 ));
               })()}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Generic confirm/info dialog */}
+      {confirmModal && (
+        <div className="confirm-overlay" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+          <div className="confirm-dialog animated-scale">
+            <h3 id="confirm-title">{confirmModal.title}</h3>
+            <p>{confirmModal.message}</p>
+            <div className="actions">
+              <button
+                className="btn-secondary"
+                onClick={() => setConfirmModal(null)}
+                style={{ padding: '0.5rem 1.25rem' }}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn-danger"
+                onClick={() => { confirmModal.onConfirm(); setConfirmModal(null); }}
+                style={{ padding: '0.5rem 1.25rem' }}
+                autoFocus
+              >
+                Confirm
+              </button>
             </div>
           </div>
         </div>

@@ -42,10 +42,17 @@ def topological_sort(tables: list[Table]) -> list[Table]:
 
 
 class DatasetGenerator:
-    def __init__(self, schema: DomainSchema, rows: int | None = None, seed: int | None = None):
+    def __init__(
+        self,
+        schema: DomainSchema,
+        rows: int | None = None,
+        seed: int | None = None,
+        seq_offsets: dict[str, int] | None = None,
+    ):
         self.schema = schema
         self.rows = rows
         self.seed = seed
+        self.seq_offsets = seq_offsets or {}
         self.faker = Faker()
         if seed is not None:
             Faker.seed(seed)
@@ -67,6 +74,7 @@ class DatasetGenerator:
 
     def _generate_table(self, table: Table, pk_pool: dict[str, list]) -> pd.DataFrame:
         n = self.rows if self.rows is not None else table.default_rows
+        seq_start = self.seq_offsets.get(table.name, 0) + 1
         data: dict[str, list] = {}
 
         self_fk_cols = []
@@ -101,6 +109,7 @@ class DatasetGenerator:
                     n,
                     min_value=col.min_value,
                     max_value=col.max_value,
+                    seq_start=seq_start,
                 )
 
             if col.nullable > 0:
