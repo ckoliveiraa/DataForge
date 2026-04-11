@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import { spawn } from 'child_process'
+import { spawn, execSync } from 'child_process'
 import { writeFileSync, readFileSync, mkdirSync, existsSync, readdirSync, rmSync } from 'fs'
 import { resolve, join } from 'path'
 import { tmpdir } from 'os'
@@ -10,11 +10,49 @@ const pyprojectRaw = readFileSync(resolve(__dirname, '../../../pyproject.toml'),
 const appVersion = pyprojectRaw.match(/^version\s*=\s*"([^"]+)"/m)?.[1] ?? '0.0.0'
 
 let activeProcess: ReturnType<typeof spawn> | null = null
+let browseInProgress = false
 
 const cliRunnerPlugin = () => ({
   name: 'cli-runner',
   configureServer(server: any) {
     server.middlewares.use(async (req: any, res: any, next: any) => {
+      if (req.url === '/api/browse-folder' && req.method === 'GET') {
+        if (browseInProgress) {
+          res.setHeader('Content-Type', 'application/json')
+          res.end(JSON.stringify({ path: '' }))
+          return
+        }
+        browseInProgress = true
+        try {
+          const ps1Path = join(tmpdir(), `df_browse_${Date.now()}.ps1`)
+          const script = [
+            'Add-Type -AssemblyName System.Windows.Forms',
+            '$owner = New-Object System.Windows.Forms.Form',
+            '$owner.TopMost = $true',
+            '$owner.StartPosition = "CenterScreen"',
+            '$owner.Size = New-Object System.Drawing.Size(1,1)',
+            '$owner.Show()',
+            '$owner.Activate()',
+            '$d = New-Object System.Windows.Forms.FolderBrowserDialog',
+            '$d.ShowNewFolderButton = $true',
+            '$r = $d.ShowDialog($owner)',
+            '$owner.Dispose()',
+            'if ($r -eq [System.Windows.Forms.DialogResult]::OK) { Write-Output $d.SelectedPath }',
+          ].join('\n')
+          writeFileSync(ps1Path, script, 'utf-8')
+          const result = execSync(`powershell -NoProfile -ExecutionPolicy Bypass -File "${ps1Path}"`, { encoding: 'utf-8', timeout: 60000 }).trim()
+          try { rmSync(ps1Path) } catch {}
+          browseInProgress = false
+          res.setHeader('Content-Type', 'application/json')
+          res.end(JSON.stringify({ path: result }))
+        } catch (e: any) {
+          browseInProgress = false
+          res.setHeader('Content-Type', 'application/json')
+          res.end(JSON.stringify({ path: '', error: e.message }))
+        }
+        return
+      }
+
       if (req.url === '/api/stop-cli' && req.method === 'POST') {
         if (activeProcess) {
           activeProcess.kill('SIGTERM')
@@ -417,6 +455,34 @@ tables:
 
 DTYPES: int_seq, uuid, int, float, str, bool, date, email, name, phone, address, city, country, company, text, url, currency, iban
 FAKER: name, first_name, last_name, email, phone_number, address, city, postcode, country, company, job, url, user_name, uuid4, date, past_date, future_date, iban, currency_code, pricetag, text, latitude, longitude, ipv4, credit_card_number
+
+RULES (all mandatory):
+
+1. str columns MUST have choices or faker_provider — never plain str alone:
+   BAD:  status: {dtype: str}
+   GOOD: status: {dtype: str, choices: [active, inactive]}
+   GOOD: category: {dtype: str, faker_provider: job}
+
+2. Every table MUST have exactly one primary_key column (dtype: int_seq or uuid).
+   BAD:  two columns with primary_key: true in the same table
+   BAD:  a table with no primary_key at all
+
+3. foreign_key MUST reference the primary_key column of the target table:
+   BAD:  foreign_key: {table: orders, column: status}
+   GOOD: foreign_key: {table: orders, column: id}
+
+4. min/max are only valid for dtype int, float, or date — never for bool, str, email, name, phone, etc.
+   BAD:  email: {dtype: email, min: 1}
+   GOOD: age:   {dtype: int,   min: 18, max: 99}
+
+5. nullable must be a float between 0.0 and 1.0:
+   BAD:  nullable: true
+   BAD:  nullable: 50
+   GOOD: nullable: 0.2
+
+6. domain must be snake_case (lowercase letters, digits, underscores — no spaces, no hyphens):
+   BAD:  domain: My Domain
+   GOOD: domain: my_domain
 
 EXAMPLE:
 domain: shop

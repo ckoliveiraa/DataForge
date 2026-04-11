@@ -1,6 +1,6 @@
 [project]
 name = "dataforge"
-version = "0.1.0"
+version = "0.1.7"
 description = "Synthetic relational dataset generator for data engineering studies"
 authors = [
     {name = "Carlos Oliveira", email = "papodedados@gmail.com"}

@@ -31,7 +31,7 @@ Apenas **Docker** e **Docker Compose** instalados na máquina. Nenhuma instalaç
 ## Instalação e início rápido
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/ckoliveiraa/DataForge.git
 cd Dataforge
 
 # Sobe o frontend (interface visual) em segundo plano
