@@ -1,54 +1,50 @@
 # Dataforge
 
-**Gerador de datasets sintéticos relacionais para engenharia de dados.**
+Dataforge é uma ferramenta para geração de datasets sintéticos **relacionais** com integridade referencial garantida. Está disponível como interface visual no navegador e como linha de comando (CLI).
 
-Dataforge cria conjuntos de dados fictícios com integridade referencial garantida — ideal para testar pipelines de dados, popular bancos de desenvolvimento e criar fixtures de teste sem depender de dados reais.
+Casos de uso típicos:
 
----
+- Popular bancos de dados de desenvolvimento sem usar dados reais
+- Criar fixtures para modelos dbt
+- Testar pipelines de ingestão e transformação de dados
+- Simular volumes de dados antes de ir para produção
 
-## Por que Dataforge?
+## Como funciona
 
-| Problema | Solução |
-|---|---|
-| Dados reais têm PII e não podem ser compartilhados | Dados 100% sintéticos via [Faker](https://faker.readthedocs.io/) |
-| Seed manual de banco é trabalhoso | Domínios prontos com um comando |
-| Dados sem relação entre tabelas quebram pipelines | Integridade referencial por ordenação topológica |
-| Formato fixo não serve para todos os destinos | CSV, JSON, Parquet, Avro — e upload direto para nuvem |
+O Dataforge lê um **schema YAML** que descreve tabelas, colunas, tipos de dados e relações entre tabelas. A partir desse schema ele gera DataFrames Pandas e os escreve nos formatos e destinos escolhidos.
 
----
+A integridade referencial é garantida por dois mecanismos:
 
-## Funcionalidades
+1. **Ordenação topológica** — tabelas pai são geradas antes de tabelas filhas.
+2. **Pool de PKs** — após gerar cada tabela, seus valores de chave primária ficam disponíveis; colunas com chave estrangeira amostram desse pool com reposição, permitindo múltiplos filhos por pai.
 
-- **Domínios prontos** — ecommerce, RH, finanças e mais
-- **Schemas customizados** em YAML
-- **Interface visual** para editar schemas sem escrever YAML
-- **Integridade referencial** — chaves estrangeiras sempre resolvidas
-- **Múltiplos formatos** — CSV, JSON (flat/nested), Parquet, Avro
-- **Upload direto** para GCS, S3, Azure Blob Storage
-- **Carga em banco** — PostgreSQL, MySQL, SQL Server, SQLite
-- **Modo recorrente** — geração contínua de batches incrementais
-- **Reprodutibilidade** — seed para resultados idênticos
+## Formas de uso
 
----
+| Modo | Acesso | Ideal para |
+|------|--------|------------|
+| Interface visual | `http://localhost:5173` | Criar schemas, explorar domínios, executar via GUI |
+| CLI Docker | `docker compose run --rm cli generate ...` | Scripts, CI, automação |
+| CLI direto (Poetry) | `dataset-gen generate ...` | Desenvolvimento local |
 
-## Início Rápido
+## Início rápido
 
 ```bash
-# Subir a interface visual
-docker compose up frontend
-
-# Gerar 1000 clientes do domínio ecommerce em CSV
-docker compose run --rm cli generate -d ecommerce -t customers -r 1000 -f csv
+git clone https://github.com/ckoliveiraa/DataForge
+cd Dataforge
+docker compose up --build -d
 ```
 
-Veja o [Guia de Instalação](getting-started/installation.md) e o [Quickstart](getting-started/quickstart.md) para o passo a passo completo.
+Acesse `http://localhost:5173` após o build concluir.
 
----
+## Estrutura de pastas do host
 
-## Arquitetura em uma Linha
+Após subir os containers, três pastas ficam mapeadas entre o container e o host:
 
-```
-Schema YAML → DatasetGenerator → [CSV | JSON | Parquet | Avro] → [Local | GCS | S3 | Azure | SQL]
-```
+| Pasta | Uso |
+|-------|-----|
+| `output/` | Arquivos gerados pelo CLI aparecem aqui |
+| `credentials/` | Arquivos de credenciais de nuvem (JSON do GCP, etc.) |
+| `src/dataforge/schemas/` | Schemas YAML customizados — editáveis sem rebuild |
 
-Cada camada é plugável via registros internos — veja [Arquitetura](development/architecture.md).
+!!! note "Pré-requisitos"
+    Apenas **Docker** e **Docker Compose** instalados na máquina. Não é necessário instalar Python, Node.js ou qualquer outra dependência separadamente.
