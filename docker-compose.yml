@@ -10,28 +10,29 @@ services:
       - "5173:5173"
     volumes:
       # Schemas editáveis sem rebuild
-      - ./schemas:/app/schemas
-      - ./src/schemas:/app/src/schemas
+      - ./src/dataforge/schemas:/app/src/dataforge/schemas
+      # Credenciais cloud montadas em pasta fixa
+      - ./credentials:/app/credentials
       # Output persistido no host
       - ./output:/app/output
-      # Hot reload do código Python e frontend
+      # Hot reload do código Python e frontend (exceto node_modules)
       - ./src/dataforge:/app/src/dataforge
-      # Volume anônimo protege o node_modules Linux instalado no build
+      # Volume nomeado protege o node_modules Linux do build
       # (impede que o mount acima sobrescreva com binários Windows do host)
       - frontend_node_modules:/app/src/dataforge/frontend/node_modules
     environment:
       - PYTHONPATH=/app/src
     restart: unless-stopped
 
-  # ── CLI standalone (uso via docker compose run) ───────────────────────────
+  # ── CLI standalone (uso via: docker compose run --rm cli <args>) ──────────
   cli:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: dataforge-cli
     volumes:
-      - ./schemas:/app/schemas
-      - ./src/schemas:/app/src/schemas
+      - ./src/dataforge/schemas:/app/src/dataforge/schemas
+      - ./credentials:/app/credentials
       - ./output:/app/output
       - ./src/dataforge:/app/src/dataforge
       - cli_node_modules:/app/src/dataforge/frontend/node_modules
