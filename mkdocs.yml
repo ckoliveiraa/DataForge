@@ -1,9 +1,9 @@
 site_name: Dataforge
 site_description: Gerador de datasets sintéticos relacionais para engenharia de dados
 site_author: Carlos Oliveira
-site_url: https://carlos-oliveira.github.io/dataforge/
-repo_name: dataforge
-repo_url: https://github.com/carlos-oliveira/dataforge
+site_url: https://ckoliveiraa.github.io/DataForge/
+repo_name: DataForge
+repo_url: https://github.com/ckoliveiraa/DataForge
 edit_uri: edit/main/docs/
 
 theme:
@@ -87,4 +87,4 @@ nav:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/carlos-oliveira/dataforge
+      link: https://github.com/ckoliveiraa/DataForge
