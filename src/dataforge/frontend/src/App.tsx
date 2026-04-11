@@ -147,6 +147,24 @@ const VALID_DTYPES = [
 
 const nodeTypes = { tableNode: TableNode };
 
+function newId(): string {
+  if (typeof crypto !== 'undefined' && typeof (crypto as any).randomUUID === 'function') {
+    return (crypto as any).randomUUID() as string;
+  }
+  // fallback for non-secure contexts (HTTP via network IP)
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+}
+
+const DATE_DTYPES = new Set(['date', 'date_of_birth', 'past_date', 'future_date', 'iso8601']);
+const DATE_FAKER_METHODS = new Set(['date', 'date_of_birth', 'past_date', 'future_date', 'iso8601', 'date_time', 'date_time_between']);
+
+function isDateColumn(col: Column): boolean {
+  return DATE_DTYPES.has(col.dtype) || DATE_FAKER_METHODS.has(col.fakerProvider);
+}
+
 
 export default function App() {
   const [domain, setDomain] = useState("custom");
@@ -234,7 +252,7 @@ export default function App() {
            columns: [
             ...table.columns,
             {
-              id: crypto.randomUUID(),
+              id: newId(),
               name: `col_${table.columns.length + 1}`,
               dtype: 'str',
               isPrimaryKey: false,
@@ -276,11 +294,11 @@ export default function App() {
   }, []);
 
   const addTable = () => {
-    const newId = crypto.randomUUID();
+    const tableId = newId();
     setTables([
       ...tables,
       {
-        id: newId,
+        id: tableId,
         name: `table_${tables.length + 1}`,
         rows: 1000,
         columns: [],
@@ -659,6 +677,7 @@ export default function App() {
     bucket: string,
     prefix: string,
     partitionByTable: Record<string, string>,
+    partitionDateGranularity: Record<string, string>,
     jsonMode: string,
     seed: string,
     dbUrl: string,
@@ -686,6 +705,7 @@ export default function App() {
     bucket: '',
     prefix: 'datasets/',
     partitionByTable: {},
+    partitionDateGranularity: {},
     jsonMode: 'flat',
     seed: '',
     dbUrl: '',
@@ -731,6 +751,7 @@ export default function App() {
           bucket: runConfig.bucket.trim(),
           prefix: runConfig.prefix.trim() || domain,
           partitionByTable: Object.keys(runConfig.partitionByTable).length > 0 ? runConfig.partitionByTable : undefined,
+          partitionDateGranularity: Object.keys(runConfig.partitionDateGranularity).length > 0 ? runConfig.partitionDateGranularity : undefined,
           jsonMode: runConfig.jsonMode,
           seed: runConfig.seed !== '' ? parseInt(runConfig.seed) : undefined,
           dbUrl: runConfig.destination === 'database' ? computedDbUrl || undefined : undefined,
@@ -1802,27 +1823,66 @@ export default function App() {
                 {tables.length > 0 && (
                   <div style={{ marginBottom: '0.75rem' }}>
                     <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Partition By <span style={{ color: '#64748b' }}>(per table — Hive-style)</span></label>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                      {tables.map(t => (
-                        <div key={t.id} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                          <span style={{ width: '120px', fontSize: '0.8rem', color: '#94a3b8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexShrink: 0 }}>{t.name}</span>
-                          <select
-                            value={runConfig.partitionByTable[t.name] || ''}
-                            onChange={e => {
-                              const col = e.target.value;
-                              const next = { ...runConfig.partitionByTable };
-                              if (col) next[t.name] = col; else delete next[t.name];
-                              setRunConfig(r => ({ ...r, partitionByTable: next }));
-                            }}
-                            style={{ flex: 1, padding: '0.35rem 0.5rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: runConfig.partitionByTable[t.name] ? '#e2e8f0' : '#475569', fontSize: '0.82rem' }}
-                          >
-                            <option value="">— no partition —</option>
-                            {t.columns.map(c => (
-                              <option key={c.id} value={c.name} style={{ color: 'black' }}>{c.name}</option>
-                            ))}
-                          </select>
-                        </div>
-                      ))}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                      {tables.map(t => {
+                        const col = runConfig.partitionByTable[t.name] || '';
+                        const gran = runConfig.partitionDateGranularity[t.name] || '';
+                        const colObj = t.columns.find(c => c.name === col);
+                        const showGranularity = !!col && !!colObj && isDateColumn(colObj);
+                        return (
+                          <div key={t.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <span style={{ width: '120px', fontSize: '0.8rem', color: '#94a3b8', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flexShrink: 0 }}>{t.name}</span>
+                              <select
+                                value={col}
+                                onChange={e => {
+                                  const val = e.target.value;
+                                  const next = { ...runConfig.partitionByTable };
+                                  if (val) next[t.name] = val; else delete next[t.name];
+                                  // clear granularity when column is removed
+                                  const nextGran = { ...runConfig.partitionDateGranularity };
+                                  if (!val) delete nextGran[t.name];
+                                  setRunConfig(r => ({ ...r, partitionByTable: next, partitionDateGranularity: nextGran }));
+                                }}
+                                style={{ flex: 1, padding: '0.35rem 0.5rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: col ? '#e2e8f0' : '#475569', fontSize: '0.82rem' }}
+                              >
+                                <option value="">— no partition —</option>
+                                {t.columns.map(c => (
+                                  <option key={c.id} value={c.name} style={{ color: 'black' }}>{c.name}</option>
+                                ))}
+                              </select>
+                            </div>
+                            {showGranularity && (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', paddingLeft: '128px' }}>
+                                {[{ value: '', label: 'Full' }, { value: 'year', label: 'YYYY' }, { value: 'month', label: 'YYYY-MM' }].map(opt => (
+                                  <button
+                                    key={opt.value}
+                                    onClick={() => {
+                                      const nextGran = { ...runConfig.partitionDateGranularity };
+                                      if (opt.value) nextGran[t.name] = opt.value; else delete nextGran[t.name];
+                                      setRunConfig(r => ({ ...r, partitionDateGranularity: nextGran }));
+                                    }}
+                                    style={{
+                                      padding: '0.2rem 0.6rem',
+                                      borderRadius: '4px',
+                                      border: gran === opt.value ? '1px solid #6366f1' : '1px solid rgba(255,255,255,0.08)',
+                                      background: gran === opt.value ? 'rgba(99,102,241,0.2)' : 'rgba(255,255,255,0.03)',
+                                      color: gran === opt.value ? '#a5b4fc' : '#475569',
+                                      fontSize: '0.75rem',
+                                      cursor: 'pointer',
+                                    }}
+                                  >{opt.label}</button>
+                                ))}
+                                {gran && (
+                                  <span style={{ fontSize: '0.72rem', color: '#475569', fontFamily: 'monospace' }}>
+                                    {col}={gran === 'year' ? '2024' : '2024-04'}/
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

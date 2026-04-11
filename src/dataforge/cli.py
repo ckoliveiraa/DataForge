@@ -160,6 +160,33 @@ def _parse_partition_by(partition_by: tuple[str, ...]) -> dict[str, str]:
     return result
 
 
+def _parse_date_granularity(specs: tuple[str, ...]) -> dict[str, str]:
+    """Converte 'table:gran' ou 'gran' em {table: gran}. Chave '*' = todas as tabelas."""
+    result: dict[str, str] = {}
+    for spec in specs:
+        if ":" in spec:
+            table, gran = spec.split(":", 1)
+            result[table.strip()] = gran.strip()
+        else:
+            result["*"] = spec.strip()
+    return result
+
+
+def _truncate_date_value(val, granularity: str) -> str:
+    """Trunca um valor de data conforme granularidade ('year' → YYYY, 'month' → YYYY-MM)."""
+    import pandas as pd
+
+    try:
+        ts = pd.Timestamp(val)
+        if granularity == "year":
+            return str(ts.year)
+        elif granularity == "month":
+            return f"{ts.year:04d}-{ts.month:02d}"
+    except Exception:
+        pass
+    return str(val).replace("/", "-").replace(" ", "_")
+
+
 def _write_batch(
     datasets: dict,
     formats: tuple[str, ...],
@@ -170,6 +197,7 @@ def _write_batch(
     recurrence: bool,
     partition_map: dict[str, str] | None = None,
     max_workers: int = 16,
+    date_granularity_map: dict[str, str] | None = None,
 ) -> list[tuple[Path, str]]:
     """Escreve um batch de datasets. Retorna lista de (local_path, remote_sub) onde
     remote_sub é o caminho relativo ao prefix: 'dataset/table_name/[col=val/]filename.ext'."""
@@ -188,12 +216,16 @@ def _write_batch(
                 written.append((path, f"{schema.name}/{name}/{path.name}"))
 
         elif fmt == "json" and recurrence and batch > 1:
-            paths = _append_json_flat(datasets, out_path, schema.name, partition_map)
+            paths = _append_json_flat(
+                datasets, out_path, schema.name, partition_map, date_granularity_map
+            )
             for p, remote_sub in paths:
                 written.append((p, remote_sub))
 
         elif fmt == "csv" and recurrence and batch > 1:
-            paths = _append_csv(datasets, out_path, schema.name, partition_map)
+            paths = _append_csv(
+                datasets, out_path, schema.name, partition_map, date_granularity_map
+            )
             for p, remote_sub in paths:
                 written.append((p, remote_sub))
 
@@ -205,6 +237,13 @@ def _write_batch(
                 partition_by = None
                 if partition_map:
                     partition_by = partition_map.get(name) or partition_map.get("*")
+
+                # Resolve granularidade para esta tabela
+                date_granularity: str | None = None
+                if date_granularity_map:
+                    date_granularity = date_granularity_map.get(name) or date_granularity_map.get(
+                        "*"
+                    )
 
                 if partition_by and partition_by in df.columns:
                     # Escrita particionada: uma subpasta por valor da coluna — paralela
@@ -219,9 +258,13 @@ def _write_batch(
                         _ts=ts,
                         _recurrence=recurrence,
                         _appendable=appendable,
+                        _date_granularity=date_granularity,
                     ):
                         val, group = val_group
-                        safe_val = str(val).replace("/", "-").replace(" ", "_")
+                        if _date_granularity:
+                            safe_val = _truncate_date_value(val, _date_granularity)
+                        else:
+                            safe_val = str(val).replace("/", "-").replace(" ", "_")
                         filename = (
                             f"{_name}_{_ts}{_ext}"
                             if _recurrence and not _appendable
@@ -238,7 +281,17 @@ def _write_batch(
                         remote_sub = f"{schema.name}/{_name}/{_partition_by}={safe_val}/{filename}"
                         return dest, remote_sub
 
-                    partitions = list(df.groupby(partition_by))
+                    if date_granularity:
+                        _grp_col = f"__partition_key_{partition_by}__"
+                        df[_grp_col] = df[partition_by].apply(
+                            lambda v, _g=date_granularity: _truncate_date_value(v, _g)
+                        )
+                        partitions = list(df.groupby(_grp_col))
+                        df.drop(columns=[_grp_col], inplace=True)
+                        for _key, _grp in partitions:
+                            _grp.drop(columns=[_grp_col], inplace=True, errors="ignore")
+                    else:
+                        partitions = list(df.groupby(partition_by))
                     max_workers = min(max_workers, len(partitions))
                     results: list[tuple[Path, str]] = []
                     with ThreadPoolExecutor(max_workers=max_workers) as pool:
@@ -274,15 +327,34 @@ def _append_csv(
     out_path: Path,
     dataset_name: str,
     partition_map: dict[str, str] | None = None,
+    date_granularity_map: dict[str, str] | None = None,
 ) -> list[tuple[Path, str]]:
     written: list[tuple[Path, str]] = []
     for name, df in datasets.items():
         partition_by = (
             (partition_map.get(name) or partition_map.get("*")) if partition_map else None
         )
+        date_granularity = (
+            (date_granularity_map.get(name) or date_granularity_map.get("*"))
+            if date_granularity_map
+            else None
+        )
         if partition_by and partition_by in df.columns:
-            for val, group in df.groupby(partition_by):
-                safe_val = str(val).replace("/", "-").replace(" ", "_")
+            if date_granularity:
+                _grp_col = f"__pk_{partition_by}__"
+                df = df.copy()
+                df[_grp_col] = df[partition_by].apply(
+                    lambda v, _g=date_granularity: _truncate_date_value(v, _g)
+                )
+                groups = [(k, g.drop(columns=[_grp_col])) for k, g in df.groupby(_grp_col)]
+            else:
+                groups = list(df.groupby(partition_by))
+            for val, group in groups:
+                safe_val = (
+                    str(val).replace("/", "-").replace(" ", "_")
+                    if not date_granularity
+                    else str(val)
+                )
                 dest_dir = out_path / dataset_name / name / f"{partition_by}={safe_val}"
                 dest_dir.mkdir(parents=True, exist_ok=True)
                 path = dest_dir / f"{name}.csv"
@@ -306,15 +378,34 @@ def _append_json_flat(
     out_path: Path,
     dataset_name: str,
     partition_map: dict[str, str] | None = None,
+    date_granularity_map: dict[str, str] | None = None,
 ) -> list[tuple[Path, str]]:
     written: list[tuple[Path, str]] = []
     for name, df in datasets.items():
         partition_by = (
             (partition_map.get(name) or partition_map.get("*")) if partition_map else None
         )
+        date_granularity = (
+            (date_granularity_map.get(name) or date_granularity_map.get("*"))
+            if date_granularity_map
+            else None
+        )
         if partition_by and partition_by in df.columns:
-            for val, group in df.groupby(partition_by):
-                safe_val = str(val).replace("/", "-").replace(" ", "_")
+            if date_granularity:
+                _grp_col = f"__pk_{partition_by}__"
+                df = df.copy()
+                df[_grp_col] = df[partition_by].apply(
+                    lambda v, _g=date_granularity: _truncate_date_value(v, _g)
+                )
+                groups = [(k, g.drop(columns=[_grp_col])) for k, g in df.groupby(_grp_col)]
+            else:
+                groups = list(df.groupby(partition_by))
+            for val, group in groups:
+                safe_val = (
+                    str(val).replace("/", "-").replace(" ", "_")
+                    if not date_granularity
+                    else str(val)
+                )
                 dest_dir = out_path / dataset_name / name / f"{partition_by}={safe_val}"
                 dest_dir.mkdir(parents=True, exist_ok=True)
                 path = dest_dir / f"{name}.json"
@@ -414,6 +505,17 @@ def cli():
     multiple=True,
     help="Partition output Hive-style. Use 'column' (all tables) or 'table:column' (per table). Repeatable.",
 )
+@click.option(
+    "--partition-date-granularity",
+    "partition_date_granularity",
+    multiple=True,
+    help=(
+        "Truncate date partition values. "
+        "Use 'granularity' (all tables) or 'table:granularity' (per table). "
+        "Granularity options: year (→ YYYY) or month (→ YYYY-MM). "
+        "Example: --partition-date-granularity month  or  --partition-date-granularity orders:year"
+    ),
+)
 # SQL loading
 @click.option(
     "--db-url",
@@ -473,6 +575,7 @@ def generate(
     prefix,
     credentials,
     partition_by,
+    partition_date_granularity,
     db_url,
     if_exists,
     db_schema,
@@ -540,6 +643,9 @@ def generate(
                 recurrence=is_recurrent,
                 partition_map=_parse_partition_by(partition_by) if partition_by else None,
                 max_workers=workers,
+                date_granularity_map=_parse_date_granularity(partition_date_granularity)
+                if partition_date_granularity
+                else None,
             )
 
             # Upload

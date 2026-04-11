@@ -1,6 +1,16 @@
 import YAML from 'yaml';
 import type { Schema, Table, Column } from '../types/schema';
 
+function genId(): string {
+  if (typeof crypto !== 'undefined' && typeof (crypto as any).randomUUID === 'function') {
+    return (crypto as any).randomUUID() as string;
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0;
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+}
+
 export class SchemaReader {
   /**
    * Parses a YAML string and converts it into the internal React state representation.
@@ -38,7 +48,7 @@ export class SchemaReader {
       const columns: Column[] = Object.keys(rawCols).map(colName => {
         const cData = rawCols[colName];
         return {
-          id: crypto.randomUUID(),
+          id: genId(),
           name: colName,
           dtype: cData.dtype || 'str',
           isPrimaryKey: !!cData.primary_key,
@@ -54,7 +64,7 @@ export class SchemaReader {
       });
 
       return {
-        id: crypto.randomUUID(),
+        id: genId(),
         name: tableName,
         rows: tData.rows || 1000,
         columns

@@ -83,7 +83,7 @@ const cliRunnerPlugin = () => ({
         req.on('end', () => {
           try {
             const data = JSON.parse(body);
-            const { yamlStr, formats, outputDir, uploadTarget, bucket, prefix, partitionByTable, jsonMode, seed, dbUrl, ifExists, dbSchema, recurrence, count, credentials, rows, tables: tablesToInclude, columns: columnsToInclude, increments, cloudCreds, workers } = data;
+            const { yamlStr, formats, outputDir, uploadTarget, bucket, prefix, partitionByTable, partitionDateGranularity, jsonMode, seed, dbUrl, ifExists, dbSchema, recurrence, count, credentials, rows, tables: tablesToInclude, columns: columnsToInclude, increments, cloudCreds, workers } = data;
 
             const baseDir = resolve(__dirname, '../../../');
             // Cloud and database-only runs use a temp dir that is cleaned up after
@@ -123,6 +123,11 @@ const cliRunnerPlugin = () => ({
             if (partitionByTable && typeof partitionByTable === 'object') {
               for (const [table, col] of Object.entries(partitionByTable as Record<string, string>)) {
                 if (col) args.push('--partition-by', `${table}:${col}`);
+              }
+            }
+            if (partitionDateGranularity && typeof partitionDateGranularity === 'object') {
+              for (const [table, gran] of Object.entries(partitionDateGranularity as Record<string, string>)) {
+                if (gran === 'year' || gran === 'month') args.push('--partition-date-granularity', `${table}:${gran}`);
               }
             }
             // Resolve credentials: UI input takes priority, falls back to credentials/ folder
