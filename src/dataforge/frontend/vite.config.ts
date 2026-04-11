@@ -550,6 +550,39 @@ DATASET DESCRIPTION:
             // Strip markdown code fences if present
             yamlResult = yamlResult.replace(/^```(?:yaml)?\n?/m, '').replace(/\n?```$/m, '').trim();
 
+            // Validate YAML before returning — detect duplicate keys and empty output
+            if (!yamlResult) {
+              res.statusCode = 422;
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({ error: 'A IA retornou uma resposta vazia. Tente reformular seu prompt.' }));
+              return;
+            }
+
+            try {
+              const { parse: parseYaml } = await import('yaml');
+              parseYaml(yamlResult); // throws if invalid (e.g. duplicate keys)
+            } catch (yamlErr: any) {
+              const msg: string = yamlErr?.message ?? String(yamlErr);
+              if (msg.includes('Map keys must be unique')) {
+                const lineMatch = msg.match(/line (\d+)/i);
+                const location = lineMatch ? ` (linha ${lineMatch[1]} do YAML gerado)` : '';
+                res.statusCode = 422;
+                res.setHeader('Content-Type', 'application/json');
+                res.end(JSON.stringify({
+                  error: `A IA gerou colunas com nomes duplicados${location}. Tente gerar novamente — se o problema persistir, adicione ao prompt: "use unique column names in every table".`,
+                  yaml: yamlResult,
+                }));
+                return;
+              }
+              res.statusCode = 422;
+              res.setHeader('Content-Type', 'application/json');
+              res.end(JSON.stringify({
+                error: `O YAML gerado pela IA é inválido: ${msg}`,
+                yaml: yamlResult,
+              }));
+              return;
+            }
+
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify({ yaml: yamlResult }));
           } catch (e: any) {
