@@ -1,9 +1,24 @@
 from __future__ import annotations
 
+import re
 from datetime import date as _date
 
 # Dtypes that support min/max ranges
 RANGE_SUPPORTED_DTYPES = {"int", "float", "date"}
+
+
+def _normalize_date_value(value: str) -> str:
+    """Normaliza sufixos de data relativos para o formato aceito pelo Faker.
+
+    Converte 'm' minúsculo para 'M' (meses) e garante que os demais
+    sufixos (d, w, y) fiquem em minúsculo, independente do que o usuário digitar.
+    """
+    return re.sub(
+        r"([+-]?\d+)([a-zA-Z])",
+        lambda m: m.group(1) + ("M" if m.group(2).lower() == "m" else m.group(2).lower()),
+        value,
+    )
+
 
 FAKER_REGISTRY: dict[str, callable] = {
     "uuid": lambda f, n, **kw: [f.uuid4() for _ in range(n)],
@@ -19,10 +34,10 @@ FAKER_REGISTRY: dict[str, callable] = {
     "bool": lambda f, n, **kw: [f.boolean() for _ in range(n)],
     "date": lambda f, n, min_value="-3y", max_value="today", **kw: [
         f.date_between(
-            start_date=min_value
+            start_date=_normalize_date_value(min_value)
             if isinstance(min_value, str)
             else _date.fromisoformat(str(min_value)),
-            end_date=max_value
+            end_date=_normalize_date_value(max_value)
             if isinstance(max_value, str)
             else _date.fromisoformat(str(max_value)),
         ).isoformat()

@@ -147,6 +147,7 @@ const VALID_DTYPES = [
 
 const nodeTypes = { tableNode: TableNode };
 
+
 export default function App() {
   const [domain, setDomain] = useState("custom");
   const [tables, setTables] = useState<Table[]>([]);
@@ -613,6 +614,7 @@ export default function App() {
   };
 
   const [showRunPanel, setShowRunPanel] = useState(false);
+  const [showRunHelp, setShowRunHelp] = useState(false);
   const [runConfig, setRunConfig] = useState<{
     formats: string[],
     destination: 'local' | 'cloud' | 'database',
@@ -1167,19 +1169,73 @@ export default function App() {
         )}
       </div>
 
+      {/* Run Generator Help Modal */}
+      {showRunHelp && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(6px)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }} onClick={() => setShowRunHelp(false)}>
+          <div style={{ width: '560px', maxWidth: '95vw', maxHeight: '85vh', overflowY: 'auto', background: 'rgba(9,12,20,0.98)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', padding: '1.5rem' }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+              <h3 style={{ margin: 0, color: '#e2e8f0', fontSize: '1rem' }}>Run Generator — Field Reference</h3>
+              <button onClick={() => setShowRunHelp(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '1.1rem', lineHeight: 1 }}>✕</button>
+            </div>
+            {([
+              { section: 'Format', fields: [
+                { name: 'Format (CSV / JSON / Parquet / Avro)', desc: 'Output file format. You can select multiple at once — the generator will write one file per format for each table.' },
+                { name: 'JSON Mode', desc: 'Flat (NDJSON): one JSON object per line, ideal for large files and streaming pipelines.\nNested: a single JSON array — easier to read but heavier in memory.' },
+                { name: 'Rows Override', desc: 'Override the number of rows defined in the schema for all tables. Leave empty to use the schema defaults.' },
+              ]},
+              { section: 'Destination', fields: [
+                { name: 'Local', desc: 'Save generated files to a folder on this machine. Click the 📁 button to browse and select the folder path.' },
+                { name: 'Cloud', desc: 'Upload generated files directly to a cloud bucket (GCS, S3, or Azure Blob Storage). Credentials are auto-loaded from the credentials/ folder in the project root.' },
+                { name: 'Bucket / Container', desc: 'Name of the target cloud bucket or container where files will be uploaded.' },
+                { name: 'Prefix', desc: 'Remote path prefix inside the bucket. Example: datasets/ → files land at datasets/schema_name/table_name/file.csv.' },
+                { name: 'Database', desc: 'Load generated data directly into a database table. Supports PostgreSQL, MySQL and SQLite.' },
+                { name: 'Database Type', desc: 'Choose the database engine. The connection form adapts to the selected type.' },
+                { name: 'File Path (SQLite)', desc: 'Path to the SQLite .db file. It will be created if it does not exist.' },
+                { name: 'Host / Port', desc: 'Address and port of the database server. Defaults are pre-filled per engine (PostgreSQL: 5432, MySQL: 3306).' },
+                { name: 'Database', desc: 'Name of the database to connect to.' },
+                { name: 'User / Password', desc: 'Credentials for the database connection.' },
+                { name: 'If Table Exists', desc: 'Replace: drops and recreates the table.\nAppend: inserts rows without deleting existing data.\nFail: aborts if the table already exists.' },
+                { name: 'DB Schema', desc: 'Optional database schema namespace (e.g. public in PostgreSQL). Leave empty to use the default.' },
+              ]},
+              { section: 'Reproducibility', fields: [
+                { name: 'Random Seed', desc: 'Fixed integer seed for the random generator. Using the same seed always produces identical data — useful for testing and reproducible demos.' },
+              ]},
+              { section: 'Recurrence', fields: [
+                { name: 'Interval (seconds)', desc: 'When set, the generator runs continuously, producing a new batch of data every N seconds. Press Stop to end the loop.' },
+                { name: 'Batch Limit', desc: 'Maximum number of batches to run. Set to 0 for infinite recurrence (stop manually with the Stop button).' },
+                { name: 'Column Increments', desc: 'Shifts a column\'s values forward by a fixed step on each batch — useful to simulate time-series or growing IDs.\nExample: orders › created_at › step 1 › days → each batch adds 1 day to all dates.' },
+              ]},
+            ] as { section: string; fields: { name: string; desc: string }[] }[]).map(({ section, fields }) => (
+              <div key={section} style={{ marginBottom: '1.25rem' }}>
+                <p style={{ margin: '0 0 0.6rem', fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.08em', color: '#475569' }}>{section}</p>
+                {fields.map(({ name, desc }) => (
+                  <div key={name} style={{ marginBottom: '0.75rem', paddingLeft: '0.75rem', borderLeft: '2px solid rgba(96,165,250,0.2)' }}>
+                    <p style={{ margin: '0 0 0.2rem', fontSize: '0.82rem', color: '#93c5fd', fontWeight: 600 }}>{name}</p>
+                    <p style={{ margin: 0, fontSize: '0.78rem', color: '#94a3b8', lineHeight: 1.5, whiteSpace: 'pre-line' }}>{desc}</p>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Run Generator Modal */}
       {showRunPanel && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.72)', backdropFilter: 'blur(6px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div className="glass-panel animated-scale" style={{ width: '580px', maxWidth: '95vw', padding: '1.5rem', background: 'rgba(9, 12, 20, 0.97)', border: '1px solid rgba(255,255,255,0.08)', borderTopColor: 'rgba(255,255,255,0.12)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
               <h2 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Play size={18} color="var(--success)"/> Run Generator</h2>
-              <button onClick={() => setShowRunPanel(false)} className="btn-icon" aria-label="Close run panel"><X size={18}/></button>
+              <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                <button onClick={() => setShowRunHelp(true)} style={{ background: 'rgba(148,163,184,0.1)', border: '1px solid rgba(148,163,184,0.2)', borderRadius: '6px', color: '#94a3b8', cursor: 'pointer', fontSize: '0.78rem', padding: '0.25rem 0.6rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>? Help</button>
+                <button onClick={() => setShowRunPanel(false)} className="btn-icon" aria-label="Close run panel"><X size={18}/></button>
+              </div>
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '70vh', overflowY: 'auto', paddingRight: '0.25rem' }}>
 
               {/* Formats + JSON mode */}
-              <div style={{ borderBottom: '1px solid rgba(148,163,184,0.15)', paddingBottom: '1rem' }}>
+              {runConfig.destination !== 'database' && <div style={{ borderBottom: '1px solid rgba(148,163,184,0.15)', paddingBottom: '1rem' }}>
                 <p style={{ margin: '0 0 0.75rem', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b' }}>Format</p>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                   {(['csv', 'json', 'parquet', 'avro'] as const).map(fmt => {
@@ -1213,7 +1269,7 @@ export default function App() {
                     <input type="number" value={runConfig.rows} onChange={e => setRunConfig(r => ({...r, rows: e.target.value}))} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. 5000" min="1" />
                   </div>
                 </div>
-              </div>
+              </div>}
 
               {/* Destination */}
               <div style={{ borderBottom: '1px solid rgba(148,163,184,0.15)', paddingBottom: '1rem' }}>
@@ -1239,7 +1295,29 @@ export default function App() {
                 {runConfig.destination === 'local' && (
                   <div>
                     <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Output Directory</label>
-                    <input type="text" value={runConfig.outputDir} onChange={e => setRunConfig(r => ({...r, outputDir: e.target.value}))} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. output" />
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <input type="text" value={runConfig.outputDir} onChange={e => setRunConfig(r => ({...r, outputDir: e.target.value}))} style={{ flex: 1, padding: '0.5rem' }} placeholder="e.g. output" />
+                      <button
+                        onClick={async (e) => {
+                          const btn = e.currentTarget;
+                          if (btn.disabled) return;
+                          btn.disabled = true;
+                          try {
+                            const res = await fetch('/api/browse-folder');
+                            const { path } = await res.json();
+                            if (path) setRunConfig(r => ({ ...r, outputDir: path }));
+                          } catch {
+                            // ignore
+                          } finally {
+                            btn.disabled = false;
+                          }
+                        }}
+                        title="Browse folder"
+                        style={{ padding: '0.5rem 0.75rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.07)', color: '#94a3b8', cursor: 'pointer', fontSize: '1rem', whiteSpace: 'nowrap' }}
+                      >
+                        📁
+                      </button>
+                    </div>
                   </div>
                 )}
 
@@ -1323,13 +1401,7 @@ export default function App() {
                           Save connection
                         </button>
                       )}
-                      <button
-                        type="button"
-                        onClick={() => { setDbAdvanced(v => !v); setDbTestStatus('idle'); setDbTestError(''); }}
-                        style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '0.75rem', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
-                      >
-                        {dbAdvanced ? 'Use form' : 'Advanced (connection string)'}
-                      </button>
+{/* Advanced connection string toggle disabled */}
                     </div>
 
                     {!dbAdvanced ? (
@@ -1607,16 +1679,7 @@ export default function App() {
                     </div>
                   </div>
                 )}
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Column Filters <span style={{ color: '#64748b' }}>(one per line: table:col1,col2)</span></label>
-                  <textarea
-                    value={runConfig.columnsFilter}
-                    onChange={e => setRunConfig(r => ({ ...r, columnsFilter: e.target.value }))}
-                    rows={3}
-                    placeholder={"orders:id,status,total\ncustomers:id,email"}
-                    style={{ width: '100%', padding: '0.5rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: 'white', resize: 'vertical', fontSize: '0.82rem', fontFamily: 'monospace' }}
-                  />
-                </div>
+{/* Column Filters disabled */}
               </div>
 
               {/* Terminal output — always visible, above the run button */}
