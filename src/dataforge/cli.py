@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -168,6 +169,7 @@ def _write_batch(
     batch: int,
     recurrence: bool,
     partition_map: dict[str, str] | None = None,
+    max_workers: int = 16,
 ) -> list[tuple[Path, str]]:
     """Escreve um batch de datasets. Retorna lista de (local_path, remote_sub) onde
     remote_sub é o caminho relativo ao prefix: 'dataset/table_name/[col=val/]filename.ext'."""
@@ -205,19 +207,48 @@ def _write_batch(
                     partition_by = partition_map.get(name) or partition_map.get("*")
 
                 if partition_by and partition_by in df.columns:
-                    # Escrita particionada: uma subpasta por valor da coluna
+                    # Escrita particionada: uma subpasta por valor da coluna — paralela
                     appendable = fmt in ("csv", "json")
-                    for val, group in df.groupby(partition_by):
+
+                    def _write_partition(
+                        val_group,
+                        _fmt=fmt,
+                        _ext=ext,
+                        _name=name,
+                        _partition_by=partition_by,
+                        _ts=ts,
+                        _recurrence=recurrence,
+                        _appendable=appendable,
+                    ):
+                        val, group = val_group
                         safe_val = str(val).replace("/", "-").replace(" ", "_")
-                        if recurrence and not appendable:
-                            filename = f"{name}_{ts}{ext}"
-                        else:
-                            filename = f"{name}{ext}"
-                        dest = (
-                            out_path / schema.name / name / f"{partition_by}={safe_val}" / filename
+                        filename = (
+                            f"{_name}_{_ts}{_ext}"
+                            if _recurrence and not _appendable
+                            else f"{_name}{_ext}"
                         )
-                        _write_df_direct(group, fmt, dest, json_mode)
-                        remote_sub = f"{schema.name}/{name}/{partition_by}={safe_val}/{filename}"
+                        dest = (
+                            out_path
+                            / schema.name
+                            / _name
+                            / f"{_partition_by}={safe_val}"
+                            / filename
+                        )
+                        _write_df_direct(group, _fmt, dest, json_mode)
+                        remote_sub = f"{schema.name}/{_name}/{_partition_by}={safe_val}/{filename}"
+                        return dest, remote_sub
+
+                    partitions = list(df.groupby(partition_by))
+                    max_workers = min(max_workers, len(partitions))
+                    results: list[tuple[Path, str]] = []
+                    with ThreadPoolExecutor(max_workers=max_workers) as pool:
+                        futures = {pool.submit(_write_partition, vg): vg for vg in partitions}
+                        for fut in as_completed(futures):
+                            dest, remote_sub = fut.result()
+                            results.append((dest, remote_sub))
+
+                    # Exibe e registra em ordem determinística
+                    for dest, remote_sub in sorted(results, key=lambda x: str(x[0])):
                         click.echo(f"  [{fmt}] {dest}")
                         written.append((dest, remote_sub))
                 else:
@@ -421,6 +452,12 @@ def cli():
         "Example: orders:created_at:1:days  or  sales:amount:100:value"
     ),
 )
+@click.option(
+    "--workers",
+    default=16,
+    type=int,
+    help="Max parallel threads for partitioned writes. Default: 16.",
+)
 def generate(
     domain,
     config,
@@ -442,6 +479,7 @@ def generate(
     recurrence,
     count,
     increment,
+    workers,
 ):
     """Generate synthetic datasets and optionally write to files, cloud or SQL.
 
@@ -501,6 +539,7 @@ def generate(
                 batch=batch,
                 recurrence=is_recurrent,
                 partition_map=_parse_partition_by(partition_by) if partition_by else None,
+                max_workers=workers,
             )
 
             # Upload

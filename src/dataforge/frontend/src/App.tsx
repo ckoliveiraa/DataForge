@@ -2,8 +2,8 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import dagre from 'dagre';
 import ReactFlow, { Background, Controls, ConnectionLineType, useNodesState, useEdgesState, MarkerType } from 'reactflow';
 import type { Edge, Node } from 'reactflow';
-import 'reactflow/dist/style.css';
-import { Plus, Download, FileJson, Upload, Trash2, Key, Link as LinkIcon, X, Network, Play, BookOpen, Search, Sparkles } from 'lucide-react';
+import 'reactflow/dist/style.css'; // ReactFlow v11 has no non-dist CSS export — necessary exception
+import { Plus, Download, FileJson, Trash2, Key, Link as LinkIcon, X, Network, Play, BookOpen, Search, Sparkles } from 'lucide-react';
 
 const FAKER_CATALOG: { category: string; color: string; methods: { name: string; example: string }[] }[] = [
   { category: 'Person', color: '#60a5fa', methods: [
@@ -441,8 +441,6 @@ export default function App() {
     return `${driver}://${creds}${form.host}${port}/${form.database}`;
   };
 
-  const computedDbUrl = dbAdvanced ? runConfig.dbUrl : buildDbUrl(dbForm);
-
   const handleTestDbConnection = async () => {
     setDbTestStatus('testing');
     setDbTestError('');
@@ -670,6 +668,7 @@ export default function App() {
     count: string,
     tablesToInclude: string[],
     columnsFilter: string,
+    workers: string,
     increments: Array<{ table: string; column: string; step: string; unit: string }>,
     cloudCreds: {
       gcsJson: string,
@@ -697,6 +696,7 @@ export default function App() {
     tablesToInclude: [],
     columnsFilter: '',
     increments: [],
+    workers: '16',
     cloudCreds: {
       gcsJson: '',
       s3AccessKey: '',
@@ -705,6 +705,8 @@ export default function App() {
       azureConnStr: '',
     },
   });
+  const computedDbUrl = dbAdvanced ? runConfig.dbUrl : buildDbUrl(dbForm);
+
   const [runLogs, setRunLogs] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const runAbortRef = useRef<AbortController | null>(null);
@@ -739,6 +741,7 @@ export default function App() {
           tables: runConfig.tablesToInclude.length > 0 ? runConfig.tablesToInclude : undefined,
           columns: runConfig.columnsFilter.trim() ? runConfig.columnsFilter.trim().split('\n').filter(Boolean) : undefined,
           increments: runConfig.increments.filter(i => i.table && i.column && i.step !== ''),
+          workers: runConfig.workers !== '' ? parseInt(runConfig.workers) : 16,
           cloudCreds: runConfig.destination === 'cloud' ? runConfig.cloudCreds : undefined,
         })
       });
@@ -805,7 +808,7 @@ export default function App() {
         </div>
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-subtle)', background: 'rgba(34,211,238,0.06)', border: '1px solid rgba(34,211,238,0.12)', borderRadius: '999px', padding: '0.2rem 0.75rem', letterSpacing: '0.04em' }}>
-            v{import.meta.env.VITE_APP_VERSION}
+            v{__APP_VERSION__}
           </span>
           <a href="https://ckoliveiraa.github.io/DataForge/" target="_blank" rel="noopener noreferrer"
             style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.85rem', transition: 'color var(--duration-base) var(--ease-out)' }}
@@ -1821,6 +1824,18 @@ export default function App() {
                         </div>
                       ))}
                     </div>
+                  </div>
+                )}
+                {Object.values(runConfig.partitionByTable).some(v => v) && (
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Partition Workers <span style={{ color: '#64748b' }}>(parallel threads)</span></label>
+                    <input type="number" value={runConfig.workers} onChange={e => setRunConfig(r => ({...r, workers: e.target.value}))} style={{ width: '100%', padding: '0.5rem' }} placeholder="16" min="1" />
+                    {(() => {
+                      const w = parseInt(runConfig.workers);
+                      if (w > 64) return <p style={{ margin: '0.35rem 0 0', fontSize: '0.75rem', color: '#f87171' }}>⚠ Above 64 threads may cause diminishing returns or instability. Recommended: 16–32 for local SSD, up to 64 for network storage.</p>;
+                      if (w > 32) return <p style={{ margin: '0.35rem 0 0', fontSize: '0.75rem', color: '#fb923c' }}>⚠ Above 32 threads only helps with slow network storage (Docker volumes, S3). Local SSD saturates earlier.</p>;
+                      return null;
+                    })()}
                   </div>
                 )}
 {/* Column Filters disabled */}

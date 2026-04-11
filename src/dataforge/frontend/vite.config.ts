@@ -83,7 +83,7 @@ const cliRunnerPlugin = () => ({
         req.on('end', () => {
           try {
             const data = JSON.parse(body);
-            const { yamlStr, formats, outputDir, uploadTarget, bucket, prefix, partitionByTable, jsonMode, seed, dbUrl, ifExists, dbSchema, recurrence, count, credentials, rows, tables: tablesToInclude, columns: columnsToInclude, increments, cloudCreds } = data;
+            const { yamlStr, formats, outputDir, uploadTarget, bucket, prefix, partitionByTable, jsonMode, seed, dbUrl, ifExists, dbSchema, recurrence, count, credentials, rows, tables: tablesToInclude, columns: columnsToInclude, increments, cloudCreds, workers } = data;
 
             const baseDir = resolve(__dirname, '../../../');
             // Cloud and database-only runs use a temp dir that is cleaned up after
@@ -183,6 +183,9 @@ const cliRunnerPlugin = () => ({
                   args.push('--increment', `${inc.table}:${inc.column}:${inc.step}:${inc.unit || 'days'}`);
                 }
               }
+            }
+            if (workers !== undefined && workers !== null && workers !== '') {
+              args.push('--workers', String(workers));
             }
 
             const venvPath = resolve(baseDir, '.venv', 'Scripts', 'python.exe');
@@ -780,7 +783,9 @@ DATASET DESCRIPTION:
 export default defineConfig({
   plugins: [react(), cliRunnerPlugin()],
   define: {
-    'import.meta.env.VITE_APP_VERSION': JSON.stringify(appVersion),
+    // Injected at build time from pyproject.toml — not available as a .env file
+    // because the version is the Python package's single source of truth.
+    __APP_VERSION__: JSON.stringify(appVersion),
   },
   server: {
     host: '0.0.0.0',  // Required for Docker
@@ -788,6 +793,11 @@ export default defineConfig({
     fs: {
       allow: ['../schemas', '.']
     }
+  },
+  // dagre is a CommonJS library — pre-bundle it so Vite doesn't fail in dev mode
+  // See: https://vitejs.dev/config/dep-optimization-options#optimizedeps-include
+  optimizeDeps: {
+    include: ['dagre'],
   },
   build: {
     rollupOptions: {
