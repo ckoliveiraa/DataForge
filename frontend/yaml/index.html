@@ -12,9 +12,13 @@
         <meta name="author" content="Carlos Oliveira">
       
       
-        <link rel="canonical" href="https://ckoliveiraa.github.io/DataForge/development/contributing/">
+        <link rel="canonical" href="https://ckoliveiraa.github.io/DataForge/frontend/yaml/">
       
       
+        <link rel="prev" href="../faker/">
+      
+      
+        <link rel="next" href="../../cli/referencia/">
       
       
         
@@ -25,7 +29,7 @@
     
     
       
-        <title>Contribuindo - Dataforge</title>
+        <title>Exportar e importar YAML - Dataforge</title>
       
     
     
@@ -78,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#contribuindo" class="md-skip">
+        <a href="#exportar-e-importar-yaml" class="md-skip">
           Ir para o conteúdo
         </a>
       
@@ -113,7 +117,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Contribuindo
+              Exportar e importar YAML
             
           </span>
         </div>
@@ -257,11 +261,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../frontend/visao-geral/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../visao-geral/" class="md-tabs__link">
           
   
   
@@ -551,28 +557,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
-        
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
             
   
   
@@ -590,7 +599,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
             
@@ -608,7 +617,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../frontend/visao-geral/" class="md-nav__link">
+      <a href="../visao-geral/" class="md-nav__link">
         
   
   
@@ -636,7 +645,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../frontend/ia/" class="md-nav__link">
+      <a href="../ia/" class="md-nav__link">
         
   
   
@@ -664,7 +673,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../frontend/diagrama/" class="md-nav__link">
+      <a href="../diagrama/" class="md-nav__link">
         
   
   
@@ -692,7 +701,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../frontend/faker/" class="md-nav__link">
+      <a href="../faker/" class="md-nav__link">
         
   
   
@@ -717,10 +726,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../frontend/yaml/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Exportar e importar YAML
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -736,6 +772,132 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#exportar-yaml-preview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exportar YAML (Preview)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Exportar YAML (Preview)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#estrutura-gerada" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Estrutura gerada
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#baixar-o-arquivo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Baixar o arquivo
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#salvar-no-servidor-save-as-default" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Salvar no servidor (Save as Default)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Salvar no servidor (Save as Default)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#como-usar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Como usar
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deletar-um-schema-salvo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deletar um schema salvo
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#importar-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Importar YAML
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Importar YAML">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#erros-tratados-na-importacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erros tratados na importação
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1355,44 +1517,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configurar-ambiente-de-desenvolvimento" class="md-nav__link">
+  <a href="#exportar-yaml-preview" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configurar ambiente de desenvolvimento
+        Exportar YAML (Preview)
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#comandos-disponiveis" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Comandos disponíveis
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#esteira-cicd" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Esteira CI/CD
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Esteira CI/CD">
+    <nav class="md-nav" aria-label="Exportar YAML (Preview)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#jobs" class="md-nav__link">
+  <a href="#estrutura-gerada" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Jobs
+        Estrutura gerada
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#baixar-o-arquivo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Baixar o arquivo
       
     </span>
   </a>
@@ -1405,57 +1556,69 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adicionando-um-novo-tipo-de-dado" class="md-nav__link">
+  <a href="#salvar-no-servidor-save-as-default" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adicionando um novo tipo de dado
+        Salvar no servidor (Save as Default)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Salvar no servidor (Save as Default)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#como-usar" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Como usar
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#adicionando-um-novo-writer" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#deletar-um-schema-salvo" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adicionando um novo writer
+        Deletar um schema salvo
       
     </span>
   </a>
   
 </li>
+        
+      </ul>
+    </nav>
+  
+</li>
       
         <li class="md-nav__item">
-  <a href="#adicionando-um-novo-dominio" class="md-nav__link">
+  <a href="#importar-yaml" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adicionando um novo domínio
+        Importar YAML
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Importar YAML">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#erros-tratados-na-importacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Erros tratados na importação
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#pre-commit-hooks" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Pre-commit hooks
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#estrutura-de-branches" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Estrutura de branches
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1479,152 +1642,92 @@
   
 
 
-<h1 id="contribuindo">Contribuindo<a class="headerlink" href="#contribuindo" title="Permanent link">&para;</a></h1>
-<hr />
-<h2 id="configurar-ambiente-de-desenvolvimento">Configurar ambiente de desenvolvimento<a class="headerlink" href="#configurar-ambiente-de-desenvolvimento" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/carlos-oliveira/dataforge.git
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>dataforge
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Instalar dependências de desenvolvimento</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>poetry<span class="w"> </span>install<span class="w"> </span>--extras<span class="w"> </span><span class="s2">&quot;parquet avro&quot;</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Configurar pre-commit hooks</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>poetry<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>install
+<h1 id="exportar-e-importar-yaml">Exportar e Importar YAML<a class="headerlink" href="#exportar-e-importar-yaml" title="Permanent link">&para;</a></h1>
+<p>A interface permite exportar o schema atual como YAML e importar um arquivo YAML existente para o canvas.</p>
+<h2 id="exportar-yaml-preview">Exportar YAML (Preview)<a class="headerlink" href="#exportar-yaml-preview" title="Permanent link">&para;</a></h2>
+<p>O botão <strong>Preview YAML</strong> gera o YAML do schema atual e exibe no painel lateral.</p>
+<p>O YAML é gerado pela classe <code>SchemaWriter</code> (<code>src/dataforge/frontend/src/services/SchemaWriter.ts</code>):</p>
+<ul>
+<li>Lê o estado interno do React (domínio, tabelas, colunas)</li>
+<li>Serializa para YAML usando a biblioteca <code>yaml</code></li>
+<li>O resultado é exibido no painel e pode ser copiado ou baixado</li>
+</ul>
+<h3 id="estrutura-gerada">Estrutura gerada<a class="headerlink" href="#estrutura-gerada" title="Permanent link">&para;</a></h3>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nt">domain</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">meu_dominio</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nt">tables</span><span class="p">:</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nt">tabela1</span><span class="p">:</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">    </span><span class="nt">rows</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1000</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="w">    </span><span class="nt">columns</span><span class="p">:</span>
+</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="w">      </span><span class="nt">id</span><span class="p">:</span>
+</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="w">        </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int_seq</span>
+</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="w">        </span><span class="nt">primary_key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-0-9"><a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a><span class="w">      </span><span class="nt">nome</span><span class="p">:</span>
+</span><span id="__span-0-10"><a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="w">        </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name</span>
+</span><span id="__span-0-11"><a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a><span class="w">      </span><span class="nt">email</span><span class="p">:</span>
+</span><span id="__span-0-12"><a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="w">        </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">email</span>
+</span><span id="__span-0-13"><a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="w">        </span><span class="nt">nullable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
 </span></code></pre></div>
-<hr />
-<h2 id="comandos-disponiveis">Comandos disponíveis<a class="headerlink" href="#comandos-disponiveis" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Formatar código</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>fmt
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Verificar lint</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>lint
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Formatar + lint (sem alterar)</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>check
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># Rodar testes</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span><span class="nb">test</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="c1"># Pipeline completa (check + testes + coverage)</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>ci
-</span></code></pre></div>
-<hr />
-<h2 id="esteira-cicd">Esteira CI/CD<a class="headerlink" href="#esteira-cicd" title="Permanent link">&para;</a></h2>
-<p>A esteira roda automaticamente no GitHub Actions em todo push:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>push
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  ↓
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>lint (ruff format + ruff check)
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  ↓
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>tests (pytest + coverage → Codecov)
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>  ↓
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>┌──────────────────┐     ┌──────────────┐
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>│  open-pr          │     │   release    │  (apenas main)
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>│  (branches != main)│    │  (tag + GH   │
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>└──────────────────┘     │   Release)   │
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>                         └──────────────┘
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>                               ↓
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>                         docs (MkDocs →
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>                         GitHub Pages)
-</span></code></pre></div>
-<h3 id="jobs">Jobs<a class="headerlink" href="#jobs" title="Permanent link">&para;</a></h3>
+<h3 id="baixar-o-arquivo">Baixar o arquivo<a class="headerlink" href="#baixar-o-arquivo" title="Permanent link">&para;</a></h3>
+<p>Clique em <strong>Download YAML</strong> (disponível após o preview) para baixar o arquivo como <code>{dominio}_schema.yaml</code>. O download é gerado via <code>Blob</code> no navegador, sem chamada ao servidor.</p>
+<h2 id="salvar-no-servidor-save-as-default">Salvar no servidor (Save as Default)<a class="headerlink" href="#salvar-no-servidor-save-as-default" title="Permanent link">&para;</a></h2>
+<p>O botão <strong>Save as Default</strong> salva o schema no servidor em <code>src/dataforge/schemas/</code>. Isso permite:</p>
+<ul>
+<li>Usar o schema via CLI com <code>-d {nome}</code></li>
+<li>Carregar o schema novamente na interface pelo seletor de domínio</li>
+</ul>
+<h3 id="como-usar">Como usar<a class="headerlink" href="#como-usar" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Clique em <strong>Save as Default</strong>.</li>
+<li>Informe um nome para o schema (apenas letras minúsculas, números, hífens e underscores).</li>
+<li>Confirme. O schema é enviado via <code>PUT /api/schemas/{nome}</code>.</li>
+</ol>
+<p>Após salvar, o schema aparece no seletor de domínio.</p>
+<h3 id="deletar-um-schema-salvo">Deletar um schema salvo<a class="headerlink" href="#deletar-um-schema-salvo" title="Permanent link">&para;</a></h3>
+<p>Para remover um schema salvo no servidor, use o botão de exclusão disponível no seletor de domínio. A operação envia <code>DELETE /api/schemas/{nome}</code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Schemas de domínio padrão</p>
+<p>Os schemas dos domínios padrão (<code>ecommerce</code>, <code>hr</code>, <code>finance</code>) são lidos de <code>src/dataforge/schemas/</code>. Salvar um schema com o mesmo nome sobrescreve o arquivo original.</p>
+</div>
+<h2 id="importar-yaml">Importar YAML<a class="headerlink" href="#importar-yaml" title="Permanent link">&para;</a></h2>
+<p>O botão <strong>Import YAML</strong> abre o seletor de arquivo do navegador. Formatos aceitos: <code>.yaml</code> e <code>.yml</code>.</p>
+<p>O arquivo é lido pela classe <code>SchemaReader</code> (<code>src/dataforge/frontend/src/services/SchemaReader.ts</code>):</p>
+<ol>
+<li>O conteúdo do arquivo é lido como texto via <code>FileReader</code>.</li>
+<li>O texto YAML é parseado com a biblioteca <code>yaml</code>.</li>
+<li>As tabelas e colunas são convertidas para o estado interno do React.</li>
+<li>O canvas é atualizado com as tabelas importadas.</li>
+</ol>
+<h3 id="erros-tratados-na-importacao">Erros tratados na importação<a class="headerlink" href="#erros-tratados-na-importacao" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>Job</th>
-<th>Gatilho</th>
-<th>O que faz</th>
+<th>Erro</th>
+<th>Causa</th>
+<th>Mensagem exibida</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>lint</code></td>
-<td>Todo push</td>
-<td>ruff format + ruff check</td>
+<td>Chaves duplicadas</td>
+<td>IA gerou duas colunas com o mesmo nome</td>
+<td>Indica linha e nome da chave duplicada</td>
 </tr>
 <tr>
-<td><code>test</code></td>
-<td>Após lint</td>
-<td>pytest + coverage upload</td>
+<td>YAML inválido</td>
+<td>Sintaxe incorreta</td>
+<td>Mensagem do parser YAML</td>
 </tr>
 <tr>
-<td><code>open-pr</code></td>
-<td>Push em branch ≠ main</td>
-<td>Cria PR para main automaticamente</td>
-</tr>
-<tr>
-<td><code>release</code></td>
-<td>Push em main</td>
-<td>Cria tag + GitHub Release</td>
-</tr>
-<tr>
-<td><code>docs</code></td>
-<td>Push em main</td>
-<td>Build MkDocs + deploy GitHub Pages</td>
+<td>Objeto inválido</td>
+<td>Arquivo não contém objeto YAML válido</td>
+<td>"Formato YAML inválido"</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="adicionando-um-novo-tipo-de-dado">Adicionando um novo tipo de dado<a class="headerlink" href="#adicionando-um-novo-tipo-de-dado" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Edite <code>src/dataforge/core/registry.py</code></li>
-<li>Adicione uma entrada ao <code>FAKER_REGISTRY</code>:</li>
-</ol>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="s2">&quot;meu_tipo&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">fake</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="p">[</span><span class="n">fake</span><span class="o">.</span><span class="n">meu_metodo</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)],</span>
-</span></code></pre></div>
-<ol>
-<li>Documente em <code>docs/usage/data-types.md</code></li>
-</ol>
-<hr />
-<h2 id="adicionando-um-novo-writer">Adicionando um novo writer<a class="headerlink" href="#adicionando-um-novo-writer" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Crie <code>src/dataforge/writers/meu_writer.py</code> implementando <code>BaseWriter</code></li>
-<li>Registre em <code>src/dataforge/writers/__init__.py</code>:</li>
-</ol>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">.meu_writer</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeuWriter</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">WRITER_REGISTRY</span><span class="p">[</span><span class="s2">&quot;meu_formato&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">MeuWriter</span>
-</span></code></pre></div>
-<hr />
-<h2 id="adicionando-um-novo-dominio">Adicionando um novo domínio<a class="headerlink" href="#adicionando-um-novo-dominio" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Crie <code>src/dataforge/domains/meu_dominio.py</code> implementando <code>DomainTemplate</code></li>
-<li>Registre em <code>src/dataforge/domains/__init__.py</code></li>
-<li>Ou simplesmente crie um YAML em <code>src/dataforge/schemas/meu_dominio.yaml</code></li>
-</ol>
-<hr />
-<h2 id="pre-commit-hooks">Pre-commit hooks<a class="headerlink" href="#pre-commit-hooks" title="Permanent link">&para;</a></h2>
-<p>O projeto usa pre-commit para garantir qualidade antes de cada commit:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># .pre-commit-config.yaml</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ruff (format + check)</span>
-</span></code></pre></div>
-<p>Para rodar manualmente:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>poetry<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
-</span></code></pre></div>
-<hr />
-<h2 id="estrutura-de-branches">Estrutura de branches<a class="headerlink" href="#estrutura-de-branches" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Branch</th>
-<th>Propósito</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>main</code></td>
-<td>Estável — gera release automaticamente</td>
-</tr>
-<tr>
-<td><code>feature/*</code></td>
-<td>Desenvolvimento de features</td>
-</tr>
-<tr>
-<td><code>fix/*</code></td>
-<td>Correções</td>
-</tr>
-</tbody>
-</table>
-<p>Ao fazer push em qualquer branch diferente de <code>main</code>, um PR é aberto automaticamente para <code>main</code> após os testes passarem.</p>
+<div class="admonition tip">
+<p class="admonition-title">Compatibilidade</p>
+<p>O YAML importado deve seguir a mesma estrutura produzida pelo Dataforge. A importação é compatível com qualquer schema gerado pelo CLI ou pela interface.</p>
+</div>
 
 
 
@@ -1657,6 +1760,44 @@
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Rodapé" >
+        
+          
+          <a href="../faker/" class="md-footer__link md-footer__link--prev" aria-label="Anterior: Catálogo Faker">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                Catálogo Faker
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../cli/referencia/" class="md-footer__link md-footer__link--next" aria-label="Próximo: Referência completa">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Próximo
+              </span>
+              <div class="md-ellipsis">
+                Referência completa
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">

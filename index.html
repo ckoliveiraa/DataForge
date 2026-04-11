@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Gerador de datasets sintéticos relacionais para engenharia de dados">
+        <meta name="description" content="Gerador de datasets sintéticos relacionais">
       
       
         <meta name="author" content="Carlos Oliveira">
@@ -16,7 +16,7 @@
       
       
       
-        <link rel="next" href="getting-started/installation/">
+        <link rel="next" href="instalacao/docker/">
       
       
         
@@ -245,11 +245,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="getting-started/installation/" class="md-tabs__link">
+        <a href="instalacao/docker/" class="md-tabs__link">
           
   
   
-  Primeiros Passos
+  Instalação
 
         </a>
       </li>
@@ -265,11 +265,11 @@
     
     
       <li class="md-tabs__item">
-        <a href="usage/frontend/" class="md-tabs__link">
+        <a href="frontend/visao-geral/" class="md-tabs__link">
           
   
   
-  Uso
+  Interface Visual
 
         </a>
       </li>
@@ -285,31 +285,71 @@
     
     
       <li class="md-tabs__item">
-        <a href="advanced/recurrence/" class="md-tabs__link">
+        <a href="cli/referencia/" class="md-tabs__link">
+          
+  
+  
+  CLI
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="schemas/yaml/" class="md-tabs__link">
+          
+  
+  
+  Schemas
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="saida/formatos/" class="md-tabs__link">
+          
+  
+  
+  Saída de dados
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="avancado/recorrencia/" class="md-tabs__link">
           
   
   
   Avançado
-
-        </a>
-      </li>
-    
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="development/architecture/" class="md-tabs__link">
-          
-  
-  
-  Desenvolvimento
 
         </a>
       </li>
@@ -434,10 +474,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#por-que-dataforge" class="md-nav__link">
+  <a href="#como-funciona" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Por que Dataforge?
+        Como funciona
       
     </span>
   </a>
@@ -445,10 +485,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#funcionalidades" class="md-nav__link">
+  <a href="#formas-de-uso" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Funcionalidades
+        Formas de uso
       
     </span>
   </a>
@@ -459,7 +499,7 @@
   <a href="#inicio-rapido" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Início Rápido
+        Início rápido
       
     </span>
   </a>
@@ -467,10 +507,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#arquitetura-em-uma-linha" class="md-nav__link">
+  <a href="#estrutura-de-pastas-do-host" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Arquitetura em uma Linha
+        Estrutura de pastas do host
       
     </span>
   </a>
@@ -517,7 +557,7 @@
   <span class="md-ellipsis">
     
   
-    Primeiros Passos
+    Instalação
   
 
     
@@ -533,7 +573,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Primeiros Passos
+    Instalação
   
 
           </label>
@@ -546,14 +586,14 @@
   
   
     <li class="md-nav__item">
-      <a href="getting-started/installation/" class="md-nav__link">
+      <a href="instalacao/docker/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Instalação
+    Docker
   
 
     
@@ -574,14 +614,14 @@
   
   
     <li class="md-nav__item">
-      <a href="getting-started/quickstart/" class="md-nav__link">
+      <a href="instalacao/poetry/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Quickstart
+    Sem Docker (Poetry)
   
 
     
@@ -634,7 +674,7 @@
   <span class="md-ellipsis">
     
   
-    Uso
+    Interface Visual
   
 
     
@@ -650,7 +690,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Uso
+    Interface Visual
   
 
           </label>
@@ -663,14 +703,14 @@
   
   
     <li class="md-nav__item">
-      <a href="usage/frontend/" class="md-nav__link">
+      <a href="frontend/visao-geral/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Interface Visual
+    Visão geral
   
 
     
@@ -691,14 +731,14 @@
   
   
     <li class="md-nav__item">
-      <a href="usage/cli/" class="md-nav__link">
+      <a href="frontend/ia/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    CLI - Referência
+    Geração com IA
   
 
     
@@ -719,14 +759,14 @@
   
   
     <li class="md-nav__item">
-      <a href="usage/domains/" class="md-nav__link">
+      <a href="frontend/diagrama/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Domínios Prontos
+    Diagrama relacional
   
 
     
@@ -747,14 +787,14 @@
   
   
     <li class="md-nav__item">
-      <a href="usage/schemas/" class="md-nav__link">
+      <a href="frontend/faker/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Schemas Customizados
+    Catálogo Faker
   
 
     
@@ -775,14 +815,14 @@
   
   
     <li class="md-nav__item">
-      <a href="usage/data-types/" class="md-nav__link">
+      <a href="frontend/yaml/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Tipos de Dados
+    Exportar e importar YAML
   
 
     
@@ -835,7 +875,7 @@
   <span class="md-ellipsis">
     
   
-    Avançado
+    CLI
   
 
     
@@ -851,7 +891,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Avançado
+    CLI
   
 
           </label>
@@ -864,14 +904,14 @@
   
   
     <li class="md-nav__item">
-      <a href="advanced/recurrence/" class="md-nav__link">
+      <a href="cli/referencia/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Modo Recorrente
+    Referência completa
   
 
     
@@ -892,70 +932,14 @@
   
   
     <li class="md-nav__item">
-      <a href="advanced/cloud-upload/" class="md-nav__link">
+      <a href="cli/exemplos/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Upload para Nuvem
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="advanced/sql-loading/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Carga em Banco SQL
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="advanced/partitioning/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Particionamento
+    Exemplos práticos
   
 
     
@@ -1008,7 +992,7 @@
   <span class="md-ellipsis">
     
   
-    Desenvolvimento
+    Schemas
   
 
     
@@ -1024,7 +1008,7 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    Desenvolvimento
+    Schemas
   
 
           </label>
@@ -1037,14 +1021,14 @@
   
   
     <li class="md-nav__item">
-      <a href="development/architecture/" class="md-nav__link">
+      <a href="schemas/yaml/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Arquitetura
+    Schema YAML customizado
   
 
     
@@ -1065,14 +1049,360 @@
   
   
     <li class="md-nav__item">
-      <a href="development/contributing/" class="md-nav__link">
+      <a href="schemas/dominios/" class="md-nav__link">
         
   
   
   <span class="md-ellipsis">
     
   
-    Contribuindo
+    Domínios prontos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="schemas/dtypes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tipos de dados (dtype)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Saída de dados
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Saída de dados
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="saida/formatos/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Formatos
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="saida/particionamento/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Particionamento
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="saida/cloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Upload em nuvem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="saida/sql/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Carga SQL
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Avançado
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Avançado
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="avancado/recorrencia/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modo recorrente
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="avancado/seed/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reprodutibilidade
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="avancado/arquitetura/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arquitetura
   
 
     
@@ -1120,10 +1450,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#por-que-dataforge" class="md-nav__link">
+  <a href="#como-funciona" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Por que Dataforge?
+        Como funciona
       
     </span>
   </a>
@@ -1131,10 +1461,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#funcionalidades" class="md-nav__link">
+  <a href="#formas-de-uso" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Funcionalidades
+        Formas de uso
       
     </span>
   </a>
@@ -1145,7 +1475,7 @@
   <a href="#inicio-rapido" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Início Rápido
+        Início rápido
       
     </span>
   </a>
@@ -1153,10 +1483,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#arquitetura-em-uma-linha" class="md-nav__link">
+  <a href="#estrutura-de-pastas-do-host" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Arquitetura em uma Linha
+        Estrutura de pastas do host
       
     </span>
   </a>
@@ -1184,63 +1514,82 @@
 
 
 <h1 id="dataforge">Dataforge<a class="headerlink" href="#dataforge" title="Permanent link">&para;</a></h1>
-<p><strong>Gerador de datasets sintéticos relacionais para engenharia de dados.</strong></p>
-<p>Dataforge cria conjuntos de dados fictícios com integridade referencial garantida — ideal para testar pipelines de dados, popular bancos de desenvolvimento e criar fixtures de teste sem depender de dados reais.</p>
-<hr />
-<h2 id="por-que-dataforge">Por que Dataforge?<a class="headerlink" href="#por-que-dataforge" title="Permanent link">&para;</a></h2>
+<p>Dataforge é uma ferramenta para geração de datasets sintéticos <strong>relacionais</strong> com integridade referencial garantida. Está disponível como interface visual no navegador e como linha de comando (CLI).</p>
+<p>Casos de uso típicos:</p>
+<ul>
+<li>Popular bancos de dados de desenvolvimento sem usar dados reais</li>
+<li>Criar fixtures para modelos dbt</li>
+<li>Testar pipelines de ingestão e transformação de dados</li>
+<li>Simular volumes de dados antes de ir para produção</li>
+</ul>
+<h2 id="como-funciona">Como funciona<a class="headerlink" href="#como-funciona" title="Permanent link">&para;</a></h2>
+<p>O Dataforge lê um <strong>schema YAML</strong> que descreve tabelas, colunas, tipos de dados e relações entre tabelas. A partir desse schema ele gera DataFrames Pandas e os escreve nos formatos e destinos escolhidos.</p>
+<p>A integridade referencial é garantida por dois mecanismos:</p>
+<ol>
+<li><strong>Ordenação topológica</strong> — tabelas pai são geradas antes de tabelas filhas.</li>
+<li><strong>Pool de PKs</strong> — após gerar cada tabela, seus valores de chave primária ficam disponíveis; colunas com chave estrangeira amostram desse pool com reposição, permitindo múltiplos filhos por pai.</li>
+</ol>
+<h2 id="formas-de-uso">Formas de uso<a class="headerlink" href="#formas-de-uso" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Problema</th>
-<th>Solução</th>
+<th>Modo</th>
+<th>Acesso</th>
+<th>Ideal para</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Dados reais têm PII e não podem ser compartilhados</td>
-<td>Dados 100% sintéticos via <a href="https://faker.readthedocs.io/">Faker</a></td>
+<td>Interface visual</td>
+<td><code>http://localhost:5173</code></td>
+<td>Criar schemas, explorar domínios, executar via GUI</td>
 </tr>
 <tr>
-<td>Seed manual de banco é trabalhoso</td>
-<td>Domínios prontos com um comando</td>
+<td>CLI Docker</td>
+<td><code>docker compose run --rm cli generate ...</code></td>
+<td>Scripts, CI, automação</td>
 </tr>
 <tr>
-<td>Dados sem relação entre tabelas quebram pipelines</td>
-<td>Integridade referencial por ordenação topológica</td>
-</tr>
-<tr>
-<td>Formato fixo não serve para todos os destinos</td>
-<td>CSV, JSON, Parquet, Avro — e upload direto para nuvem</td>
+<td>CLI direto (Poetry)</td>
+<td><code>dataset-gen generate ...</code></td>
+<td>Desenvolvimento local</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="funcionalidades">Funcionalidades<a class="headerlink" href="#funcionalidades" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Domínios prontos</strong> — ecommerce, RH, finanças e mais</li>
-<li><strong>Schemas customizados</strong> em YAML</li>
-<li><strong>Interface visual</strong> para editar schemas sem escrever YAML</li>
-<li><strong>Integridade referencial</strong> — chaves estrangeiras sempre resolvidas</li>
-<li><strong>Múltiplos formatos</strong> — CSV, JSON (flat/nested), Parquet, Avro</li>
-<li><strong>Upload direto</strong> para GCS, S3, Azure Blob Storage</li>
-<li><strong>Carga em banco</strong> — PostgreSQL, MySQL, SQL Server, SQLite</li>
-<li><strong>Modo recorrente</strong> — geração contínua de batches incrementais</li>
-<li><strong>Reprodutibilidade</strong> — seed para resultados idênticos</li>
-</ul>
-<hr />
-<h2 id="inicio-rapido">Início Rápido<a class="headerlink" href="#inicio-rapido" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Subir a interface visual</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>frontend
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Gerar 1000 clientes do domínio ecommerce em CSV</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>cli<span class="w"> </span>generate<span class="w"> </span>-d<span class="w"> </span>ecommerce<span class="w"> </span>-t<span class="w"> </span>customers<span class="w"> </span>-r<span class="w"> </span><span class="m">1000</span><span class="w"> </span>-f<span class="w"> </span>csv
+<h2 id="inicio-rapido">Início rápido<a class="headerlink" href="#inicio-rapido" title="Permanent link">&para;</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/ckoliveiraa/DataForge
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>Dataforge
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>docker<span class="w"> </span>compose<span class="w"> </span>up<span class="w"> </span>--build<span class="w"> </span>-d
 </span></code></pre></div>
-<p>Veja o <a href="getting-started/installation/">Guia de Instalação</a> e o <a href="getting-started/quickstart/">Quickstart</a> para o passo a passo completo.</p>
-<hr />
-<h2 id="arquitetura-em-uma-linha">Arquitetura em uma Linha<a class="headerlink" href="#arquitetura-em-uma-linha" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Schema YAML → DatasetGenerator → [CSV | JSON | Parquet | Avro] → [Local | GCS | S3 | Azure | SQL]
-</span></code></pre></div>
-<p>Cada camada é plugável via registros internos — veja <a href="development/architecture/">Arquitetura</a>.</p>
+<p>Acesse <code>http://localhost:5173</code> após o build concluir.</p>
+<h2 id="estrutura-de-pastas-do-host">Estrutura de pastas do host<a class="headerlink" href="#estrutura-de-pastas-do-host" title="Permanent link">&para;</a></h2>
+<p>Após subir os containers, três pastas ficam mapeadas entre o container e o host:</p>
+<table>
+<thead>
+<tr>
+<th>Pasta</th>
+<th>Uso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>output/</code></td>
+<td>Arquivos gerados pelo CLI aparecem aqui</td>
+</tr>
+<tr>
+<td><code>credentials/</code></td>
+<td>Arquivos de credenciais de nuvem (JSON do GCP, etc.)</td>
+</tr>
+<tr>
+<td><code>src/dataforge/schemas/</code></td>
+<td>Schemas YAML customizados — editáveis sem rebuild</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="admonition-title">Pré-requisitos</p>
+<p>Apenas <strong>Docker</strong> e <strong>Docker Compose</strong> instalados na máquina. Não é necessário instalar Python, Node.js ou qualquer outra dependência separadamente.</p>
+</div>
 
 
 
@@ -1279,13 +1628,13 @@
         
         
           
-          <a href="getting-started/installation/" class="md-footer__link md-footer__link--next" aria-label="Próximo: Instalação">
+          <a href="instalacao/docker/" class="md-footer__link md-footer__link--next" aria-label="Próximo: Docker">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Próximo
               </span>
               <div class="md-ellipsis">
-                Instalação
+                Docker
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -1342,6 +1691,8 @@
     
     
       <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
       
     
   </body>

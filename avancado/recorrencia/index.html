@@ -12,9 +12,13 @@
         <meta name="author" content="Carlos Oliveira">
       
       
-        <link rel="canonical" href="https://ckoliveiraa.github.io/DataForge/development/contributing/">
+        <link rel="canonical" href="https://ckoliveiraa.github.io/DataForge/avancado/recorrencia/">
       
       
+        <link rel="prev" href="../../saida/sql/">
+      
+      
+        <link rel="next" href="../seed/">
       
       
         
@@ -25,7 +29,7 @@
     
     
       
-        <title>Contribuindo - Dataforge</title>
+        <title>Modo recorrente - Dataforge</title>
       
     
     
@@ -78,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#contribuindo" class="md-skip">
+        <a href="#modo-recorrente" class="md-skip">
           Ir para o conteúdo
         </a>
       
@@ -113,7 +117,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Contribuindo
+              Modo recorrente
             
           </span>
         </div>
@@ -337,11 +341,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../avancado/recorrencia/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="./" class="md-tabs__link">
           
   
   
@@ -1187,28 +1193,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
-        
-          
-          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
             
   
   
@@ -1226,7 +1235,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1241,10 +1250,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../avancado/recorrencia/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Modo recorrente
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1260,6 +1296,153 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#ativando" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ativando
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#flags-do-modo-recorrente" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Flags do modo recorrente
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#seed-incremental" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Seed incremental
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#continuidade-de-int_seq" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Continuidade de int_seq
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#incremento-de-colunas-increment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Incremento de colunas (--increment)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Incremento de colunas (--increment)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unidades-disponiveis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unidades disponíveis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemplos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemplos
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comportamento-de-escrita-por-formato" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comportamento de escrita por formato
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comportamento-sql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comportamento SQL
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interface-visual" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interface visual
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#saida-no-terminal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Saída no terminal
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1272,7 +1455,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../avancado/seed/" class="md-nav__link">
+      <a href="../seed/" class="md-nav__link">
         
   
   
@@ -1300,7 +1483,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../avancado/arquitetura/" class="md-nav__link">
+      <a href="../arquitetura/" class="md-nav__link">
         
   
   
@@ -1355,10 +1538,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configurar-ambiente-de-desenvolvimento" class="md-nav__link">
+  <a href="#ativando" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configurar ambiente de desenvolvimento
+        Ativando
       
     </span>
   </a>
@@ -1366,10 +1549,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#comandos-disponiveis" class="md-nav__link">
+  <a href="#flags-do-modo-recorrente" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Comandos disponíveis
+        Flags do modo recorrente
       
     </span>
   </a>
@@ -1377,22 +1560,55 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#esteira-cicd" class="md-nav__link">
+  <a href="#seed-incremental" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Esteira CI/CD
+        Seed incremental
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Esteira CI/CD">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#continuidade-de-int_seq" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Continuidade de int_seq
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#incremento-de-colunas-increment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Incremento de colunas (--increment)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Incremento de colunas (--increment)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#jobs" class="md-nav__link">
+  <a href="#unidades-disponiveis" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Jobs
+        Unidades disponíveis
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#exemplos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemplos
       
     </span>
   </a>
@@ -1405,10 +1621,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adicionando-um-novo-tipo-de-dado" class="md-nav__link">
+  <a href="#comportamento-de-escrita-por-formato" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adicionando um novo tipo de dado
+        Comportamento de escrita por formato
       
     </span>
   </a>
@@ -1416,10 +1632,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adicionando-um-novo-writer" class="md-nav__link">
+  <a href="#comportamento-sql" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adicionando um novo writer
+        Comportamento SQL
       
     </span>
   </a>
@@ -1427,10 +1643,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adicionando-um-novo-dominio" class="md-nav__link">
+  <a href="#interface-visual" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adicionando um novo domínio
+        Interface visual
       
     </span>
   </a>
@@ -1438,21 +1654,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pre-commit-hooks" class="md-nav__link">
+  <a href="#saida-no-terminal" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pre-commit hooks
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#estrutura-de-branches" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Estrutura de branches
+        Saída no terminal
       
     </span>
   </a>
@@ -1479,152 +1684,159 @@
   
 
 
-<h1 id="contribuindo">Contribuindo<a class="headerlink" href="#contribuindo" title="Permanent link">&para;</a></h1>
-<hr />
-<h2 id="configurar-ambiente-de-desenvolvimento">Configurar ambiente de desenvolvimento<a class="headerlink" href="#configurar-ambiente-de-desenvolvimento" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/carlos-oliveira/dataforge.git
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>dataforge
+<h1 id="modo-recorrente">Modo Recorrente<a class="headerlink" href="#modo-recorrente" title="Permanent link">&para;</a></h1>
+<p>O modo recorrente faz o gerador produzir batches de dados em intervalos regulares, simulando um pipeline de dados contínuo ou incremental.</p>
+<h2 id="ativando">Ativando<a class="headerlink" href="#ativando" title="Permanent link">&para;</a></h2>
+<p>Use a flag <code>-R</code> / <code>--recurrence</code> com o intervalo em segundos:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Um batch a cada 30 segundos, indefinidamente</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>cli<span class="w"> </span>generate<span class="w"> </span>-d<span class="w"> </span>finance<span class="w"> </span>-f<span class="w"> </span>json<span class="w"> </span>-R<span class="w"> </span><span class="m">30</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Instalar dependências de desenvolvimento</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>poetry<span class="w"> </span>install<span class="w"> </span>--extras<span class="w"> </span><span class="s2">&quot;parquet avro&quot;</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Configurar pre-commit hooks</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>poetry<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>install
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Exatamente 10 batches com intervalo de 60 segundos</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>cli<span class="w"> </span>generate<span class="w"> </span>-d<span class="w"> </span>ecommerce<span class="w"> </span>-f<span class="w"> </span>parquet<span class="w"> </span>-R<span class="w"> </span><span class="m">60</span><span class="w"> </span>--count<span class="w"> </span><span class="m">10</span>
 </span></code></pre></div>
-<hr />
-<h2 id="comandos-disponiveis">Comandos disponíveis<a class="headerlink" href="#comandos-disponiveis" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Formatar código</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>fmt
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Verificar lint</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>lint
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Formatar + lint (sem alterar)</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>check
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># Rodar testes</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span><span class="nb">test</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="c1"># Pipeline completa (check + testes + coverage)</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>ci
-</span></code></pre></div>
-<hr />
-<h2 id="esteira-cicd">Esteira CI/CD<a class="headerlink" href="#esteira-cicd" title="Permanent link">&para;</a></h2>
-<p>A esteira roda automaticamente no GitHub Actions em todo push:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>push
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  ↓
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>lint (ruff format + ruff check)
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  ↓
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>tests (pytest + coverage → Codecov)
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>  ↓
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>┌──────────────────┐     ┌──────────────┐
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>│  open-pr          │     │   release    │  (apenas main)
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>│  (branches != main)│    │  (tag + GH   │
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>└──────────────────┘     │   Release)   │
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>                         └──────────────┘
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>                               ↓
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>                         docs (MkDocs →
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>                         GitHub Pages)
-</span></code></pre></div>
-<h3 id="jobs">Jobs<a class="headerlink" href="#jobs" title="Permanent link">&para;</a></h3>
+<p>Para parar manualmente: <code>Ctrl+C</code>.</p>
+<h2 id="flags-do-modo-recorrente">Flags do modo recorrente<a class="headerlink" href="#flags-do-modo-recorrente" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Job</th>
-<th>Gatilho</th>
-<th>O que faz</th>
+<th>Flag</th>
+<th>Padrão</th>
+<th>Descrição</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>lint</code></td>
-<td>Todo push</td>
-<td>ruff format + ruff check</td>
+<td><code>--recurrence</code> / <code>-R</code></td>
+<td>—</td>
+<td>Intervalo em segundos entre batches (ativa o modo)</td>
 </tr>
 <tr>
-<td><code>test</code></td>
-<td>Após lint</td>
-<td>pytest + coverage upload</td>
-</tr>
-<tr>
-<td><code>open-pr</code></td>
-<td>Push em branch ≠ main</td>
-<td>Cria PR para main automaticamente</td>
-</tr>
-<tr>
-<td><code>release</code></td>
-<td>Push em main</td>
-<td>Cria tag + GitHub Release</td>
-</tr>
-<tr>
-<td><code>docs</code></td>
-<td>Push em main</td>
-<td>Build MkDocs + deploy GitHub Pages</td>
+<td><code>--count</code></td>
+<td><code>0</code></td>
+<td>Número de batches (<code>0</code> = infinito)</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="adicionando-um-novo-tipo-de-dado">Adicionando um novo tipo de dado<a class="headerlink" href="#adicionando-um-novo-tipo-de-dado" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Edite <code>src/dataforge/core/registry.py</code></li>
-<li>Adicione uma entrada ao <code>FAKER_REGISTRY</code>:</li>
-</ol>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="s2">&quot;meu_tipo&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">fake</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="p">[</span><span class="n">fake</span><span class="o">.</span><span class="n">meu_metodo</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)],</span>
+<h2 id="seed-incremental">Seed incremental<a class="headerlink" href="#seed-incremental" title="Permanent link">&para;</a></h2>
+<p>Quando <code>--seed</code> é usado com modo recorrente, o seed de cada batch é calculado como <code>seed + batch_index - 1</code>. Isso garante que cada batch produza dados diferentes mas determinísticos:</p>
+<ul>
+<li>Batch 1: seed = 42</li>
+<li>Batch 2: seed = 43</li>
+<li>Batch 3: seed = 44</li>
+</ul>
+<h2 id="continuidade-de-int_seq">Continuidade de int_seq<a class="headerlink" href="#continuidade-de-int_seq" title="Permanent link">&para;</a></h2>
+<p>Colunas com <code>dtype: int_seq</code> são contínuas entre batches. O gerador acumula o offset de linhas por tabela:</p>
+<ul>
+<li>Batch 1 (100 linhas): IDs 1 a 100</li>
+<li>Batch 2 (100 linhas): IDs 101 a 200</li>
+<li>Batch 3 (100 linhas): IDs 201 a 300</li>
+</ul>
+<h2 id="incremento-de-colunas-increment">Incremento de colunas (<code>--increment</code>)<a class="headerlink" href="#incremento-de-colunas-increment" title="Permanent link">&para;</a></h2>
+<p>A flag <code>--increment</code> desloca os valores de uma coluna a cada batch, simulando avanço temporal ou numérico:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>--increment tabela:coluna:passo[:unidade]
 </span></code></pre></div>
-<ol>
-<li>Documente em <code>docs/usage/data-types.md</code></li>
-</ol>
-<hr />
-<h2 id="adicionando-um-novo-writer">Adicionando um novo writer<a class="headerlink" href="#adicionando-um-novo-writer" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Crie <code>src/dataforge/writers/meu_writer.py</code> implementando <code>BaseWriter</code></li>
-<li>Registre em <code>src/dataforge/writers/__init__.py</code>:</li>
-</ol>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">.meu_writer</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeuWriter</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">WRITER_REGISTRY</span><span class="p">[</span><span class="s2">&quot;meu_formato&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">MeuWriter</span>
-</span></code></pre></div>
-<hr />
-<h2 id="adicionando-um-novo-dominio">Adicionando um novo domínio<a class="headerlink" href="#adicionando-um-novo-dominio" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Crie <code>src/dataforge/domains/meu_dominio.py</code> implementando <code>DomainTemplate</code></li>
-<li>Registre em <code>src/dataforge/domains/__init__.py</code></li>
-<li>Ou simplesmente crie um YAML em <code>src/dataforge/schemas/meu_dominio.yaml</code></li>
-</ol>
-<hr />
-<h2 id="pre-commit-hooks">Pre-commit hooks<a class="headerlink" href="#pre-commit-hooks" title="Permanent link">&para;</a></h2>
-<p>O projeto usa pre-commit para garantir qualidade antes de cada commit:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># .pre-commit-config.yaml</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ruff (format + check)</span>
-</span></code></pre></div>
-<p>Para rodar manualmente:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>poetry<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
-</span></code></pre></div>
-<hr />
-<h2 id="estrutura-de-branches">Estrutura de branches<a class="headerlink" href="#estrutura-de-branches" title="Permanent link">&para;</a></h2>
+<h3 id="unidades-disponiveis">Unidades disponíveis<a class="headerlink" href="#unidades-disponiveis" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>Branch</th>
-<th>Propósito</th>
+<th>Unidade</th>
+<th>Descrição</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>main</code></td>
-<td>Estável — gera release automaticamente</td>
+<td><code>days</code></td>
+<td>Dias (padrão)</td>
 </tr>
 <tr>
-<td><code>feature/*</code></td>
-<td>Desenvolvimento de features</td>
+<td><code>hours</code></td>
+<td>Horas</td>
 </tr>
 <tr>
-<td><code>fix/*</code></td>
-<td>Correções</td>
+<td><code>weeks</code></td>
+<td>Semanas</td>
+</tr>
+<tr>
+<td><code>months</code></td>
+<td>Meses (≈ 30,44 dias)</td>
+</tr>
+<tr>
+<td><code>years</code></td>
+<td>Anos (≈ 365,25 dias)</td>
+</tr>
+<tr>
+<td><code>value</code></td>
+<td>Valor numérico puro</td>
 </tr>
 </tbody>
 </table>
-<p>Ao fazer push em qualquer branch diferente de <code>main</code>, um PR é aberto automaticamente para <code>main</code> após os testes passarem.</p>
+<h3 id="exemplos">Exemplos<a class="headerlink" href="#exemplos" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Avança a coluna &quot;created_at&quot; 1 dia por batch</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>cli<span class="w"> </span>generate<span class="w"> </span>-d<span class="w"> </span>ecommerce<span class="w"> </span>-f<span class="w"> </span>parquet<span class="w"> </span>-R<span class="w"> </span><span class="m">10</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span>--increment<span class="w"> </span><span class="s2">&quot;orders:created_at:1:days&quot;</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="c1"># Avança o valor de &quot;amount&quot; em 100 a cada batch</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>cli<span class="w"> </span>generate<span class="w"> </span>-d<span class="w"> </span>finance<span class="w"> </span>-f<span class="w"> </span>csv<span class="w"> </span>-R<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">  </span>--increment<span class="w"> </span><span class="s2">&quot;transactions:amount:100:value&quot;</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="c1"># Avança por hora</span>
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>cli<span class="w"> </span>generate<span class="w"> </span>-d<span class="w"> </span>finance<span class="w"> </span>-f<span class="w"> </span>json<span class="w"> </span>-R<span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">  </span>--increment<span class="w"> </span><span class="s2">&quot;transactions:created_at:1:hours&quot;</span>
+</span></code></pre></div>
+<p>O offset aplicado é <code>passo × (batch_index - 1)</code>, portanto o batch 1 tem offset zero.</p>
+<h2 id="comportamento-de-escrita-por-formato">Comportamento de escrita por formato<a class="headerlink" href="#comportamento-de-escrita-por-formato" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Formato</th>
+<th>Batch 1</th>
+<th>Batches 2+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CSV</td>
+<td>Cria o arquivo</td>
+<td>Append no mesmo arquivo</td>
+</tr>
+<tr>
+<td>JSON flat</td>
+<td>Cria o arquivo</td>
+<td>Append no mesmo arquivo</td>
+</tr>
+<tr>
+<td>Parquet</td>
+<td>Cria <code>tabela.parquet</code></td>
+<td>Cria <code>tabela_YYYYMMDD_HHMMSS.parquet</code></td>
+</tr>
+<tr>
+<td>Avro</td>
+<td>Cria <code>tabela.avro</code></td>
+<td>Cria <code>tabela_YYYYMMDD_HHMMSS.avro</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="comportamento-sql">Comportamento SQL<a class="headerlink" href="#comportamento-sql" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Batch 1: usa o valor de <code>--if-exists</code></li>
+<li>Batches 2+: forçado para <code>append</code></li>
+</ul>
+<h2 id="interface-visual">Interface visual<a class="headerlink" href="#interface-visual" title="Permanent link">&para;</a></h2>
+<p>O painel <strong>Run Generator</strong> da interface visual expõe o campo de intervalo de recorrência e número de batches. Os logs de execução aparecem em tempo real e o processo pode ser interrompido pelo botão de parada.</p>
+<h2 id="saida-no-terminal">Saída no terminal<a class="headerlink" href="#saida-no-terminal" title="Permanent link">&para;</a></h2>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Recurrence mode: interval=30.0s | batches=infinite | Ctrl+C to stop
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>------------------------------------------------------------
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>[Batch 1] 2024-01-15 10:00:00
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>  [csv] output/ecommerce/orders/orders.csv
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>  [csv] output/ecommerce/customers/customers.csv
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>  Aguardando 30.0s... (Ctrl+C para parar)
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>[Batch 2] 2024-01-15 10:00:30
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>  [csv/append] output/ecommerce/orders/orders.csv (+1000 rows)
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>  [csv/append] output/ecommerce/customers/customers.csv (+500 rows)
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>  Aguardando 30.0s... (Ctrl+C para parar)
+</span></code></pre></div>
 
 
 
@@ -1657,6 +1869,44 @@
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Rodapé" >
+        
+          
+          <a href="../../saida/sql/" class="md-footer__link md-footer__link--prev" aria-label="Anterior: Carga SQL">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                Carga SQL
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../seed/" class="md-footer__link md-footer__link--next" aria-label="Próximo: Reprodutibilidade">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Próximo
+              </span>
+              <div class="md-ellipsis">
+                Reprodutibilidade
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">

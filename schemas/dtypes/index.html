@@ -12,9 +12,13 @@
         <meta name="author" content="Carlos Oliveira">
       
       
-        <link rel="canonical" href="https://ckoliveiraa.github.io/DataForge/development/contributing/">
+        <link rel="canonical" href="https://ckoliveiraa.github.io/DataForge/schemas/dtypes/">
       
       
+        <link rel="prev" href="../dominios/">
+      
+      
+        <link rel="next" href="../../saida/formatos/">
       
       
         
@@ -25,7 +29,7 @@
     
     
       
-        <title>Contribuindo - Dataforge</title>
+        <title>Tipos de dados (dtype) - Dataforge</title>
       
     
     
@@ -78,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#contribuindo" class="md-skip">
+        <a href="#tipos-de-dados-dtype" class="md-skip">
           Ir para o conteúdo
         </a>
       
@@ -113,7 +117,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Contribuindo
+              Tipos de dados (dtype)
             
           </span>
         </div>
@@ -297,11 +301,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../schemas/yaml/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../yaml/" class="md-tabs__link">
           
   
   
@@ -869,28 +875,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -908,7 +917,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
@@ -926,7 +935,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../schemas/yaml/" class="md-nav__link">
+      <a href="../yaml/" class="md-nav__link">
         
   
   
@@ -954,7 +963,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../schemas/dominios/" class="md-nav__link">
+      <a href="../dominios/" class="md-nav__link">
         
   
   
@@ -979,10 +988,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../schemas/dtypes/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tipos de dados (dtype)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -998,6 +1034,153 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#tabela-de-dtypes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tabela de dtypes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#detalhes-de-implementacao" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Detalhes de implementação
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Detalhes de implementação">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#int_seq" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        int_seq
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#float" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        float
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#date" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        date
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#address" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        address
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usando-faker_provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usando faker_provider
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usando-choices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usando choices
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#combinando-choices-com-nullable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Combinando choices com nullable
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exemplos-praticos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Exemplos práticos
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1355,10 +1538,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configurar-ambiente-de-desenvolvimento" class="md-nav__link">
+  <a href="#tabela-de-dtypes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configurar ambiente de desenvolvimento
+        Tabela de dtypes
       
     </span>
   </a>
@@ -1366,33 +1549,66 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#comandos-disponiveis" class="md-nav__link">
+  <a href="#detalhes-de-implementacao" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Comandos disponíveis
+        Detalhes de implementação
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#esteira-cicd" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Esteira CI/CD
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Esteira CI/CD">
+    <nav class="md-nav" aria-label="Detalhes de implementação">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#jobs" class="md-nav__link">
+  <a href="#int_seq" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Jobs
+        int_seq
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#float" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        float
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#date" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        date
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#address" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        address
       
     </span>
   </a>
@@ -1405,10 +1621,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adicionando-um-novo-tipo-de-dado" class="md-nav__link">
+  <a href="#usando-faker_provider" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adicionando um novo tipo de dado
+        Usando faker_provider
       
     </span>
   </a>
@@ -1416,10 +1632,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adicionando-um-novo-writer" class="md-nav__link">
+  <a href="#usando-choices" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adicionando um novo writer
+        Usando choices
       
     </span>
   </a>
@@ -1427,10 +1643,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adicionando-um-novo-dominio" class="md-nav__link">
+  <a href="#combinando-choices-com-nullable" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adicionando um novo domínio
+        Combinando choices com nullable
       
     </span>
   </a>
@@ -1438,21 +1654,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pre-commit-hooks" class="md-nav__link">
+  <a href="#exemplos-praticos" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pre-commit hooks
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#estrutura-de-branches" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Estrutura de branches
+        Exemplos práticos
       
     </span>
   </a>
@@ -1479,152 +1684,239 @@
   
 
 
-<h1 id="contribuindo">Contribuindo<a class="headerlink" href="#contribuindo" title="Permanent link">&para;</a></h1>
-<hr />
-<h2 id="configurar-ambiente-de-desenvolvimento">Configurar ambiente de desenvolvimento<a class="headerlink" href="#configurar-ambiente-de-desenvolvimento" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/carlos-oliveira/dataforge.git
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>dataforge
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Instalar dependências de desenvolvimento</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>poetry<span class="w"> </span>install<span class="w"> </span>--extras<span class="w"> </span><span class="s2">&quot;parquet avro&quot;</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Configurar pre-commit hooks</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>poetry<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>install
-</span></code></pre></div>
-<hr />
-<h2 id="comandos-disponiveis">Comandos disponíveis<a class="headerlink" href="#comandos-disponiveis" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Formatar código</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>fmt
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Verificar lint</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>lint
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Formatar + lint (sem alterar)</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>check
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># Rodar testes</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span><span class="nb">test</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="c1"># Pipeline completa (check + testes + coverage)</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>ci
-</span></code></pre></div>
-<hr />
-<h2 id="esteira-cicd">Esteira CI/CD<a class="headerlink" href="#esteira-cicd" title="Permanent link">&para;</a></h2>
-<p>A esteira roda automaticamente no GitHub Actions em todo push:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>push
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  ↓
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>lint (ruff format + ruff check)
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  ↓
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>tests (pytest + coverage → Codecov)
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>  ↓
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>┌──────────────────┐     ┌──────────────┐
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>│  open-pr          │     │   release    │  (apenas main)
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>│  (branches != main)│    │  (tag + GH   │
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>└──────────────────┘     │   Release)   │
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>                         └──────────────┘
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>                               ↓
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>                         docs (MkDocs →
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>                         GitHub Pages)
-</span></code></pre></div>
-<h3 id="jobs">Jobs<a class="headerlink" href="#jobs" title="Permanent link">&para;</a></h3>
+<h1 id="tipos-de-dados-dtype">Tipos de Dados (dtype)<a class="headerlink" href="#tipos-de-dados-dtype" title="Permanent link">&para;</a></h1>
+<p>O campo <code>dtype</code> de cada coluna define o tipo de dado gerado. Os tipos são resolvidos pelo <code>FAKER_REGISTRY</code> em <code>src/dataforge/core/registry.py</code>.</p>
+<h2 id="tabela-de-dtypes">Tabela de dtypes<a class="headerlink" href="#tabela-de-dtypes" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Job</th>
-<th>Gatilho</th>
-<th>O que faz</th>
+<th>dtype</th>
+<th>Descrição</th>
+<th>Suporta <code>min</code>/<code>max</code></th>
+<th>Padrão de range</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>lint</code></td>
-<td>Todo push</td>
-<td>ruff format + ruff check</td>
+<td><code>int_seq</code></td>
+<td>Inteiro sequencial (1, 2, 3...) — ideal para PKs</td>
+<td>Não</td>
+<td>—</td>
 </tr>
 <tr>
-<td><code>test</code></td>
-<td>Após lint</td>
-<td>pytest + coverage upload</td>
+<td><code>uuid</code></td>
+<td>UUID v4</td>
+<td>Não</td>
+<td>—</td>
 </tr>
 <tr>
-<td><code>open-pr</code></td>
-<td>Push em branch ≠ main</td>
-<td>Cria PR para main automaticamente</td>
+<td><code>int</code></td>
+<td>Inteiro aleatório</td>
+<td>Sim</td>
+<td>0 – 100.000</td>
 </tr>
 <tr>
-<td><code>release</code></td>
-<td>Push em main</td>
-<td>Cria tag + GitHub Release</td>
+<td><code>float</code></td>
+<td>Float com 2 casas decimais</td>
+<td>Sim</td>
+<td>0 – 10.000</td>
 </tr>
 <tr>
-<td><code>docs</code></td>
-<td>Push em main</td>
-<td>Build MkDocs + deploy GitHub Pages</td>
+<td><code>str</code></td>
+<td>Palavra genérica</td>
+<td>Não</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>bool</code></td>
+<td>Booleano (<code>True</code>/<code>False</code>)</td>
+<td>Não</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>date</code></td>
+<td>Data aleatória em formato ISO (<code>YYYY-MM-DD</code>)</td>
+<td>Sim</td>
+<td>Últimos 3 anos até hoje</td>
+</tr>
+<tr>
+<td><code>name</code></td>
+<td>Nome completo</td>
+<td>Não</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>email</code></td>
+<td>Endereço de e-mail</td>
+<td>Não</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>phone</code></td>
+<td>Número de telefone</td>
+<td>Não</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>address</code></td>
+<td>Endereço completo (sem quebras de linha)</td>
+<td>Não</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>city</code></td>
+<td>Cidade</td>
+<td>Não</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>country</code></td>
+<td>País</td>
+<td>Não</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>company</code></td>
+<td>Nome de empresa</td>
+<td>Não</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>text</code></td>
+<td>Frase/sentença</td>
+<td>Não</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>url</code></td>
+<td>URL</td>
+<td>Não</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>currency</code></td>
+<td>Código de moeda (ex: <code>BRL</code>, <code>USD</code>)</td>
+<td>Não</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>iban</code></td>
+<td>IBAN bancário</td>
+<td>Não</td>
+<td>—</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="adicionando-um-novo-tipo-de-dado">Adicionando um novo tipo de dado<a class="headerlink" href="#adicionando-um-novo-tipo-de-dado" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Edite <code>src/dataforge/core/registry.py</code></li>
-<li>Adicione uma entrada ao <code>FAKER_REGISTRY</code>:</li>
-</ol>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="s2">&quot;meu_tipo&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">fake</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="p">[</span><span class="n">fake</span><span class="o">.</span><span class="n">meu_metodo</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)],</span>
+<h2 id="detalhes-de-implementacao">Detalhes de implementação<a class="headerlink" href="#detalhes-de-implementacao" title="Permanent link">&para;</a></h2>
+<h3 id="int_seq"><code>int_seq</code><a class="headerlink" href="#int_seq" title="Permanent link">&para;</a></h3>
+<p>Gera sequência inteira a partir de <code>seq_start</code> (padrão: 1). Em modo recorrente, o offset é acumulado entre batches para garantir continuidade.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">seq_start</span><span class="p">,</span> <span class="n">seq_start</span> <span class="o">+</span> <span class="n">n</span><span class="p">))</span>
 </span></code></pre></div>
-<ol>
-<li>Documente em <code>docs/usage/data-types.md</code></li>
-</ol>
-<hr />
-<h2 id="adicionando-um-novo-writer">Adicionando um novo writer<a class="headerlink" href="#adicionando-um-novo-writer" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Crie <code>src/dataforge/writers/meu_writer.py</code> implementando <code>BaseWriter</code></li>
-<li>Registre em <code>src/dataforge/writers/__init__.py</code>:</li>
-</ol>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">.meu_writer</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeuWriter</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">WRITER_REGISTRY</span><span class="p">[</span><span class="s2">&quot;meu_formato&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">MeuWriter</span>
+<h3 id="int"><code>int</code><a class="headerlink" href="#int" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">faker</span><span class="o">.</span><span class="n">random_int</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">min_value</span><span class="p">),</span> <span class="nb">max</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">max_value</span><span class="p">))</span>
 </span></code></pre></div>
-<hr />
-<h2 id="adicionando-um-novo-dominio">Adicionando um novo domínio<a class="headerlink" href="#adicionando-um-novo-dominio" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Crie <code>src/dataforge/domains/meu_dominio.py</code> implementando <code>DomainTemplate</code></li>
-<li>Registre em <code>src/dataforge/domains/__init__.py</code></li>
-<li>Ou simplesmente crie um YAML em <code>src/dataforge/schemas/meu_dominio.yaml</code></li>
-</ol>
-<hr />
-<h2 id="pre-commit-hooks">Pre-commit hooks<a class="headerlink" href="#pre-commit-hooks" title="Permanent link">&para;</a></h2>
-<p>O projeto usa pre-commit para garantir qualidade antes de cada commit:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># .pre-commit-config.yaml</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ruff (format + check)</span>
+<h3 id="float"><code>float</code><a class="headerlink" href="#float" title="Permanent link">&para;</a></h3>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">round</span><span class="p">(</span><span class="n">faker</span><span class="o">.</span><span class="n">pyfloat</span><span class="p">(</span><span class="n">min_value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">min_value</span><span class="p">),</span> <span class="n">max_value</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">max_value</span><span class="p">)),</span> <span class="mi">2</span><span class="p">)</span>
 </span></code></pre></div>
-<p>Para rodar manualmente:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>poetry<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
+<h3 id="date"><code>date</code><a class="headerlink" href="#date" title="Permanent link">&para;</a></h3>
+<p>Aceita strings ISO (<code>"2020-01-01"</code>) ou notação relativa do Faker (<code>"-6m"</code>, <code>"-3y"</code>, <code>"today"</code>).</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">faker</span><span class="o">.</span><span class="n">date_between</span><span class="p">(</span><span class="n">start_date</span><span class="o">=</span><span class="n">min_value</span><span class="p">,</span> <span class="n">end_date</span><span class="o">=</span><span class="n">max_value</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
 </span></code></pre></div>
-<hr />
-<h2 id="estrutura-de-branches">Estrutura de branches<a class="headerlink" href="#estrutura-de-branches" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Branch</th>
-<th>Propósito</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>main</code></td>
-<td>Estável — gera release automaticamente</td>
-</tr>
-<tr>
-<td><code>feature/*</code></td>
-<td>Desenvolvimento de features</td>
-</tr>
-<tr>
-<td><code>fix/*</code></td>
-<td>Correções</td>
-</tr>
-</tbody>
-</table>
-<p>Ao fazer push em qualquer branch diferente de <code>main</code>, um PR é aberto automaticamente para <code>main</code> após os testes passarem.</p>
+<h3 id="address"><code>address</code><a class="headerlink" href="#address" title="Permanent link">&para;</a></h3>
+<p>As quebras de linha do endereço Faker são substituídas por vírgulas:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">faker</span><span class="o">.</span><span class="n">address</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="p">)</span>
+</span></code></pre></div>
+<h2 id="usando-faker_provider">Usando <code>faker_provider</code><a class="headerlink" href="#usando-faker_provider" title="Permanent link">&para;</a></h2>
+<p>Para qualquer método do Faker não listado acima, use <code>faker_provider</code>:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nt">cep</span><span class="p">:</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">  </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nt">faker_provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">postcode</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="nt">iban</span><span class="p">:</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="w">  </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="w">  </span><span class="nt">faker_provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">iban</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="nt">placa</span><span class="p">:</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">  </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+</span><span id="__span-5-11"><a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">  </span><span class="nt">faker_provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">license_plate</span>
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Prioridade</p>
+<p>Quando <code>faker_provider</code> está definido, ele tem prioridade absoluta sobre <code>dtype</code>. O campo <code>dtype</code> é necessário para o parser, mas o valor gerado vem do método Faker especificado.</p>
+</div>
+<h2 id="usando-choices">Usando <code>choices</code><a class="headerlink" href="#usando-choices" title="Permanent link">&para;</a></h2>
+<p>Para valores fixos (enum), use <code>choices</code>:</p>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">status</span><span class="p">:</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">  </span><span class="nt">choices</span><span class="p">:</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ativo</span>
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inativo</span>
+</span><span id="__span-6-6"><a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pendente</span>
+</span><span id="__span-6-7"><a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>
+</span><span id="__span-6-8"><a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a><span class="nt">tier</span><span class="p">:</span>
+</span><span id="__span-6-9"><a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a><span class="w">  </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+</span><span id="__span-6-10"><a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a><span class="w">  </span><span class="nt">choices</span><span class="p">:</span>
+</span><span id="__span-6-11"><a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">bronze</span>
+</span><span id="__span-6-12"><a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">silver</span>
+</span><span id="__span-6-13"><a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gold</span>
+</span><span id="__span-6-14"><a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platinum</span>
+</span></code></pre></div>
+<p>Os valores são sorteados aleatoriamente com reposição.</p>
+<h2 id="combinando-choices-com-nullable">Combinando <code>choices</code> com <code>nullable</code><a class="headerlink" href="#combinando-choices-com-nullable" title="Permanent link">&para;</a></h2>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nt">categoria</span><span class="p">:</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">  </span><span class="nt">nullable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+</span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="w">  </span><span class="nt">choices</span><span class="p">:</span>
+</span><span id="__span-7-5"><a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">A</span>
+</span><span id="__span-7-6"><a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">B</span>
+</span><span id="__span-7-7"><a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">C</span>
+</span></code></pre></div>
+<p>10% dos valores serão nulos; os 90% restantes serão sorteados de <code>choices</code>.</p>
+<h2 id="exemplos-praticos">Exemplos práticos<a class="headerlink" href="#exemplos-praticos" title="Permanent link">&para;</a></h2>
+<div class="language-yaml highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># Chave primária sequencial</span>
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="nt">id</span><span class="p">:</span>
+</span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int_seq</span>
+</span><span id="__span-8-4"><a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="w">  </span><span class="nt">primary_key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</span><span id="__span-8-5"><a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
+</span><span id="__span-8-6"><a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="c1"># Identificador único</span>
+</span><span id="__span-8-7"><a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="nt">uuid</span><span class="p">:</span>
+</span><span id="__span-8-8"><a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="w">  </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">uuid</span>
+</span><span id="__span-8-9"><a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>
+</span><span id="__span-8-10"><a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a><span class="c1"># Rating de 1 a 5</span>
+</span><span id="__span-8-11"><a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="nt">rating</span><span class="p">:</span>
+</span><span id="__span-8-12"><a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="w">  </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">int</span>
+</span><span id="__span-8-13"><a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a><span class="w">  </span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-8-14"><a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="w">  </span><span class="nt">max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
+</span><span id="__span-8-15"><a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>
+</span><span id="__span-8-16"><a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a><span class="c1"># Percentual de desconto</span>
+</span><span id="__span-8-17"><a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a><span class="nt">desconto</span><span class="p">:</span>
+</span><span id="__span-8-18"><a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a><span class="w">  </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">float</span>
+</span><span id="__span-8-19"><a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a><span class="w">  </span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+</span><span id="__span-8-20"><a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a><span class="w">  </span><span class="nt">max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</span><span id="__span-8-21"><a id="__codelineno-8-21" name="__codelineno-8-21" href="#__codelineno-8-21"></a>
+</span><span id="__span-8-22"><a id="__codelineno-8-22" name="__codelineno-8-22" href="#__codelineno-8-22"></a><span class="c1"># Data de criação nos últimos 2 anos</span>
+</span><span id="__span-8-23"><a id="__codelineno-8-23" name="__codelineno-8-23" href="#__codelineno-8-23"></a><span class="nt">criado_em</span><span class="p">:</span>
+</span><span id="__span-8-24"><a id="__codelineno-8-24" name="__codelineno-8-24" href="#__codelineno-8-24"></a><span class="w">  </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">date</span>
+</span><span id="__span-8-25"><a id="__codelineno-8-25" name="__codelineno-8-25" href="#__codelineno-8-25"></a><span class="w">  </span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;-2y&quot;</span>
+</span><span id="__span-8-26"><a id="__codelineno-8-26" name="__codelineno-8-26" href="#__codelineno-8-26"></a><span class="w">  </span><span class="nt">max</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;today&quot;</span>
+</span><span id="__span-8-27"><a id="__codelineno-8-27" name="__codelineno-8-27" href="#__codelineno-8-27"></a>
+</span><span id="__span-8-28"><a id="__codelineno-8-28" name="__codelineno-8-28" href="#__codelineno-8-28"></a><span class="c1"># Status com valores fixos</span>
+</span><span id="__span-8-29"><a id="__codelineno-8-29" name="__codelineno-8-29" href="#__codelineno-8-29"></a><span class="nt">status</span><span class="p">:</span>
+</span><span id="__span-8-30"><a id="__codelineno-8-30" name="__codelineno-8-30" href="#__codelineno-8-30"></a><span class="w">  </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+</span><span id="__span-8-31"><a id="__codelineno-8-31" name="__codelineno-8-31" href="#__codelineno-8-31"></a><span class="w">  </span><span class="nt">choices</span><span class="p">:</span>
+</span><span id="__span-8-32"><a id="__codelineno-8-32" name="__codelineno-8-32" href="#__codelineno-8-32"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ativo</span>
+</span><span id="__span-8-33"><a id="__codelineno-8-33" name="__codelineno-8-33" href="#__codelineno-8-33"></a><span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">inativo</span>
+</span><span id="__span-8-34"><a id="__codelineno-8-34" name="__codelineno-8-34" href="#__codelineno-8-34"></a>
+</span><span id="__span-8-35"><a id="__codelineno-8-35" name="__codelineno-8-35" href="#__codelineno-8-35"></a><span class="c1"># Campo opcional (20% nulo)</span>
+</span><span id="__span-8-36"><a id="__codelineno-8-36" name="__codelineno-8-36" href="#__codelineno-8-36"></a><span class="nt">observacao</span><span class="p">:</span>
+</span><span id="__span-8-37"><a id="__codelineno-8-37" name="__codelineno-8-37" href="#__codelineno-8-37"></a><span class="w">  </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">text</span>
+</span><span id="__span-8-38"><a id="__codelineno-8-38" name="__codelineno-8-38" href="#__codelineno-8-38"></a><span class="w">  </span><span class="nt">nullable</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
+</span><span id="__span-8-39"><a id="__codelineno-8-39" name="__codelineno-8-39" href="#__codelineno-8-39"></a>
+</span><span id="__span-8-40"><a id="__codelineno-8-40" name="__codelineno-8-40" href="#__codelineno-8-40"></a><span class="c1"># Código postal via Faker</span>
+</span><span id="__span-8-41"><a id="__codelineno-8-41" name="__codelineno-8-41" href="#__codelineno-8-41"></a><span class="nt">cep</span><span class="p">:</span>
+</span><span id="__span-8-42"><a id="__codelineno-8-42" name="__codelineno-8-42" href="#__codelineno-8-42"></a><span class="w">  </span><span class="nt">dtype</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">str</span>
+</span><span id="__span-8-43"><a id="__codelineno-8-43" name="__codelineno-8-43" href="#__codelineno-8-43"></a><span class="w">  </span><span class="nt">faker_provider</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">postcode</span>
+</span></code></pre></div>
 
 
 
@@ -1657,6 +1949,44 @@
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Rodapé" >
+        
+          
+          <a href="../dominios/" class="md-footer__link md-footer__link--prev" aria-label="Anterior: Domínios prontos">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                Domínios prontos
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../saida/formatos/" class="md-footer__link md-footer__link--next" aria-label="Próximo: Formatos">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Próximo
+              </span>
+              <div class="md-ellipsis">
+                Formatos
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">

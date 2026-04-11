@@ -12,8 +12,10 @@
         <meta name="author" content="Carlos Oliveira">
       
       
-        <link rel="canonical" href="https://ckoliveiraa.github.io/DataForge/development/contributing/">
+        <link rel="canonical" href="https://ckoliveiraa.github.io/DataForge/avancado/arquitetura/">
       
+      
+        <link rel="prev" href="../seed/">
       
       
       
@@ -25,7 +27,7 @@
     
     
       
-        <title>Contribuindo - Dataforge</title>
+        <title>Arquitetura - Dataforge</title>
       
     
     
@@ -78,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#contribuindo" class="md-skip">
+        <a href="#arquitetura" class="md-skip">
           Ir para o conteúdo
         </a>
       
@@ -113,7 +115,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Contribuindo
+              Arquitetura
             
           </span>
         </div>
@@ -337,11 +339,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../avancado/recorrencia/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../recorrencia/" class="md-tabs__link">
           
   
   
@@ -1187,28 +1191,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_7" >
-        
-          
-          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
             
   
   
@@ -1226,7 +1233,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1244,7 +1251,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../avancado/recorrencia/" class="md-nav__link">
+      <a href="../recorrencia/" class="md-nav__link">
         
   
   
@@ -1272,7 +1279,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../avancado/seed/" class="md-nav__link">
+      <a href="../seed/" class="md-nav__link">
         
   
   
@@ -1297,10 +1304,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../avancado/arquitetura/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arquitetura
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1316,6 +1350,109 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#diagrama-geral" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Diagrama geral
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#componentes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Componentes
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Componentes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#frontend-react-typescript" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Frontend (React + TypeScript)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#servidor-viteconfigts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Servidor (vite.config.ts)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Python
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integridade-referencial" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integridade referencial
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stack-de-tecnologia" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stack de tecnologia
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1355,10 +1492,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configurar-ambiente-de-desenvolvimento" class="md-nav__link">
+  <a href="#diagrama-geral" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configurar ambiente de desenvolvimento
+        Diagrama geral
       
     </span>
   </a>
@@ -1366,33 +1503,55 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#comandos-disponiveis" class="md-nav__link">
+  <a href="#componentes" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Comandos disponíveis
+        Componentes
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#esteira-cicd" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Esteira CI/CD
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Esteira CI/CD">
+    <nav class="md-nav" aria-label="Componentes">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#jobs" class="md-nav__link">
+  <a href="#frontend-react-typescript" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Jobs
+        Frontend (React + TypeScript)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#servidor-viteconfigts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Servidor (vite.config.ts)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#core-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Python
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integridade-referencial" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Integridade referencial
       
     </span>
   </a>
@@ -1405,54 +1564,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adicionando-um-novo-tipo-de-dado" class="md-nav__link">
+  <a href="#stack-de-tecnologia" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adicionando um novo tipo de dado
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#adicionando-um-novo-writer" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Adicionando um novo writer
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#adicionando-um-novo-dominio" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Adicionando um novo domínio
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#pre-commit-hooks" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Pre-commit hooks
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#estrutura-de-branches" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Estrutura de branches
+        Stack de tecnologia
       
     </span>
   </a>
@@ -1479,152 +1594,254 @@
   
 
 
-<h1 id="contribuindo">Contribuindo<a class="headerlink" href="#contribuindo" title="Permanent link">&para;</a></h1>
-<hr />
-<h2 id="configurar-ambiente-de-desenvolvimento">Configurar ambiente de desenvolvimento<a class="headerlink" href="#configurar-ambiente-de-desenvolvimento" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/carlos-oliveira/dataforge.git
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>dataforge
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Instalar dependências de desenvolvimento</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>poetry<span class="w"> </span>install<span class="w"> </span>--extras<span class="w"> </span><span class="s2">&quot;parquet avro&quot;</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Configurar pre-commit hooks</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>poetry<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>install
-</span></code></pre></div>
-<hr />
-<h2 id="comandos-disponiveis">Comandos disponíveis<a class="headerlink" href="#comandos-disponiveis" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Formatar código</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>fmt
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Verificar lint</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>lint
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Formatar + lint (sem alterar)</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>check
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># Rodar testes</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span><span class="nb">test</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="c1"># Pipeline completa (check + testes + coverage)</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>ci
-</span></code></pre></div>
-<hr />
-<h2 id="esteira-cicd">Esteira CI/CD<a class="headerlink" href="#esteira-cicd" title="Permanent link">&para;</a></h2>
-<p>A esteira roda automaticamente no GitHub Actions em todo push:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>push
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  ↓
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>lint (ruff format + ruff check)
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  ↓
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>tests (pytest + coverage → Codecov)
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>  ↓
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>┌──────────────────┐     ┌──────────────┐
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>│  open-pr          │     │   release    │  (apenas main)
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>│  (branches != main)│    │  (tag + GH   │
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>└──────────────────┘     │   Release)   │
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>                         └──────────────┘
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>                               ↓
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>                         docs (MkDocs →
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>                         GitHub Pages)
-</span></code></pre></div>
-<h3 id="jobs">Jobs<a class="headerlink" href="#jobs" title="Permanent link">&para;</a></h3>
+<h1 id="arquitetura">Arquitetura<a class="headerlink" href="#arquitetura" title="Permanent link">&para;</a></h1>
+<p>Visão técnica dos componentes do Dataforge e como eles se comunicam.</p>
+<h2 id="diagrama-geral">Diagrama geral<a class="headerlink" href="#diagrama-geral" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart LR
+    subgraph Browser["Navegador (React + Vite)"]
+        UI[Interface Visual\nApp.tsx]
+        SR[SchemaReader]
+        SW[SchemaWriter]
+        UI --&gt; SR
+        UI --&gt; SW
+    end
+
+    subgraph Server["Servidor Vite / Backend Python"]
+        API_SCHEMAS[GET /api/schemas\nGET /api/schemas/:nome\nPUT /api/schemas/:nome\nDELETE /api/schemas/:nome]
+        API_AI[POST /api/ai-generate\nPOST /api/ai-models]
+        API_DB[POST /api/test-db-connection]
+    end
+
+    subgraph Core["Core Python"]
+        CLI[dataset-gen CLI\ncli.py]
+        GEN[DatasetGenerator\ncore/generator.py]
+        REG[FAKER_REGISTRY\ncore/registry.py]
+        SCHEMA[DomainSchema / Table / Column\ncore/schema.py]
+        LOADER[load_schema\nconfig/loader.py]
+        DOMAINS[DOMAIN_REGISTRY\ndomains/]
+    end
+
+    subgraph Output["Saída"]
+        FILES[Arquivos locais\nCSV / JSON / Parquet / Avro]
+        CLOUD[Nuvem\nGCS / S3 / Azure]
+        SQL_DB[Banco SQL\nSQLite / PG / MySQL]
+    end
+
+    subgraph ExternalAI["APIs de IA"]
+        ANTHROPIC[Anthropic]
+        OPENAI[OpenAI]
+        GOOGLE[Google Gemini]
+        GROQ[Groq]
+        MISTRAL[Mistral]
+        TOGETHER[Together AI]
+        OLLAMA[Ollama local]
+    end
+
+    UI -- HTTP --&gt; API_SCHEMAS
+    UI -- HTTP --&gt; API_AI
+    UI -- HTTP --&gt; API_DB
+    API_AI --&gt; ANTHROPIC
+    API_AI --&gt; OPENAI
+    API_AI --&gt; GOOGLE
+    API_AI --&gt; GROQ
+    API_AI --&gt; MISTRAL
+    API_AI --&gt; TOGETHER
+    API_AI --&gt; OLLAMA
+    API_SCHEMAS -- lê/escreve --&gt; SCHEMA_FILES[(src/dataforge/schemas/*.yaml)]
+    CLI --&gt; LOADER
+    CLI --&gt; DOMAINS
+    LOADER --&gt; SCHEMA
+    DOMAINS --&gt; SCHEMA
+    CLI --&gt; GEN
+    GEN --&gt; REG
+    GEN --&gt; FILES
+    GEN --&gt; CLOUD
+    GEN --&gt; SQL_DB</code></pre>
+<h2 id="componentes">Componentes<a class="headerlink" href="#componentes" title="Permanent link">&para;</a></h2>
+<h3 id="frontend-react-typescript">Frontend (React + TypeScript)<a class="headerlink" href="#frontend-react-typescript" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th>Job</th>
-<th>Gatilho</th>
-<th>O que faz</th>
+<th>Arquivo</th>
+<th>Responsabilidade</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>lint</code></td>
-<td>Todo push</td>
-<td>ruff format + ruff check</td>
+<td><code>App.tsx</code></td>
+<td>Componente raiz; gerencia todo o estado da aplicação</td>
 </tr>
 <tr>
-<td><code>test</code></td>
-<td>Após lint</td>
-<td>pytest + coverage upload</td>
+<td><code>types/schema.ts</code></td>
+<td>Tipos TypeScript: <code>Column</code>, <code>Table</code>, <code>Schema</code></td>
 </tr>
 <tr>
-<td><code>open-pr</code></td>
-<td>Push em branch ≠ main</td>
-<td>Cria PR para main automaticamente</td>
+<td><code>services/SchemaReader.ts</code></td>
+<td>Converte YAML em estado interno React</td>
 </tr>
 <tr>
-<td><code>release</code></td>
-<td>Push em main</td>
-<td>Cria tag + GitHub Release</td>
+<td><code>services/SchemaWriter.ts</code></td>
+<td>Converte estado interno em YAML</td>
 </tr>
 <tr>
-<td><code>docs</code></td>
-<td>Push em main</td>
-<td>Build MkDocs + deploy GitHub Pages</td>
+<td><code>components/TableNode.tsx</code></td>
+<td>Nó customizado do ReactFlow para renderizar tabelas</td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="adicionando-um-novo-tipo-de-dado">Adicionando um novo tipo de dado<a class="headerlink" href="#adicionando-um-novo-tipo-de-dado" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Edite <code>src/dataforge/core/registry.py</code></li>
-<li>Adicione uma entrada ao <code>FAKER_REGISTRY</code>:</li>
-</ol>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="s2">&quot;meu_tipo&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">fake</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="p">[</span><span class="n">fake</span><span class="o">.</span><span class="n">meu_metodo</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)],</span>
-</span></code></pre></div>
-<ol>
-<li>Documente em <code>docs/usage/data-types.md</code></li>
-</ol>
-<hr />
-<h2 id="adicionando-um-novo-writer">Adicionando um novo writer<a class="headerlink" href="#adicionando-um-novo-writer" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Crie <code>src/dataforge/writers/meu_writer.py</code> implementando <code>BaseWriter</code></li>
-<li>Registre em <code>src/dataforge/writers/__init__.py</code>:</li>
-</ol>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">.meu_writer</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeuWriter</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">WRITER_REGISTRY</span><span class="p">[</span><span class="s2">&quot;meu_formato&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">MeuWriter</span>
-</span></code></pre></div>
-<hr />
-<h2 id="adicionando-um-novo-dominio">Adicionando um novo domínio<a class="headerlink" href="#adicionando-um-novo-dominio" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Crie <code>src/dataforge/domains/meu_dominio.py</code> implementando <code>DomainTemplate</code></li>
-<li>Registre em <code>src/dataforge/domains/__init__.py</code></li>
-<li>Ou simplesmente crie um YAML em <code>src/dataforge/schemas/meu_dominio.yaml</code></li>
-</ol>
-<hr />
-<h2 id="pre-commit-hooks">Pre-commit hooks<a class="headerlink" href="#pre-commit-hooks" title="Permanent link">&para;</a></h2>
-<p>O projeto usa pre-commit para garantir qualidade antes de cada commit:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># .pre-commit-config.yaml</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ruff (format + check)</span>
-</span></code></pre></div>
-<p>Para rodar manualmente:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>poetry<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
-</span></code></pre></div>
-<hr />
-<h2 id="estrutura-de-branches">Estrutura de branches<a class="headerlink" href="#estrutura-de-branches" title="Permanent link">&para;</a></h2>
+<h3 id="servidor-viteconfigts">Servidor (vite.config.ts)<a class="headerlink" href="#servidor-viteconfigts" title="Permanent link">&para;</a></h3>
+<p>O servidor de desenvolvimento do Vite expõe endpoints de API via proxy ou plugin. Os endpoints disponíveis são:</p>
 <table>
 <thead>
 <tr>
-<th>Branch</th>
-<th>Propósito</th>
+<th>Endpoint</th>
+<th>Método</th>
+<th>Descrição</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>main</code></td>
-<td>Estável — gera release automaticamente</td>
+<td><code>/api/schemas</code></td>
+<td>GET</td>
+<td>Lista schemas disponíveis</td>
 </tr>
 <tr>
-<td><code>feature/*</code></td>
-<td>Desenvolvimento de features</td>
+<td><code>/api/schemas/:nome</code></td>
+<td>GET</td>
+<td>Retorna o YAML de um schema</td>
 </tr>
 <tr>
-<td><code>fix/*</code></td>
-<td>Correções</td>
+<td><code>/api/schemas/:nome</code></td>
+<td>PUT</td>
+<td>Salva um schema no servidor</td>
+</tr>
+<tr>
+<td><code>/api/schemas/:nome</code></td>
+<td>DELETE</td>
+<td>Remove um schema do servidor</td>
+</tr>
+<tr>
+<td><code>/api/ai-generate</code></td>
+<td>POST</td>
+<td>Gera schema via IA</td>
+</tr>
+<tr>
+<td><code>/api/ai-models</code></td>
+<td>POST</td>
+<td>Lista modelos disponíveis para o provider</td>
+</tr>
+<tr>
+<td><code>/api/test-db-connection</code></td>
+<td>POST</td>
+<td>Testa uma connection string SQL</td>
 </tr>
 </tbody>
 </table>
-<p>Ao fazer push em qualquer branch diferente de <code>main</code>, um PR é aberto automaticamente para <code>main</code> após os testes passarem.</p>
+<h3 id="core-python">Core Python<a class="headerlink" href="#core-python" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Módulo</th>
+<th>Responsabilidade</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cli.py</code></td>
+<td>Entry point Click; define todos os comandos e flags</td>
+</tr>
+<tr>
+<td><code>core/schema.py</code></td>
+<td>Dataclasses: <code>DomainSchema</code>, <code>Table</code>, <code>Column</code>, <code>ForeignKey</code></td>
+</tr>
+<tr>
+<td><code>core/registry.py</code></td>
+<td><code>FAKER_REGISTRY</code> — mapeamento de dtype para função geradora</td>
+</tr>
+<tr>
+<td><code>core/generator.py</code></td>
+<td><code>DatasetGenerator</code> — geração com ordenação topológica e pool de PKs</td>
+</tr>
+<tr>
+<td><code>config/loader.py</code></td>
+<td>Parser YAML com merge de schemas e validação de FKs</td>
+</tr>
+<tr>
+<td><code>domains/</code></td>
+<td>Classes de domínio pré-configuradas (ecommerce, hr, finance)</td>
+</tr>
+<tr>
+<td><code>uploaders/</code></td>
+<td>Implementações de upload para GCS, S3 e Azure</td>
+</tr>
+<tr>
+<td><code>loaders/sql_loader.py</code></td>
+<td>Carga de DataFrames em banco via SQLAlchemy</td>
+</tr>
+<tr>
+<td><code>writers/json_writer.py</code></td>
+<td>Escrita JSON no modo nested</td>
+</tr>
+</tbody>
+</table>
+<h3 id="integridade-referencial">Integridade referencial<a class="headerlink" href="#integridade-referencial" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>flowchart TD
+    A[Schema com FKs] --&gt; B[Ordenação topológica das tabelas]
+    B --&gt; C[Gerar tabela pai]
+    C --&gt; D[Registrar PKs no pool]
+    D --&gt; E[Gerar tabela filha]
+    E --&gt; F[Amostrar PKs do pai para colunas FK]
+    F --&gt; G{Mais tabelas?}
+    G -- Sim --&gt; C
+    G -- Não --&gt; H[Datasets prontos]</code></pre>
+<p>Tabelas com FK auto-referenciada (ex: <code>employees.manager_id</code>) são preenchidas após a geração da própria tabela, usando o pool de PKs recém-criado.</p>
+<h2 id="stack-de-tecnologia">Stack de tecnologia<a class="headerlink" href="#stack-de-tecnologia" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Camada</th>
+<th>Tecnologia</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Frontend</td>
+<td>React 18, TypeScript, Vite, ReactFlow, Dagre</td>
+</tr>
+<tr>
+<td>Backend API</td>
+<td>Plugin Vite (Node.js)</td>
+</tr>
+<tr>
+<td>CLI</td>
+<td>Python 3.12, Click</td>
+</tr>
+<tr>
+<td>Geração de dados</td>
+<td>Faker, Pandas</td>
+</tr>
+<tr>
+<td>Formatos</td>
+<td>PyArrow (Parquet), fastavro (Avro)</td>
+</tr>
+<tr>
+<td>Upload nuvem</td>
+<td>google-cloud-storage, boto3, azure-storage-blob</td>
+</tr>
+<tr>
+<td>SQL</td>
+<td>SQLAlchemy 2.0, psycopg2-binary, pymysql</td>
+</tr>
+<tr>
+<td>Build Python</td>
+<td>poetry-core 2.0</td>
+</tr>
+<tr>
+<td>Container</td>
+<td>Docker multi-stage (python:3.12-slim + Node.js 20 LTS)</td>
+</tr>
+</tbody>
+</table>
 
 
 
@@ -1657,6 +1874,28 @@
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Rodapé" >
+        
+          
+          <a href="../seed/" class="md-footer__link md-footer__link--prev" aria-label="Anterior: Reprodutibilidade">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                Reprodutibilidade
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">

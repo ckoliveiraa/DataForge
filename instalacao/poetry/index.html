@@ -12,9 +12,13 @@
         <meta name="author" content="Carlos Oliveira">
       
       
-        <link rel="canonical" href="https://ckoliveiraa.github.io/DataForge/development/contributing/">
+        <link rel="canonical" href="https://ckoliveiraa.github.io/DataForge/instalacao/poetry/">
       
       
+        <link rel="prev" href="../docker/">
+      
+      
+        <link rel="next" href="../../frontend/visao-geral/">
       
       
         
@@ -25,7 +29,7 @@
     
     
       
-        <title>Contribuindo - Dataforge</title>
+        <title>Sem Docker (Poetry) - Dataforge</title>
       
     
     
@@ -78,7 +82,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#contribuindo" class="md-skip">
+        <a href="#instalacao-sem-docker-poetry" class="md-skip">
           Ir para o conteúdo
         </a>
       
@@ -113,7 +117,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Contribuindo
+              Sem Docker (Poetry)
             
           </span>
         </div>
@@ -237,11 +241,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../instalacao/docker/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../docker/" class="md-tabs__link">
           
   
   
@@ -434,28 +440,31 @@
       
   
   
+    
   
   
+  
     
     
     
     
+      
+        
+        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
         
           
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
-        
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
             
   
   
@@ -473,7 +482,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -491,7 +500,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../instalacao/docker/" class="md-nav__link">
+      <a href="../docker/" class="md-nav__link">
         
   
   
@@ -516,10 +525,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../instalacao/poetry/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sem Docker (Poetry)
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -535,6 +571,137 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Índice">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Índice
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pre-requisitos" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Pré-requisitos
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clonando-e-instalando" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Clonando e instalando
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Clonando e instalando">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#instalacao-base-csv-e-json-apenas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Instalação base (CSV e JSON apenas)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#instalacao-com-todos-os-extras" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Instalação com todos os extras
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#extras-disponiveis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extras disponíveis
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usando-o-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usando o CLI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependencias-de-desenvolvimento" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependências de desenvolvimento
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dependências de desenvolvimento">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tarefas-disponiveis-taskipy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tarefas disponíveis (taskipy)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interface-visual-sem-docker" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Interface visual sem Docker
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1355,10 +1522,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#configurar-ambiente-de-desenvolvimento" class="md-nav__link">
+  <a href="#pre-requisitos" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configurar ambiente de desenvolvimento
+        Pré-requisitos
       
     </span>
   </a>
@@ -1366,33 +1533,33 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#comandos-disponiveis" class="md-nav__link">
+  <a href="#clonando-e-instalando" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Comandos disponíveis
+        Clonando e instalando
       
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#esteira-cicd" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Esteira CI/CD
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Esteira CI/CD">
+    <nav class="md-nav" aria-label="Clonando e instalando">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#jobs" class="md-nav__link">
+  <a href="#instalacao-base-csv-e-json-apenas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Jobs
+        Instalação base (CSV e JSON apenas)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#instalacao-com-todos-os-extras" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Instalação com todos os extras
       
     </span>
   </a>
@@ -1405,10 +1572,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adicionando-um-novo-tipo-de-dado" class="md-nav__link">
+  <a href="#extras-disponiveis" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adicionando um novo tipo de dado
+        Extras disponíveis
       
     </span>
   </a>
@@ -1416,10 +1583,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adicionando-um-novo-writer" class="md-nav__link">
+  <a href="#usando-o-cli" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adicionando um novo writer
+        Usando o CLI
       
     </span>
   </a>
@@ -1427,32 +1594,38 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#adicionando-um-novo-dominio" class="md-nav__link">
+  <a href="#dependencias-de-desenvolvimento" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Adicionando um novo domínio
+        Dependências de desenvolvimento
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Dependências de desenvolvimento">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tarefas-disponiveis-taskipy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tarefas disponíveis (taskipy)
       
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#pre-commit-hooks" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Pre-commit hooks
-      
-    </span>
-  </a>
+        
+      </ul>
+    </nav>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#estrutura-de-branches" class="md-nav__link">
+  <a href="#interface-visual-sem-docker" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Estrutura de branches
+        Interface visual sem Docker
       
     </span>
   </a>
@@ -1479,152 +1652,116 @@
   
 
 
-<h1 id="contribuindo">Contribuindo<a class="headerlink" href="#contribuindo" title="Permanent link">&para;</a></h1>
-<hr />
-<h2 id="configurar-ambiente-de-desenvolvimento">Configurar ambiente de desenvolvimento<a class="headerlink" href="#configurar-ambiente-de-desenvolvimento" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/carlos-oliveira/dataforge.git
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>dataforge
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Instalar dependências de desenvolvimento</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>poetry<span class="w"> </span>install<span class="w"> </span>--extras<span class="w"> </span><span class="s2">&quot;parquet avro&quot;</span>
-</span><span id="__span-0-6"><a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-</span><span id="__span-0-7"><a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Configurar pre-commit hooks</span>
-</span><span id="__span-0-8"><a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>poetry<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>install
+<h1 id="instalacao-sem-docker-poetry">Instalação sem Docker (Poetry)<a class="headerlink" href="#instalacao-sem-docker-poetry" title="Permanent link">&para;</a></h1>
+<p>Para quem prefere instalar diretamente no ambiente local. Requer Python 3.12+ e Poetry.</p>
+<h2 id="pre-requisitos">Pré-requisitos<a class="headerlink" href="#pre-requisitos" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Python 3.12 ou superior</li>
+<li><a href="https://python-poetry.org/docs/#installation">Poetry</a></li>
+</ul>
+<h2 id="clonando-e-instalando">Clonando e instalando<a class="headerlink" href="#clonando-e-instalando" title="Permanent link">&para;</a></h2>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/ckoliveiraa/DataForge
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>Dataforge
 </span></code></pre></div>
-<hr />
-<h2 id="comandos-disponiveis">Comandos disponíveis<a class="headerlink" href="#comandos-disponiveis" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Formatar código</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>fmt
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Verificar lint</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>lint
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Formatar + lint (sem alterar)</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>check
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
-</span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># Rodar testes</span>
-</span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span><span class="nb">test</span>
-</span><span id="__span-1-12"><a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>
-</span><span id="__span-1-13"><a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a><span class="c1"># Pipeline completa (check + testes + coverage)</span>
-</span><span id="__span-1-14"><a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>ci
+<h3 id="instalacao-base-csv-e-json-apenas">Instalação base (CSV e JSON apenas)<a class="headerlink" href="#instalacao-base-csv-e-json-apenas" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>poetry<span class="w"> </span>install
 </span></code></pre></div>
-<hr />
-<h2 id="esteira-cicd">Esteira CI/CD<a class="headerlink" href="#esteira-cicd" title="Permanent link">&para;</a></h2>
-<p>A esteira roda automaticamente no GitHub Actions em todo push:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>push
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  ↓
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>lint (ruff format + ruff check)
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  ↓
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>tests (pytest + coverage → Codecov)
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>  ↓
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>┌──────────────────┐     ┌──────────────┐
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>│  open-pr          │     │   release    │  (apenas main)
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>│  (branches != main)│    │  (tag + GH   │
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>└──────────────────┘     │   Release)   │
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>                         └──────────────┘
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>                               ↓
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>                         docs (MkDocs →
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>                         GitHub Pages)
+<h3 id="instalacao-com-todos-os-extras">Instalação com todos os extras<a class="headerlink" href="#instalacao-com-todos-os-extras" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>poetry<span class="w"> </span>install<span class="w"> </span>-E<span class="w"> </span><span class="s2">&quot;parquet avro sql postgres gcp aws azure&quot;</span>
 </span></code></pre></div>
-<h3 id="jobs">Jobs<a class="headerlink" href="#jobs" title="Permanent link">&para;</a></h3>
+<h2 id="extras-disponiveis">Extras disponíveis<a class="headerlink" href="#extras-disponiveis" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Job</th>
-<th>Gatilho</th>
-<th>O que faz</th>
+<th>Extra</th>
+<th>Funcionalidade</th>
+<th>Pacote instalado</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>lint</code></td>
-<td>Todo push</td>
-<td>ruff format + ruff check</td>
+<td><code>parquet</code></td>
+<td>Formato Parquet com compressão Snappy</td>
+<td><code>pyarrow&gt;=16.0</code></td>
 </tr>
 <tr>
-<td><code>test</code></td>
-<td>Após lint</td>
-<td>pytest + coverage upload</td>
+<td><code>avro</code></td>
+<td>Formato Avro com schema inferido</td>
+<td><code>fastavro&gt;=1.9</code></td>
 </tr>
 <tr>
-<td><code>open-pr</code></td>
-<td>Push em branch ≠ main</td>
-<td>Cria PR para main automaticamente</td>
+<td><code>sql</code></td>
+<td>SQLite e bancos via SQLAlchemy</td>
+<td><code>sqlalchemy&gt;=2.0</code></td>
 </tr>
 <tr>
-<td><code>release</code></td>
-<td>Push em main</td>
-<td>Cria tag + GitHub Release</td>
+<td><code>postgres</code></td>
+<td>PostgreSQL</td>
+<td><code>sqlalchemy&gt;=2.0</code>, <code>psycopg2-binary&gt;=2.9</code></td>
 </tr>
 <tr>
-<td><code>docs</code></td>
-<td>Push em main</td>
-<td>Build MkDocs + deploy GitHub Pages</td>
+<td><code>mysql</code></td>
+<td>MySQL / MariaDB</td>
+<td><code>sqlalchemy&gt;=2.0</code>, <code>pymysql&gt;=1.1</code></td>
+</tr>
+<tr>
+<td><code>mssql</code></td>
+<td>SQL Server</td>
+<td><code>sqlalchemy&gt;=2.0</code>, <code>pyodbc&gt;=5.0</code></td>
+</tr>
+<tr>
+<td><code>gcp</code></td>
+<td>Google Cloud Storage</td>
+<td><code>google-cloud-storage&gt;=2.0</code></td>
+</tr>
+<tr>
+<td><code>aws</code></td>
+<td>Amazon S3</td>
+<td><code>boto3&gt;=1.34</code></td>
+</tr>
+<tr>
+<td><code>azure</code></td>
+<td>Azure Blob Storage</td>
+<td><code>azure-storage-blob&gt;=12.0</code></td>
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="adicionando-um-novo-tipo-de-dado">Adicionando um novo tipo de dado<a class="headerlink" href="#adicionando-um-novo-tipo-de-dado" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Edite <code>src/dataforge/core/registry.py</code></li>
-<li>Adicione uma entrada ao <code>FAKER_REGISTRY</code>:</li>
-</ol>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="s2">&quot;meu_tipo&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">fake</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="o">**</span><span class="n">kw</span><span class="p">:</span> <span class="p">[</span><span class="n">fake</span><span class="o">.</span><span class="n">meu_metodo</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)],</span>
+<h2 id="usando-o-cli">Usando o CLI<a class="headerlink" href="#usando-o-cli" title="Permanent link">&para;</a></h2>
+<p>Após instalar, o comando <code>dataset-gen</code> fica disponível no terminal:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Equivalente a docker compose run --rm cli list-domains</span>
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>dataset-gen<span class="w"> </span>list-domains
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Gerar dataset</span>
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>dataset-gen<span class="w"> </span>generate<span class="w"> </span>-d<span class="w"> </span>ecommerce<span class="w"> </span>-f<span class="w"> </span>csv<span class="w"> </span>-o<span class="w"> </span>./output
 </span></code></pre></div>
-<ol>
-<li>Documente em <code>docs/usage/data-types.md</code></li>
-</ol>
-<hr />
-<h2 id="adicionando-um-novo-writer">Adicionando um novo writer<a class="headerlink" href="#adicionando-um-novo-writer" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Crie <code>src/dataforge/writers/meu_writer.py</code> implementando <code>BaseWriter</code></li>
-<li>Registre em <code>src/dataforge/writers/__init__.py</code>:</li>
-</ol>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">.meu_writer</span><span class="w"> </span><span class="kn">import</span> <span class="n">MeuWriter</span>
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">WRITER_REGISTRY</span><span class="p">[</span><span class="s2">&quot;meu_formato&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">MeuWriter</span>
+<div class="admonition note">
+<p class="admonition-title">Diferença de caminhos</p>
+<p>Sem Docker, use caminhos do host diretamente. O prefixo <code>/app/</code> não existe fora do container.</p>
+</div>
+<h2 id="dependencias-de-desenvolvimento">Dependências de desenvolvimento<a class="headerlink" href="#dependencias-de-desenvolvimento" title="Permanent link">&para;</a></h2>
+<p>Para contribuir com o projeto:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>poetry<span class="w"> </span>install<span class="w"> </span>--with<span class="w"> </span>dev
 </span></code></pre></div>
-<hr />
-<h2 id="adicionando-um-novo-dominio">Adicionando um novo domínio<a class="headerlink" href="#adicionando-um-novo-dominio" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Crie <code>src/dataforge/domains/meu_dominio.py</code> implementando <code>DomainTemplate</code></li>
-<li>Registre em <code>src/dataforge/domains/__init__.py</code></li>
-<li>Ou simplesmente crie um YAML em <code>src/dataforge/schemas/meu_dominio.yaml</code></li>
-</ol>
-<hr />
-<h2 id="pre-commit-hooks">Pre-commit hooks<a class="headerlink" href="#pre-commit-hooks" title="Permanent link">&para;</a></h2>
-<p>O projeto usa pre-commit para garantir qualidade antes de cada commit:</p>
-<div class="language-yaml highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># .pre-commit-config.yaml</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ruff (format + check)</span>
+<p>Isso instala <code>ruff</code>, <code>pytest</code>, <code>pytest-cov</code> e <code>pre-commit</code>.</p>
+<h3 id="tarefas-disponiveis-taskipy">Tarefas disponíveis (taskipy)<a class="headerlink" href="#tarefas-disponiveis-taskipy" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>lint<span class="w">    </span><span class="c1"># Verifica erros de estilo</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>fmt<span class="w">     </span><span class="c1"># Formata o código</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span><span class="nb">test</span><span class="w">    </span><span class="c1"># Executa os testes</span>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>poetry<span class="w"> </span>run<span class="w"> </span>task<span class="w"> </span>ci<span class="w">      </span><span class="c1"># Lint + formato + testes com cobertura</span>
 </span></code></pre></div>
-<p>Para rodar manualmente:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>poetry<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
+<h2 id="interface-visual-sem-docker">Interface visual sem Docker<a class="headerlink" href="#interface-visual-sem-docker" title="Permanent link">&para;</a></h2>
+<p>A interface visual requer Node.js 20+. Para rodar em modo de desenvolvimento:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nb">cd</span><span class="w"> </span>src/dataforge/frontend
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>npm<span class="w"> </span>install
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>npm<span class="w"> </span>run<span class="w"> </span>dev
 </span></code></pre></div>
-<hr />
-<h2 id="estrutura-de-branches">Estrutura de branches<a class="headerlink" href="#estrutura-de-branches" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Branch</th>
-<th>Propósito</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>main</code></td>
-<td>Estável — gera release automaticamente</td>
-</tr>
-<tr>
-<td><code>feature/*</code></td>
-<td>Desenvolvimento de features</td>
-</tr>
-<tr>
-<td><code>fix/*</code></td>
-<td>Correções</td>
-</tr>
-</tbody>
-</table>
-<p>Ao fazer push em qualquer branch diferente de <code>main</code>, um PR é aberto automaticamente para <code>main</code> após os testes passarem.</p>
+<p>Acesse <code>http://localhost:5173</code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">Variável PYTHONPATH</p>
+<p>Defina <code>PYTHONPATH</code> para que o servidor Vite encontre o código Python:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span>/caminho/para/Dataforge/src
+</span></code></pre></div></p>
+</div>
 
 
 
@@ -1657,6 +1794,44 @@
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Rodapé" >
+        
+          
+          <a href="../docker/" class="md-footer__link md-footer__link--prev" aria-label="Anterior: Docker">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Anterior
+              </span>
+              <div class="md-ellipsis">
+                Docker
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../frontend/visao-geral/" class="md-footer__link md-footer__link--next" aria-label="Próximo: Visão geral">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Próximo
+              </span>
+              <div class="md-ellipsis">
+                Visão geral
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">
