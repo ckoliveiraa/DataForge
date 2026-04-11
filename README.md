@@ -154,26 +154,24 @@ Use `--domain <nome>` para gerar um conjunto de tabelas relacionais pré-configu
 | `products` | 200 | `categories.id` |
 | `orders` | 1000 | `customers.id` |
 | `order_items` | 3000 | `orders.id`, `products.id` |
-| `payments` | 1000 | `orders.id` |
-| `reviews` | 800 | `products.id`, `customers.id` |
 
 ### RH (`-d hr`)
 
 | Tabela | Linhas padrão | FK para |
 |--------|---------------|---------|
-| `departments` | — | — |
-| `job_titles` | — | — |
-| `employees` | — | `departments.id`, `job_titles.id`, `employees.id` |
-| `salaries` | — | `employees.id` |
+| `departments` | 10 | — |
+| `job_titles` | 20 | — |
+| `employees` | 300 | `departments.id`, `job_titles.id`, `employees.id` |
+| `salaries` | 300 | `employees.id` |
 
 ### Financeiro (`-d finance`)
 
 | Tabela | Linhas padrão | FK para |
 |--------|---------------|---------|
-| `customers` | — | — |
-| `categories` | — | — |
-| `accounts` | — | `customers.id` |
-| `transactions` | — | `accounts.id`, `categories.id` |
+| `customers` | 500 | — |
+| `categories` | 15 | — |
+| `accounts` | 600 | `customers.id` |
+| `transactions` | 5000 | `accounts.id`, `categories.id` |
 
 Schemas YAML de exemplo para cada domínio estão em `src/dataforge/schemas/`.
 
