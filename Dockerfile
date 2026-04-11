@@ -33,8 +33,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends curl \
 COPY --from=python-build /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=python-build /usr/local/bin/dataset-gen /usr/local/bin/dataset-gen
 
-# Copia código-fonte Python e schemas
+# Copia código-fonte Python, schemas e pyproject.toml (lido pelo vite.config.ts)
 COPY src/ ./src/
+COPY pyproject.toml ./
 
 # Frontend: instala dependências em layer separado (cache)
 # Usa npm install em vez de npm ci para gerar binários nativos Linux corretamente
