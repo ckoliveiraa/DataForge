@@ -58,17 +58,23 @@ Após subir o container, três pastas ficam mapeadas entre o container e o seu c
 
 ## Interface Visual
 
-A interface visual roda em `http://localhost:5173` e permite criar e editar schemas sem escrever YAML manualmente.
+A interface visual roda em `http://localhost:5173` e é a forma principal de uso do Dataforge — crie schemas, configure a geração e execute o CLI sem sair do navegador.
 
 ### O que é possível fazer
 
-- **Criar tabelas** — defina nome e quantidade de linhas
-- **Adicionar colunas** — escolha o `dtype`, configure `min`/`max`, marque como `primary_key` ou `nullable`
-- **Definir chaves estrangeiras (FKs)** — conecte colunas de uma tabela a outra arrastando no diagrama
-- **Usar templates de domínios prontos** — carregue um schema de e-commerce, RH ou financeiro como ponto de partida
-- **Navegar no catálogo de Faker** — veja exemplos de todos os `faker_provider` disponíveis antes de aplicar
-- **Exportar YAML** — baixe o schema gerado para usar com o CLI ou salvar em `schemas/`
-- **Importar YAML** — carregue um schema existente para editar visualmente
+- **Criar e editar tabelas** — defina nome, quantidade de linhas, colunas, `dtype`, `min`/`max`, `nullable`, `choices`, `faker_provider` e chaves primárias
+- **Definir chaves estrangeiras (FKs)** — conecte colunas entre tabelas; as setas aparecem no diagrama em tempo real
+- **Faker Browser** — catálogo visual de ~100 métodos do Faker organizados por categoria, com exemplo de valor gerado; clique para aplicar à coluna
+- **AI Generate** — descreva o domínio em linguagem natural e gere o schema automaticamente via API de IA (Anthropic, OpenAI, Google Gemini, Groq, Mistral, Together AI ou Ollama)
+- **Auto Layout** — reorganiza o diagrama automaticamente (algoritmo Dagre)
+- **Preview YAML** — visualiza e baixa o YAML do schema atual sem salvar
+- **Save as Default** — salva o schema no servidor (`src/dataforge/schemas/`) para reutilização futura
+- **Run Generator** — executa o CLI diretamente da interface com configuração visual completa:
+  - Formatos de saída (CSV, JSON, Parquet, Avro) e modo JSON (flat/nested)
+  - Destino: **local**, **nuvem** (GCS, S3, Azure) ou **banco de dados** (PostgreSQL, MySQL, SQLite) com teste de conexão e conexões salvas
+  - Particionamento Hive-style por tabela
+  - Modo recorrente, seed e incrementos de coluna
+  - Logs de execução em tempo real com botão de parada
 
 O diagrama é atualizado em tempo real e mostra as relações entre tabelas com setas representando FKs.
 
