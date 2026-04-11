@@ -796,9 +796,6 @@ export default function App() {
             ref={fileInputRef}
             onChange={handleFileUpload}
           />
-          <button className="btn-secondary" onClick={() => fileInputRef.current?.click()} style={{ padding: '0.5rem 1rem' }}>
-            <Upload size={16} /> Load YAML
-          </button>
           {tables.length > 0 && (
              <button className="btn-secondary" onClick={generateSchema} style={{ padding: '0.5rem 1rem' }}>
                <FileJson size={16} /> Preview YAML
@@ -947,38 +944,55 @@ export default function App() {
                         </div>
                         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                           <label style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.5rem' }}>Nullable</label>
-                          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.4rem 0' }}>
-                            <input
-                              type="checkbox"
-                              checked={parseFloat(col.nullable as any) > 0}
-                              onChange={e => onUpdateColumn(selectedTable.id, col.id, 'nullable', e.target.checked ? '0.5' : '0')}
-                              style={{ width: '1rem', height: '1rem', accentColor: '#38bdf8', cursor: 'pointer' }}
-                            />
-                            <span style={{ fontSize: '0.8rem', color: parseFloat(col.nullable as any) > 0 ? '#38bdf8' : '#475569' }}>
-                              {parseFloat(col.nullable as any) > 0 ? 'Yes' : 'No'}
-                            </span>
-                          </label>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer' }}>
+                              <input
+                                type="checkbox"
+                                checked={parseFloat(col.nullable as any) > 0}
+                                onChange={e => onUpdateColumn(selectedTable.id, col.id, 'nullable', e.target.checked ? '0.5' : '0')}
+                                style={{ width: '1rem', height: '1rem', accentColor: '#38bdf8', cursor: 'pointer' }}
+                              />
+                            </label>
+                            {parseFloat(col.nullable as any) > 0 ? (
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', flex: 1 }}>
+                                <input
+                                  type="number"
+                                  min={1}
+                                  max={100}
+                                  value={Math.round(parseFloat(col.nullable as any) * 100)}
+                                  onChange={e => {
+                                    const pct = Math.min(100, Math.max(1, parseInt(e.target.value) || 1));
+                                    onUpdateColumn(selectedTable.id, col.id, 'nullable', String(pct / 100));
+                                  }}
+                                  style={{ width: '52px', padding: '0.3rem 0.4rem', fontSize: '0.8rem', textAlign: 'center' }}
+                                />
+                                <span style={{ fontSize: '0.8rem', color: '#38bdf8' }}>%</span>
+                              </div>
+                            ) : (
+                              <span style={{ fontSize: '0.8rem', color: '#475569' }}>No</span>
+                            )}
+                          </div>
                         </div>
                       </div>
 
                       {['int', 'float', 'date'].includes(col.dtype) && (
                         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-                          <div style={{ flex: 1 }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
                             <label style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Min</label>
                             <input
                               value={col.min}
                               onChange={e => onUpdateColumn(selectedTable.id, col.id, 'min', e.target.value)}
                               placeholder={col.dtype === 'date' ? 'e.g. -1y' : 'e.g. 0'}
-                              style={{ padding: '0.5rem' }}
+                              style={{ padding: '0.5rem', width: '100%', boxSizing: 'border-box' }}
                             />
                           </div>
-                          <div style={{ flex: 1 }}>
+                          <div style={{ flex: 1, minWidth: 0 }}>
                             <label style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Max</label>
                             <input
                               value={col.max}
                               onChange={e => onUpdateColumn(selectedTable.id, col.id, 'max', e.target.value)}
                               placeholder={col.dtype === 'date' ? 'e.g. today' : 'e.g. 100'}
-                              style={{ padding: '0.5rem' }}
+                              style={{ padding: '0.5rem', width: '100%', boxSizing: 'border-box' }}
                             />
                           </div>
                         </div>
