@@ -185,13 +185,15 @@ tables:
 
 ## Usando o schema
 
+Salve o arquivo em `src/dataforge/schemas/` e use `-d custom -c` para referenciar o caminho dentro do container:
+
 ```bash
 # Via Docker
 docker compose run --rm cli generate \
-  -c /app/schemas/suporte.yaml \
+  -d custom -c /app/src/dataforge/schemas/suporte.yaml \
   -f parquet \
   -o /app/output
 
 # Via CLI local
-dataset-gen generate -c ./schemas/suporte.yaml -f csv
+dataset-gen generate -d custom -c ./src/dataforge/schemas/suporte.yaml -f csv
 ```

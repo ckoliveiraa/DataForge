@@ -7,44 +7,61 @@ Cinco minutos para gerar seu primeiro dataset.
 ## 1. Subir a interface visual
 
 ```bash
-docker compose up frontend
+docker compose up frontend -d
 ```
 
 Acesse [http://localhost:5173](http://localhost:5173). O editor visual permite criar e editar schemas sem escrever YAML.
 
 ---
 
-## 2. Listar domínios disponíveis
+## 2. Listar schemas disponíveis
 
 ```bash
 docker compose run --rm cli list-domains
 ```
 
+Saída:
+
 ```
-ecommerce   Loja virtual com produtos, clientes, pedidos e pagamentos
-hr          RH com departamentos, cargos, funcionários e salários
-finance     Finanças com contas, transações e categorias
+  acoes
+  crm
+  ecommerce
+  estoque
+  finance
+  frota
+  manutencao
+  rh
 ```
 
 ---
 
 ## 3. Inspecionar um domínio
 
+`schema-info` recebe o nome do domínio como argumento posicional:
+
 ```bash
-docker compose run --rm cli schema-info -d ecommerce
+docker compose run --rm cli schema-info ecommerce
 ```
+
+Saída:
 
 ```
 Domain: ecommerce
-  categories      (20 rows)   — id, name, description
-  products        (200 rows)  — id, category_id*, name, price, stock_quantity
-  customers       (500 rows)  — id, name, email, phone, city, country
-  orders          (1000 rows) — id, customer_id*, status, created_at
-  order_items     (3000 rows) — id, order_id*, product_id*, quantity, unit_price
-  payments        (1000 rows) — id, order_id*, method, amount, paid_at
-  reviews         (800 rows)  — id, product_id*, customer_id*, rating, comment
 
-(*) chave estrangeira
+  Table: categories  (default rows: 20)
+    id: int_seq  [PK]
+    name: str
+    description: text  [nullable=0.2]
+
+  Table: products  (default rows: 200)
+    id: int_seq  [PK]
+    name: str
+    price: float
+    stock_quantity: int
+    category_id: int  [FK->categories.id]
+
+  Table: customers  (default rows: 500)
+    ...
 ```
 
 ---
@@ -60,27 +77,29 @@ Os arquivos são criados em `./output/ecommerce/`:
 ```
 output/
 └── ecommerce/
-    ├── categories.csv
-    ├── products.csv
-    ├── customers.csv
-    ├── orders.csv
-    ├── order_items.csv
-    ├── payments.csv
-    └── reviews.csv
+    ├── categories/
+    │   └── categories.csv
+    ├── products/
+    │   └── products.csv
+    ├── customers/
+    │   └── customers.csv
+    ├── orders/
+    │   └── orders.csv
+    └── order_items/
+        └── order_items.csv
 ```
 
 ---
 
 ## 5. Geração customizada
 
-### Quantidade de linhas
+### Sobrescrever quantidade de linhas (todas as tabelas)
 
 ```bash
-# 5000 pedidos e 15000 itens de pedido
+# 500 linhas em todas as tabelas
 docker compose run --rm cli generate \
   -d ecommerce \
-  -r orders=5000 \
-  -r order_items=15000 \
+  -r 500 \
   -f parquet
 ```
 
@@ -98,9 +117,9 @@ docker compose run --rm cli generate \
 ### Schema customizado
 
 ```bash
-# Usar um YAML próprio
+# Usar um YAML próprio salvo em src/dataforge/schemas/
 docker compose run --rm cli generate \
-  -c /app/schemas/meu_schema.yaml \
+  -d custom -c /app/src/dataforge/schemas/crm.yaml \
   -f csv
 ```
 

@@ -27,18 +27,31 @@ git clone https://github.com/carlos-oliveira/dataforge.git
 cd dataforge
 ```
 
-### 2. Build da imagem
+### 2. Build e inicialização
 
 ```bash
-docker compose build
+# Build e sobe o frontend em segundo plano
+docker compose up --build -d
 ```
 
 A imagem realiza um build multi-stage:
 
-1. **Stage Python** — instala todas as dependências opcionais (parquet, avro, SQL, cloud)
-2. **Stage final** — copia o runtime, inclui Node.js 20 para o frontend
+1. **Stage `python-build`** — instala todas as dependências opcionais (parquet, avro, SQL, cloud) usando `pip`
+2. **Stage final** — copia o runtime Python, instala Node.js 20 LTS e instala as dependências do frontend via `npm install`
 
-### 3. Verificar a instalação
+O frontend estará disponível em `http://localhost:5173` após a conclusão do build.
+
+### 3. Volumes mapeados
+
+| Volume | Host | Container | Uso |
+|---|---|---|---|
+| Schemas | `./src/dataforge/schemas` | `/app/src/dataforge/schemas` | Editar YAMLs sem rebuild |
+| Credenciais | `./credentials` | `/app/credentials` | Arquivos de credencial cloud (SA GCP, etc.) |
+| Output | `./output` | `/app/output` | Arquivos gerados pelo CLI |
+| Código-fonte | `./src/dataforge` | `/app/src/dataforge` | Hot-reload de Python e frontend |
+| `frontend_node_modules` | (volume nomeado Docker) | `/app/src/dataforge/frontend/node_modules` | Protege os binários Linux do `npm install` de serem sobrescritos pelo volume do código-fonte (importante em hosts Windows) |
+
+### 4. Verificar a instalação
 
 ```bash
 # Exibir o help do CLI

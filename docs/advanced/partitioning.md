@@ -25,31 +25,38 @@ output/
 ## Uso
 
 ```bash
-# Particionar pedidos por status
-dataset-gen generate -d ecommerce \
-  -t orders \
+# Particionar todas as tabelas por uma coluna de mesma nome
+docker compose run --rm cli generate -d ecommerce \
   -f parquet \
-  --partition-by status
+  --partition-by ordered_at
 
-# Particionar por data
-dataset-gen generate -d ecommerce \
-  -t orders \
-  -f csv \
-  --partition-by created_at
+# Particionar tabela específica
+docker compose run --rm cli generate -d ecommerce \
+  -f parquet \
+  --partition-by "orders:status"
+
+# Múltiplas tabelas com colunas diferentes
+docker compose run --rm cli generate -d ecommerce \
+  -f parquet \
+  --partition-by "orders:status" \
+  --partition-by "customers:country"
 ```
+
+!!! note "`--partition-by` sem prefixo de tabela"
+    `--partition-by created_at` aplica a partição na coluna `created_at` de **todas** as tabelas que possuem essa coluna. Para tabelas sem essa coluna, a escrita é feita normalmente (sem partição).
 
 ---
 
 ## Compatibilidade com motores de query
 
-A estrutura de particionamento é compatível com:
+A estrutura é compatível com:
 
 - **Apache Hive**
 - **Apache Spark** (`spark.read.parquet("output/ecommerce/orders/")`)
-- **AWS Athena** / **Glue**
-- **Google BigQuery** (via partição por coluna em cargas externas)
-- **DuckDB** (`read_parquet('output/ecommerce/orders/**/*.parquet', hive_partitioning=true)`)
-- **Delta Lake** / **Iceberg** (via conversão)
+- **AWS Athena / Glue**
+- **Google BigQuery** (via tabelas externas com partição por coluna)
+- **DuckDB** (`read_parquet(..., hive_partitioning=true)`)
+- **Delta Lake / Iceberg** (via conversão)
 
 ### Exemplo DuckDB
 
@@ -70,19 +77,22 @@ df.filter(df.status == "pago").show()
 
 ## Particionamento + upload para nuvem
 
+Use `--upload` junto com `--partition-by`. A estrutura de partições é replicada no bucket remoto:
+
 ```bash
-dataset-gen generate -d ecommerce \
-  -f parquet \
-  --partition-by created_at \
-  --gcs-bucket meu-datalake \
-  --gcs-prefix raw/ecommerce
+docker compose run --rm cli generate -d ecommerce -f parquet \
+  --partition-by ordered_at \
+  --upload gcs \
+  --bucket meu-datalake \
+  --prefix raw/ecommerce/ \
+  --credentials /app/credentials/sa.json
 ```
 
 Resultado no GCS:
 
 ```
-gs://meu-datalake/raw/ecommerce/orders/created_at=2024-01-15/orders.parquet
-gs://meu-datalake/raw/ecommerce/orders/created_at=2024-01-16/orders.parquet
+gs://meu-datalake/raw/ecommerce/ecommerce/orders/ordered_at=2024-01-15/orders.parquet
+gs://meu-datalake/raw/ecommerce/ecommerce/orders/ordered_at=2024-01-16/orders.parquet
 ...
 ```
 
@@ -91,6 +101,6 @@ gs://meu-datalake/raw/ecommerce/orders/created_at=2024-01-16/orders.parquet
 ## Escolha da coluna de partição
 
 !!! tip "Boas práticas"
-    - Use colunas de **baixa cardinalidade** (status, categoria, data) — evite UUID ou colunas numéricas com muitos valores únicos
-    - Colunas do tipo `date` geram uma partição por dia — ideal para dados temporais
-    - Colunas `choices` geram um número previsível de partições
+    - Use colunas de **baixa cardinalidade** — `status`, `country`, `date`. Evite UUID ou inteiros com muitos valores únicos.
+    - Colunas `date` geram uma partição por dia — ideal para dados temporais.
+    - Colunas com `choices` geram um número previsível e controlado de partições.

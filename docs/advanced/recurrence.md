@@ -1,6 +1,6 @@
 # Modo Recorrente
 
-O modo recorrente gera múltiplos batches de dados de forma contínua, simulando ingestão incremental de dados ao longo do tempo.
+O modo recorrente gera múltiplos batches de dados de forma contínua, simulando ingestão incremental ao longo do tempo.
 
 ---
 
@@ -8,19 +8,34 @@ O modo recorrente gera múltiplos batches de dados de forma contínua, simulando
 
 - Testar pipelines de ingestão incremental
 - Simular CDC (Change Data Capture)
-- Popular bancos em batches para evitar lock de memória
+- Popular bancos em batches para evitar pico de memória
 - Gerar dados com progressão temporal realista
+
+---
+
+## Flags do modo recorrente
+
+| Flag | Atalho | Padrão | Descrição |
+|---|---|---|---|
+| `--recurrence` | `-R` | — | Intervalo **em segundos** entre batches. Ativa o modo recorrente. |
+| `--count` | — | `0` | Número de batches a gerar. `0` = infinito (Ctrl+C para parar). |
+
+!!! warning "Semântica de `-R`"
+    `-R 30` significa: gerar um batch, aguardar **30 segundos**, gerar o próximo. Não significa "30 batches". Use `--count` para limitar o número de batches.
 
 ---
 
 ## Configuração básica
 
 ```bash
-# Gerar 10 batches, um imediatamente após o outro
-dataset-gen generate -d ecommerce -R 10 -f csv
+# Gerar batches a cada 30 segundos, infinito (Ctrl+C para parar)
+docker compose run --rm cli generate -d ecommerce -R 30 -f csv
 
-# 24 batches com intervalo de 1 hora entre cada um
-dataset-gen generate -d ecommerce -R 24 --interval 3600 -f csv
+# 10 batches com intervalo de 60 segundos entre cada um
+docker compose run --rm cli generate -d ecommerce -R 60 --count 10 -f csv
+
+# 5 batches sem espera entre eles (processamento em lote imediato)
+docker compose run --rm cli generate -d finance -R 0 --count 5 -f parquet
 ```
 
 ---
@@ -29,91 +44,98 @@ dataset-gen generate -d ecommerce -R 24 --interval 3600 -f csv
 
 | Formato | Batch 1 | Batch 2+ |
 |---|---|---|
-| CSV | Cria arquivo novo | **Append** ao arquivo existente |
-| JSON flat (NDJSON) | Cria arquivo novo | **Append** ao arquivo existente |
-| Parquet | Cria arquivo | Cria novo arquivo com timestamp |
-| Avro | Cria arquivo | Cria novo arquivo com timestamp |
+| CSV | Cria arquivo novo | **Append** ao mesmo arquivo |
+| JSON flat (NDJSON) | Cria arquivo novo | **Append** ao mesmo arquivo |
+| Parquet | Cria arquivo | Cria **novo arquivo com timestamp** |
+| Avro | Cria arquivo | Cria **novo arquivo com timestamp** |
 
-Parquet e Avro não são appendáveis nativamente, então cada batch gera um arquivo separado com sufixo de timestamp:
+Parquet e Avro não suportam append nativo, então cada batch gera um arquivo separado:
 
 ```
-output/ecommerce/orders_20240115_143022.parquet
-output/ecommerce/orders_20240115_153022.parquet
+output/
+└── ecommerce/
+    └── orders/
+        ├── orders_20240115_143022.parquet   ← batch 1
+        ├── orders_20240115_143052.parquet   ← batch 2
+        └── orders_20240115_143122.parquet   ← batch 3
 ```
 
 ---
 
-## Incrementos de coluna
+## Incrementos de coluna (`--increment`)
 
-Use `--increment` para que colunas numéricas avancem a cada batch, evitando IDs duplicados e criando progressão temporal:
+Use `--increment` para deslocar valores de uma coluna a cada batch. Isso permite simular progressão temporal ou IDs contínuos sem sobrescrever dados anteriores.
 
-```
---increment tabela:coluna:passo
-```
+**Formato:** `tabela:coluna:passo[:unidade]`
+
+**Unidades disponíveis:**
+
+| Unidade | Descrição |
+|---|---|
+| `days` | Dias (padrão) |
+| `hours` | Horas |
+| `weeks` | Semanas |
+| `months` | Meses (~30.44 dias) |
+| `years` | Anos (~365.25 dias) |
+| `value` | Incremento numérico direto |
+
+O deslocamento aplicado é `passo × índice_do_batch` (batch 1 = índice 0, batch 2 = índice 1, etc.).
 
 ```bash
-# IDs de pedidos avançam 1000 a cada batch
-# IDs de itens avançam 5000 a cada batch
-dataset-gen generate -d ecommerce \
-  -t orders -t order_items \
-  -R 10 \
-  --increment orders:id:1000 \
-  --increment order_items:id:5000 \
+# Datas da coluna "ordered_at" avançam 7 dias a cada batch
+docker compose run --rm cli generate -d ecommerce \
+  -t orders \
+  -R 0 --count 4 \
+  --increment orders:ordered_at:7:days \
+  -f parquet
+
+# Valor numérico avança 100 por batch
+docker compose run --rm cli generate -d ecommerce \
+  -t orders \
+  -R 5 --count 6 \
+  --increment orders:total_amount:100:value \
   -f csv
 ```
 
-No batch 1, `orders.id` vai de 1 a 1000.
-No batch 2, vai de 1001 a 2000. E assim por diante.
+!!! note "Múltiplos incrementos"
+    `--increment` é repetível. Use um por coluna que deseja incrementar.
 
 ---
 
-## Progressão de datas
+## IDs sequenciais em modo recorrente
 
-Combine `--increment` com colunas do tipo `date` para simular dados com datas crescentes:
+Quando `dtype: int_seq` é usado, o gerador rastreia automaticamente o offset acumulado entre batches via `seq_offsets`. IDs nunca se repetem entre batches — **não é necessário usar `--increment` para colunas `int_seq`**.
 
-```yaml
-# schema.yaml
-tables:
-  eventos:
-    rows: 500
-    columns:
-      id:
-        dtype: int_seq
-        primary_key: true
-      timestamp_evento:
-        dtype: date
-        min: "2024-01-01"
-        max: "2024-01-07"
-```
+---
+
+## Modo recorrente com SQL
+
+Em modo recorrente com `--db-url`:
+
+- **Batch 1**: usa o valor de `--if-exists` (`replace` ou `append`)
+- **Batches seguintes**: sempre usam `append`, preservando os dados anteriores
 
 ```bash
-# Cada batch representa uma semana diferente
-dataset-gen generate -c /app/schemas/schema.yaml \
-  -R 52 \
-  --increment eventos:id:500 \
-  -f parquet
+docker compose run --rm cli generate -d ecommerce \
+  -R 0 --count 10 \
+  --db-url "postgresql+psycopg2://admin:senha@localhost:5432/dwh" \
+  --if-exists replace
 ```
 
 ---
 
 ## Exemplo: pipeline de streaming simulado
 
+Simula 1 hora de pedidos gerados a cada 5 minutos (12 batches), com datas avançando 5 minutos por batch:
+
 ```bash
-# Simula 1 hora de eventos com batches de 1 minuto
-dataset-gen generate -d ecommerce \
-  -t orders -t payments \
-  -r orders=100 \
-  -r payments=100 \
-  -R 60 \
-  --interval 60 \
-  --increment orders:id:100 \
-  --increment payments:id:100 \
-  -f csv \
+docker compose run --rm cli generate -d ecommerce \
+  -t orders \
+  -r 50 \
+  -R 300 --count 12 \
+  --increment orders:ordered_at:5:hours \
+  -f parquet \
   -o /app/output/streaming
 ```
 
----
-
-## IDs sequenciais em modo recorrente
-
-Quando `dtype: int_seq` é usado, o gerador rastreia o offset acumulado entre batches (`seq_offsets`). IDs nunca se repetem entre batches automaticamente — não é necessário usar `--increment` para colunas `int_seq`.
+Resultado: 12 arquivos Parquet timestampados, cada um com 50 pedidos de datas diferentes.
