@@ -135,7 +135,7 @@ const FAKER_CATALOG: { category: string; color: string; methods: { name: string;
   ]},
 ];
 
-import type { Table, Column } from './types/schema';
+import type { Schema, Table, Column } from './types/schema';
 import { SchemaWriter } from './services/SchemaWriter';
 import { SchemaReader } from './services/SchemaReader';
 import TableNode from './components/TableNode';
@@ -549,7 +549,16 @@ export default function App() {
         body: JSON.stringify({ provider: aiProvider, apiKey: currentApiKey.trim(), model: currentModel.trim() || undefined, prompt: aiPrompt }),
       });
       const data = await res.json();
-      if (!res.ok || data.error) { setAiError(data.error || 'AI generation failed.'); return; }
+      if (!res.ok || data.error) {
+        const errMsg = data.error || 'AI generation failed.';
+        // If the backend also returned the raw YAML (e.g. duplicate keys), show it so the user can inspect/fix
+        if (data.yaml) {
+          setAiError(`${errMsg}\n\nYAML gerado (para referência):\n${data.yaml}`);
+        } else {
+          setAiError(errMsg);
+        }
+        return;
+      }
       const parsed = SchemaReader.parseYaml(data.yaml);
       setDomain(parsed.domain || 'custom');
       const tablesWithPos = parsed.tables.map((t: Table, index: number) => ({
@@ -606,6 +615,7 @@ export default function App() {
   const [showRunPanel, setShowRunPanel] = useState(false);
   const [runConfig, setRunConfig] = useState<{
     formats: string[],
+    destination: 'local' | 'cloud' | 'database',
     outputDir: string,
     rows: string,
     uploadTarget: string,
@@ -644,8 +654,11 @@ export default function App() {
   });
   const [runLogs, setRunLogs] = useState('');
   const [isRunning, setIsRunning] = useState(false);
+  const runAbortRef = useRef<AbortController | null>(null);
 
   const handleRunCli = async () => {
+    const controller = new AbortController();
+    runAbortRef.current = controller;
     setIsRunning(true);
     setRunLogs('');
     try {
@@ -653,6 +666,7 @@ export default function App() {
       const res = await fetch('/api/run-cli', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
+        signal: controller.signal,
         body: JSON.stringify({
           yamlStr,
           formats: runConfig.formats,
@@ -703,8 +717,12 @@ export default function App() {
         }
       }
     } catch (e: any) {
-      setRunLogs(prev => prev + `\nConnection Error: ${e.message || String(e)}`);
+      if ((e as DOMException).name !== 'AbortError') {
+        setRunLogs(prev => prev + `\nConnection Error: ${e.message || String(e)}`);
+      }
       setIsRunning(false);
+    } finally {
+      runAbortRef.current = null;
     }
   };
 
@@ -735,6 +753,16 @@ export default function App() {
           <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-subtle)', background: 'rgba(34,211,238,0.06)', border: '1px solid rgba(34,211,238,0.12)', borderRadius: '999px', padding: '0.2rem 0.75rem', letterSpacing: '0.04em' }}>
             v{import.meta.env.VITE_APP_VERSION}
           </span>
+          <a href="https://ckoliveiraa.github.io/DataForge/" target="_blank" rel="noopener noreferrer"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.85rem', transition: 'color var(--duration-base) var(--ease-out)' }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-main)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-muted)')}>
+            <svg height="18" width="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+            </svg>
+            Docs
+          </a>
           <a href="https://github.com/ckoliveiraa/DataForge" target="_blank" rel="noopener noreferrer"
             style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', textDecoration: 'none', fontSize: '0.85rem', transition: 'color var(--duration-base) var(--ease-out)' }}
             onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-main)')}
@@ -1162,7 +1190,7 @@ export default function App() {
                           const next = active
                             ? runConfig.formats.filter(f => f !== fmt)
                             : [...runConfig.formats, fmt];
-                          setRunConfig({ ...runConfig, formats: next.length > 0 ? next : [fmt] });
+                          setRunConfig(r => ({ ...r, formats: next.length > 0 ? next : [fmt] }));
                         }}
                         style={{ padding: '0.35rem 0.85rem', borderRadius: '6px', border: `1px solid ${active ? '#10b981' : 'rgba(255,255,255,0.1)'}`, background: active ? 'rgba(16,185,129,0.15)' : 'rgba(255,255,255,0.05)', color: active ? '#10b981' : '#94a3b8', cursor: 'pointer', fontSize: '0.85rem', fontWeight: active ? 600 : 400 }}>
                         {fmt.toUpperCase()}
@@ -1173,7 +1201,7 @@ export default function App() {
                 {runConfig.formats.includes('json') && (
                   <div style={{ marginTop: '0.75rem' }}>
                     <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>JSON Mode</label>
-                    <select value={runConfig.jsonMode} onChange={e => setRunConfig({...runConfig, jsonMode: e.target.value})} style={{ width: '100%', padding: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px' }}>
+                    <select value={runConfig.jsonMode} onChange={e => setRunConfig(r => ({...r, jsonMode: e.target.value}))} style={{ width: '100%', padding: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px' }}>
                       <option value="flat" style={{color: 'black'}}>Flat (NDJSON)</option>
                       <option value="nested" style={{color: 'black'}}>Nested</option>
                     </select>
@@ -1182,7 +1210,7 @@ export default function App() {
                 <div style={{ display: 'flex', gap: '1rem', marginTop: '0.75rem' }}>
                   <div style={{ flex: 1 }}>
                     <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Rows Override <span style={{ color: '#64748b' }}>(optional)</span></label>
-                    <input type="number" value={runConfig.rows} onChange={e => setRunConfig({...runConfig, rows: e.target.value})} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. 5000" min="1" />
+                    <input type="number" value={runConfig.rows} onChange={e => setRunConfig(r => ({...r, rows: e.target.value}))} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. 5000" min="1" />
                   </div>
                 </div>
               </div>
@@ -1199,7 +1227,7 @@ export default function App() {
                     const active = runConfig.destination === key;
                     return (
                       <button key={key} type="button"
-                        onClick={() => setRunConfig({ ...runConfig, destination: key })}
+                        onClick={() => setRunConfig(r => ({ ...r, destination: key }))}
                         style={{ flex: 1, padding: '0.5rem', borderRadius: '8px', border: `1px solid ${active ? color : 'rgba(255,255,255,0.1)'}`, background: active ? `${color}18` : 'rgba(255,255,255,0.04)', color: active ? color : '#64748b', cursor: 'pointer', fontSize: '0.9rem', fontWeight: active ? 700 : 400, transition: 'all 0.15s' }}>
                         {label}
                       </button>
@@ -1211,7 +1239,7 @@ export default function App() {
                 {runConfig.destination === 'local' && (
                   <div>
                     <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Output Directory</label>
-                    <input type="text" value={runConfig.outputDir} onChange={e => setRunConfig({...runConfig, outputDir: e.target.value})} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. output" />
+                    <input type="text" value={runConfig.outputDir} onChange={e => setRunConfig(r => ({...r, outputDir: e.target.value}))} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. output" />
                   </div>
                 )}
 
@@ -1220,7 +1248,7 @@ export default function App() {
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                     <div>
                       <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Provider</label>
-                      <select value={runConfig.uploadTarget} onChange={e => setRunConfig({...runConfig, uploadTarget: e.target.value})} style={{ width: '100%', padding: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px' }}>
+                      <select value={runConfig.uploadTarget} onChange={e => setRunConfig(r => ({...r, uploadTarget: e.target.value}))} style={{ width: '100%', padding: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px' }}>
                         <option value="gcs" style={{color: 'black'}}>Google Cloud Storage</option>
                         <option value="s3" style={{color: 'black'}}>AWS S3</option>
                         <option value="azure" style={{color: 'black'}}>Azure Blob Storage</option>
@@ -1229,11 +1257,11 @@ export default function App() {
                     <div style={{ display: 'flex', gap: '1rem' }}>
                       <div style={{ flex: 1 }}>
                         <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Bucket / Container</label>
-                        <input type="text" value={runConfig.bucket} onChange={e => setRunConfig({...runConfig, bucket: e.target.value})} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. my-data-lake" />
+                        <input type="text" value={runConfig.bucket} onChange={e => setRunConfig(r => ({...r, bucket: e.target.value}))} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. my-data-lake" />
                       </div>
                       <div style={{ flex: 1 }}>
                         <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Prefix</label>
-                        <input type="text" value={runConfig.prefix} onChange={e => setRunConfig({...runConfig, prefix: e.target.value})} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. datasets/" />
+                        <input type="text" value={runConfig.prefix} onChange={e => setRunConfig(r => ({...r, prefix: e.target.value}))} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. datasets/" />
                       </div>
                     </div>
                     <p style={{ margin: 0, fontSize: '0.75rem', color: '#475569', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
@@ -1400,7 +1428,7 @@ export default function App() {
                         <input
                           type="text"
                           value={runConfig.dbUrl}
-                          onChange={e => { setRunConfig({...runConfig, dbUrl: e.target.value}); setDbTestStatus('idle'); setDbTestError(''); }}
+                          onChange={e => { setRunConfig(r => ({...r, dbUrl: e.target.value})); setDbTestStatus('idle'); setDbTestError(''); }}
                           style={{ width: '100%', padding: '0.5rem' }}
                           placeholder="postgresql+psycopg2://user:pass@host:5432/db"
                         />
@@ -1442,7 +1470,7 @@ export default function App() {
                     <div style={{ display: 'flex', gap: '1rem' }}>
                       <div style={{ flex: 1 }}>
                         <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>If Table Exists</label>
-                        <select value={runConfig.ifExists} onChange={e => setRunConfig({...runConfig, ifExists: e.target.value})} style={{ width: '100%', padding: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px' }}>
+                        <select value={runConfig.ifExists} onChange={e => setRunConfig(r => ({...r, ifExists: e.target.value}))} style={{ width: '100%', padding: '0.5rem', background: 'rgba(255,255,255,0.05)', color: 'white', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px' }}>
                           <option value="replace" style={{color: 'black'}}>Replace</option>
                           <option value="append" style={{color: 'black'}}>Append</option>
                           <option value="fail" style={{color: 'black'}}>Fail</option>
@@ -1450,7 +1478,7 @@ export default function App() {
                       </div>
                       <div style={{ flex: 1 }}>
                         <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>DB Schema <span style={{ color: '#64748b' }}>(optional)</span></label>
-                        <input type="text" value={runConfig.dbSchema} onChange={e => setRunConfig({...runConfig, dbSchema: e.target.value})} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. public" />
+                        <input type="text" value={runConfig.dbSchema} onChange={e => setRunConfig(r => ({...r, dbSchema: e.target.value}))} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. public" />
                       </div>
                     </div>
                   </div>
@@ -1462,7 +1490,7 @@ export default function App() {
                 <p style={{ margin: '0 0 0.75rem', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: '#64748b' }}>Reproducibility</p>
                 <div>
                   <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Random Seed <span style={{ color: '#64748b' }}>(optional)</span></label>
-                  <input type="number" value={runConfig.seed} onChange={e => setRunConfig({...runConfig, seed: e.target.value})} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. 42" />
+                  <input type="number" value={runConfig.seed} onChange={e => setRunConfig(r => ({...r, seed: e.target.value}))} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. 42" />
                 </div>
               </div>
 
@@ -1472,12 +1500,12 @@ export default function App() {
                 <div style={{ display: 'flex', gap: '1rem' }}>
                   <div style={{ flex: 1 }}>
                     <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Interval (seconds) <span style={{ color: '#64748b' }}>(optional)</span></label>
-                    <input type="number" value={runConfig.recurrence} onChange={e => setRunConfig({...runConfig, recurrence: e.target.value})} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. 60" min="1" />
+                    <input type="number" value={runConfig.recurrence} onChange={e => setRunConfig(r => ({...r, recurrence: e.target.value}))} style={{ width: '100%', padding: '0.5rem' }} placeholder="e.g. 60" min="1" />
                   </div>
                   {runConfig.recurrence && (
                     <div style={{ flex: 1 }}>
                       <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Batch Limit <span style={{ color: '#64748b' }}>(0 = infinite)</span></label>
-                      <input type="number" value={runConfig.count} onChange={e => setRunConfig({...runConfig, count: e.target.value})} style={{ width: '100%', padding: '0.5rem' }} placeholder="0" min="0" />
+                      <input type="number" value={runConfig.count} onChange={e => setRunConfig(r => ({...r, count: e.target.value}))} style={{ width: '100%', padding: '0.5rem' }} placeholder="0" min="0" />
                     </div>
                   )}
                 </div>
@@ -1488,26 +1516,26 @@ export default function App() {
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                       <label style={{ color: '#cbd5e1', fontSize: '0.85rem' }}>Column Increments <span style={{ color: '#64748b' }}>(shift values per batch)</span></label>
                       <button type="button"
-                        onClick={() => setRunConfig({ ...runConfig, increments: [...runConfig.increments, { table: tables[0]?.name || '', column: '', step: '1', unit: 'days' }] })}
+                        onClick={() => setRunConfig(r => ({ ...r, increments: [...r.increments, { table: tables[0]?.name || '', column: '', step: '1', unit: 'days' }] }))}
                         style={{ padding: '0.2rem 0.6rem', background: 'rgba(96,165,250,0.12)', border: '1px solid rgba(96,165,250,0.3)', borderRadius: '5px', color: '#60a5fa', cursor: 'pointer', fontSize: '0.78rem' }}>
                         + Add
                       </button>
                     </div>
                     {runConfig.increments.map((inc, idx) => (
                       <div key={idx} style={{ display: 'flex', gap: '0.4rem', alignItems: 'center', marginBottom: '0.4rem' }}>
-                        <select value={inc.table} onChange={e => { const next = [...runConfig.increments]; next[idx] = { ...next[idx], table: e.target.value, column: '' }; setRunConfig({ ...runConfig, increments: next }); }}
+                        <select value={inc.table} onChange={e => { const next = [...runConfig.increments]; next[idx] = { ...next[idx], table: e.target.value, column: '' }; setRunConfig(r => ({ ...r, increments: next })); }}
                           style={{ flex: '1.2', padding: '0.35rem 0.4rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: '#e2e8f0', fontSize: '0.8rem' }}>
                           <option value="">table</option>
                           {tables.map(t => <option key={t.id} value={t.name} style={{ color: 'black' }}>{t.name}</option>)}
                         </select>
-                        <select value={inc.column} onChange={e => { const next = [...runConfig.increments]; next[idx] = { ...next[idx], column: e.target.value }; setRunConfig({ ...runConfig, increments: next }); }}
+                        <select value={inc.column} onChange={e => { const next = [...runConfig.increments]; next[idx] = { ...next[idx], column: e.target.value }; setRunConfig(r => ({ ...r, increments: next })); }}
                           style={{ flex: '1.5', padding: '0.35rem 0.4rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: inc.column ? '#e2e8f0' : '#475569', fontSize: '0.8rem' }}>
                           <option value="">column</option>
                           {(tables.find(t => t.name === inc.table)?.columns || []).map(c => <option key={c.id} value={c.name} style={{ color: 'black' }}>{c.name}</option>)}
                         </select>
-                        <input type="number" value={inc.step} onChange={e => { const next = [...runConfig.increments]; next[idx] = { ...next[idx], step: e.target.value }; setRunConfig({ ...runConfig, increments: next }); }}
+                        <input type="number" value={inc.step} onChange={e => { const next = [...runConfig.increments]; next[idx] = { ...next[idx], step: e.target.value }; setRunConfig(r => ({ ...r, increments: next })); }}
                           style={{ width: '56px', padding: '0.35rem 0.4rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: '#e2e8f0', fontSize: '0.8rem' }} placeholder="step" />
-                        <select value={inc.unit} onChange={e => { const next = [...runConfig.increments]; next[idx] = { ...next[idx], unit: e.target.value }; setRunConfig({ ...runConfig, increments: next }); }}
+                        <select value={inc.unit} onChange={e => { const next = [...runConfig.increments]; next[idx] = { ...next[idx], unit: e.target.value }; setRunConfig(r => ({ ...r, increments: next })); }}
                           style={{ flex: '1', padding: '0.35rem 0.4rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: '#e2e8f0', fontSize: '0.8rem' }}>
                           <option value="days" style={{ color: 'black' }}>days</option>
                           <option value="hours" style={{ color: 'black' }}>hours</option>
@@ -1516,7 +1544,7 @@ export default function App() {
                           <option value="years" style={{ color: 'black' }}>years</option>
                           <option value="value" style={{ color: 'black' }}>value (+N)</option>
                         </select>
-                        <button type="button" onClick={() => { const next = runConfig.increments.filter((_, i) => i !== idx); setRunConfig({ ...runConfig, increments: next }); }}
+                        <button type="button" onClick={() => { const next = runConfig.increments.filter((_, i) => i !== idx); setRunConfig(r => ({ ...r, increments: next })); }}
                           style={{ padding: '0.2rem 0.5rem', background: 'none', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '5px', color: '#f87171', cursor: 'pointer', fontSize: '0.8rem' }}>✕</button>
                       </div>
                     ))}
@@ -1539,7 +1567,7 @@ export default function App() {
                               const next = active
                                 ? runConfig.tablesToInclude.filter(n => n !== t.name)
                                 : [...runConfig.tablesToInclude, t.name];
-                              setRunConfig({ ...runConfig, tablesToInclude: next });
+                              setRunConfig(r => ({ ...r, tablesToInclude: next }));
                             }}
                             style={{ padding: '0.25rem 0.65rem', borderRadius: '5px', border: `1px solid ${active ? '#60a5fa' : 'rgba(255,255,255,0.1)'}`, background: active ? 'rgba(96,165,250,0.15)' : 'rgba(255,255,255,0.04)', color: active ? '#60a5fa' : '#64748b', cursor: 'pointer', fontSize: '0.8rem', fontWeight: active ? 600 : 400 }}>
                             {t.name}
@@ -1548,7 +1576,7 @@ export default function App() {
                       })}
                     </div>
                     {runConfig.tablesToInclude.length > 0 && (
-                      <button type="button" onClick={() => setRunConfig({ ...runConfig, tablesToInclude: [] })} style={{ marginTop: '0.35rem', background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '0.75rem' }}>Clear selection (use all)</button>
+                      <button type="button" onClick={() => setRunConfig(r => ({ ...r, tablesToInclude: [] }))} style={{ marginTop: '0.35rem', background: 'none', border: 'none', color: '#475569', cursor: 'pointer', fontSize: '0.75rem' }}>Clear selection (use all)</button>
                     )}
                   </div>
                 )}
@@ -1565,7 +1593,7 @@ export default function App() {
                               const col = e.target.value;
                               const next = { ...runConfig.partitionByTable };
                               if (col) next[t.name] = col; else delete next[t.name];
-                              setRunConfig({ ...runConfig, partitionByTable: next });
+                              setRunConfig(r => ({ ...r, partitionByTable: next }));
                             }}
                             style={{ flex: 1, padding: '0.35rem 0.5rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: runConfig.partitionByTable[t.name] ? '#e2e8f0' : '#475569', fontSize: '0.82rem' }}
                           >
@@ -1583,7 +1611,7 @@ export default function App() {
                   <label style={{ display: 'block', marginBottom: '0.5rem', color: '#cbd5e1', fontSize: '0.85rem' }}>Column Filters <span style={{ color: '#64748b' }}>(one per line: table:col1,col2)</span></label>
                   <textarea
                     value={runConfig.columnsFilter}
-                    onChange={e => setRunConfig({ ...runConfig, columnsFilter: e.target.value })}
+                    onChange={e => setRunConfig(r => ({ ...r, columnsFilter: e.target.value }))}
                     rows={3}
                     placeholder={"orders:id,status,total\ncustomers:id,email"}
                     style={{ width: '100%', padding: '0.5rem', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '6px', color: 'white', resize: 'vertical', fontSize: '0.82rem', fontFamily: 'monospace' }}
@@ -1732,7 +1760,7 @@ export default function App() {
             </div>
 
             {aiError && (
-              <div style={{ margin: '0 0 0.75rem', fontSize: '0.8rem', color: '#f87171', background: 'rgba(248,113,113,0.07)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: '6px', padding: '0.5rem 0.75rem' }}>{aiError}</div>
+              <div style={{ margin: '0 0 0.75rem', fontSize: '0.8rem', color: '#f87171', background: 'rgba(248,113,113,0.07)', border: '1px solid rgba(248,113,113,0.2)', borderRadius: '6px', padding: '0.5rem 0.75rem', whiteSpace: 'pre-wrap', wordBreak: 'break-word', maxHeight: '200px', overflowY: 'auto' }}>{aiError}</div>
             )}
 
             <div style={{ display: 'flex', gap: '0.75rem' }}>

@@ -37,7 +37,12 @@ def _filter_schema(schema, tables: tuple[str, ...], columns: tuple[str, ...]):
     if columns:
         col_map: dict[str, list[str]] = {}
         for spec in columns:
-            tname, cols = spec.split(":", 1)
+            parts = spec.split(":", 1)
+            if len(parts) != 2:
+                raise click.UsageError(
+                    f"Invalid --columns '{spec}'. Expected format: table:col1,col2"
+                )
+            tname, cols = parts
             col_map[tname] = [c.strip() for c in cols.split(",")]
         for table in schema.tables:
             if table.name in col_map:
@@ -117,6 +122,7 @@ def _apply_increments(datasets: dict, increments: list[dict], batch_index: int) 
         df = datasets[table]
         offset = step * batch_index
 
+        df = df.copy()
         if unit == "value":
             df[column] = pd.to_numeric(df[column], errors="coerce") + offset
         else:
@@ -144,6 +150,11 @@ def _parse_partition_by(partition_by: tuple[str, ...]) -> dict[str, str]:
             table, col = spec.split(":", 1)
             result[table.strip()] = col.strip()
         else:
+            if "*" in result:
+                raise click.UsageError(
+                    "Multiple --partition-by entries without 'table:' prefix are not allowed. "
+                    "Use 'table:column' format to partition different tables by different columns."
+                )
             result["*"] = spec.strip()
     return result
 
@@ -523,10 +534,9 @@ def generate(
 
 @cli.command("list-domains")
 def list_domains():
-    """List available schema YAMLs."""
-    schemas_dir = Path(__file__).parent / "schemas"
-    for f in sorted(schemas_dir.glob("*.yaml")):
-        click.echo(f"  {f.stem}")
+    """List available built-in domains."""
+    for name in sorted(DOMAIN_REGISTRY):
+        click.echo(f"  {name}")
 
 
 @cli.command("schema-info")

@@ -1,11 +1,12 @@
 site_name: Dataforge
-site_description: Gerador de datasets sintéticos relacionais para engenharia de dados
+site_description: Gerador de datasets sintéticos relacionais
 site_author: Carlos Oliveira
 site_url: https://ckoliveiraa.github.io/DataForge/
 repo_name: DataForge
 repo_url: https://github.com/ckoliveiraa/DataForge
 edit_uri: edit/main/docs/
 
+docs_dir: docs
 theme:
   name: material
   language: pt
@@ -49,7 +50,11 @@ plugins:
 markdown_extensions:
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.highlight:
       anchor_linenums: true
       line_spans: __span
@@ -64,27 +69,38 @@ markdown_extensions:
   - toc:
       permalink: true
 
-nav:
-  - Início: index.md
-  - Primeiros Passos:
-      - Instalação: getting-started/installation.md
-      - Quickstart: getting-started/quickstart.md
-  - Uso:
-      - Interface Visual: usage/frontend.md
-      - CLI - Referência: usage/cli.md
-      - Domínios Prontos: usage/domains.md
-      - Schemas Customizados: usage/schemas.md
-      - Tipos de Dados: usage/data-types.md
-  - Avançado:
-      - Modo Recorrente: advanced/recurrence.md
-      - Upload para Nuvem: advanced/cloud-upload.md
-      - Carga em Banco SQL: advanced/sql-loading.md
-      - Particionamento: advanced/partitioning.md
-  - Desenvolvimento:
-      - Arquitetura: development/architecture.md
-      - Contribuindo: development/contributing.md
+extra_javascript:
+  - https://unpkg.com/mermaid@10/dist/mermaid.min.js
 
 extra:
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/ckoliveiraa/DataForge
+
+nav:
+  - Início: index.md
+  - Instalação:
+    - Docker: instalacao/docker.md
+    - Sem Docker (Poetry): instalacao/poetry.md
+  - Interface Visual:
+    - Visão geral: frontend/visao-geral.md
+    - Geração com IA: frontend/ia.md
+    - Diagrama relacional: frontend/diagrama.md
+    - Catálogo Faker: frontend/faker.md
+    - Exportar e importar YAML: frontend/yaml.md
+  - CLI:
+    - Referência completa: cli/referencia.md
+    - Exemplos práticos: cli/exemplos.md
+  - Schemas:
+    - Schema YAML customizado: schemas/yaml.md
+    - Domínios prontos: schemas/dominios.md
+    - Tipos de dados (dtype): schemas/dtypes.md
+  - Saída de dados:
+    - Formatos: saida/formatos.md
+    - Particionamento: saida/particionamento.md
+    - Upload em nuvem: saida/cloud.md
+    - Carga SQL: saida/sql.md
+  - Avançado:
+    - Modo recorrente: avancado/recorrencia.md
+    - Reprodutibilidade: avancado/seed.md
+    - Arquitetura: avancado/arquitetura.md

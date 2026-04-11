@@ -27,6 +27,11 @@ def _parse_schema(raw: dict) -> DomainSchema:
             fk = None
             if "foreign_key" in cconf:
                 fk_conf = cconf["foreign_key"]
+                if "table" not in fk_conf or "column" not in fk_conf:
+                    raise ValueError(
+                        f"FK on '{cname}' is missing required fields. "
+                        f"Expected: foreign_key: {{table: <name>, column: <name>}}"
+                    )
                 fk = ForeignKey(
                     ref_table=fk_conf["table"],
                     ref_column=fk_conf["column"],
