@@ -2,6 +2,8 @@
 
 O recurso **AI Generate** permite descrever um domínio de negócio em linguagem natural e gerar automaticamente o schema YAML com tabelas, colunas, tipos de dados e relações.
 
+![Modal de geração com IA](../assets/screenshots/modal-ia.png)
+
 ## Fluxo completo
 
 ```mermaid

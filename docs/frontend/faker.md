@@ -2,6 +2,8 @@
 
 O **Faker Browser** é um painel de busca visual com todos os métodos do Faker disponíveis na interface. Ele permite explorar e aplicar provedores de dados diretamente às colunas do schema.
 
+![Catálogo Faker](../assets/screenshots/catalogo-faker.png)
+
 ## Acessando
 
 Clique no botão **Faker Browser** na barra de ações. O painel lateral é aberto com campo de busca e listagem por categoria.
