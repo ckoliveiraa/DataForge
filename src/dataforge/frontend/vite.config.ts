@@ -1317,6 +1317,7 @@ DATASET DESCRIPTION:
       // ── Schedules API ─────────────────────────────────────────────────────
 
       if (req.url === '/api/schedules' && req.method === 'GET') {
+        if (!getAuthUser(req)) { res.statusCode = 401; res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify({ error: 'Unauthorized' })); return; }
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(readSchedules()));
         return;
@@ -1326,6 +1327,7 @@ DATASET DESCRIPTION:
         let body = '';
         req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
         req.on('end', () => {
+          if (!getAuthUser(req)) { res.statusCode = 401; res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify({ error: 'Unauthorized' })); return; }
           try {
             const { name, cronExpression, config } = JSON.parse(body);
             if (!name?.trim()) { res.statusCode = 400; res.end(JSON.stringify({ error: 'name is required' })); return; }
@@ -1360,6 +1362,7 @@ DATASET DESCRIPTION:
         let body = '';
         req.on('data', (chunk: Buffer) => { body += chunk.toString(); });
         req.on('end', () => {
+          if (!getAuthUser(req)) { res.statusCode = 401; res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify({ error: 'Unauthorized' })); return; }
           try {
             const id = scheduleIdMatch[1];
             const patch = JSON.parse(body);
@@ -1387,6 +1390,7 @@ DATASET DESCRIPTION:
       }
 
       if (scheduleIdMatch && req.method === 'DELETE') {
+        if (!getAuthUser(req)) { res.statusCode = 401; res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify({ error: 'Unauthorized' })); return; }
         const id = scheduleIdMatch[1];
         let schedules = readSchedules();
         if (!schedules.find(s => s.id === id)) { res.statusCode = 404; res.end(JSON.stringify({ error: 'Not found' })); return; }
@@ -1400,6 +1404,7 @@ DATASET DESCRIPTION:
 
       const scheduleRunMatch = req.url?.match(/^\/api\/schedules\/([a-z0-9-]+)\/run$/);
       if (scheduleRunMatch && req.method === 'POST') {
+        if (!getAuthUser(req)) { res.statusCode = 401; res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify({ error: 'Unauthorized' })); return; }
         const id = scheduleRunMatch[1];
         const schedule = readSchedules().find(s => s.id === id);
         if (!schedule) { res.statusCode = 404; res.end(JSON.stringify({ error: 'Not found' })); return; }
@@ -1415,6 +1420,7 @@ DATASET DESCRIPTION:
       }
 
       if (req.url?.startsWith('/api/run-history') && req.method === 'GET') {
+        if (!getAuthUser(req)) { res.statusCode = 401; res.setHeader('Content-Type', 'application/json'); res.end(JSON.stringify({ error: 'Unauthorized' })); return; }
         const urlObj = new URL(req.url, 'http://localhost');
         const filterScheduleId = urlObj.searchParams.get('scheduleId');
         const limit = parseInt(urlObj.searchParams.get('limit') ?? '100', 10);

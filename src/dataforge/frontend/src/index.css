@@ -471,7 +471,7 @@ pre {
   .animated, .animated-scale {
     animation: none;
   }
-  button, input, select {
+  button, input, select, textarea {
     transition: none;
   }
 }

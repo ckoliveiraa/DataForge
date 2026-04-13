@@ -41,6 +41,8 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
+  - attr_list
+  - md_in_html
 
 extra_javascript:
   - https://unpkg.com/mermaid@10/dist/mermaid.min.js
@@ -107,6 +109,68 @@ docs/
     ├── seed.md                     ← reprodutibilidade
     └── arquitetura.md              ← diagrama Mermaid + descrição de componentes
 ```
+
+## Screenshots do frontend
+
+A documentação **deve incluir prints reais da interface**. Siga este processo:
+
+### 1. Verificar se o frontend está rodando
+
+Antes de tirar screenshots, verifique se o frontend já está acessível em `http://localhost:5173`. Use a ferramenta `browser_navigate` para navegar até a URL e `browser_take_screenshot` para capturar.
+
+Se o frontend não estiver rodando, inicie com:
+
+```bash
+docker compose up frontend -d
+```
+
+Aguarde alguns segundos e verifique novamente.
+
+### 2. Screenshots a capturar
+
+Salve todos os screenshots em `docs/assets/screenshots/`. Crie a pasta se não existir. Use os nomes de arquivo abaixo (exatos, sem espaços):
+
+| Arquivo                          | O que capturar                                                                 |
+|----------------------------------|--------------------------------------------------------------------------------|
+| `visao-geral.png`                | A interface completa com painel lateral + canvas (domínio ecommerce carregado) |
+| `modal-ia.png`                   | O modal de geração com IA aberto, com provider e prompt preenchidos            |
+| `diagrama-relacional.png`        | O canvas com um diagrama relacional com pelo menos 3 tabelas conectadas        |
+| `catalogo-faker.png`             | O painel do catálogo Faker aberto                                              |
+| `yaml-exportado.png`             | A aba de YAML exportado com código visível                                     |
+| `run-generator.png`              | O modal "Run Generator" / painel de execução aberto                            |
+
+### 3. Como tirar os screenshots
+
+Use a sequência de ferramentas MCP de browser:
+
+1. `browser_navigate` → `http://localhost:5173`
+2. `browser_take_screenshot` → salva a visão geral
+3. Para abrir modais: use `browser_click` no botão correspondente, depois `browser_take_screenshot`
+4. Para carregar um domínio: use `browser_select_option` ou `browser_click` no seletor de domínio
+
+Após cada screenshot, salve o arquivo em `docs/assets/screenshots/<nome>.png` usando a ferramenta `Write` com o conteúdo binário retornado, **ou** use `browser_take_screenshot` com o parâmetro de caminho de saída se disponível.
+
+### 4. Referenciar nas páginas
+
+Após salvar os screenshots, referencie-os nas páginas correspondentes do MkDocs:
+
+- `docs/frontend/visao-geral.md` → `![Visão geral da interface](../assets/screenshots/visao-geral.png)`
+- `docs/frontend/ia.md` → `![Modal de geração com IA](../assets/screenshots/modal-ia.png)`
+- `docs/frontend/diagrama.md` → `![Diagrama relacional](../assets/screenshots/diagrama-relacional.png)`
+- `docs/frontend/faker.md` → `![Catálogo Faker](../assets/screenshots/catalogo-faker.png)`
+- `docs/frontend/yaml.md` → `![YAML exportado](../assets/screenshots/yaml-exportado.png)`
+
+Posicione cada imagem logo após o primeiro parágrafo introdutório da página, antes do detalhamento.
+
+### 5. Se o frontend não puder ser iniciado
+
+Se após tentar subir com Docker o frontend ainda não estiver acessível, registre no chat:
+
+> "Frontend indisponível para screenshots. As páginas de interface foram documentadas sem capturas de tela. Execute `docker compose up frontend` e rode `/documentar` novamente para adicionar os prints."
+
+Não bloqueie a geração do restante da documentação por causa dos screenshots — eles são adicionais, não bloqueantes.
+
+---
 
 ## O que ler antes de escrever
 

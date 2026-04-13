@@ -20,6 +20,8 @@ services:
       # Volume nomeado protege o node_modules Linux do build
       # (impede que o mount acima sobrescreva com binários Windows do host)
       - frontend_node_modules:/app/src/dataforge/frontend/node_modules
+      # Dados persistidos: usuários, env-keys, JWT secret
+      - ./data:/app/data
     environment:
       - PYTHONPATH=/app/src
     restart: unless-stopped

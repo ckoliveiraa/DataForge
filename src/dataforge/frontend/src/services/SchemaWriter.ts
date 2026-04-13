@@ -24,8 +24,8 @@ export class SchemaWriter {
           colDef.nullable = nullProb;
         }
 
-        if (c.min) colDef.min = isNaN(Number(c.min)) ? c.min : Number(c.min);
-        if (c.max) colDef.max = isNaN(Number(c.max)) ? c.max : Number(c.max);
+        if (c.min !== '' && c.min != null) colDef.min = isNaN(Number(c.min)) ? c.min : Number(c.min);
+        if (c.max !== '' && c.max != null) colDef.max = isNaN(Number(c.max)) ? c.max : Number(c.max);
         if (c.choices && c.choices.length > 0) colDef.choices = c.choices;
 
         if (c.isForeignKey && c.fkTable && c.fkColumn) {
