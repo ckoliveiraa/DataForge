@@ -1606,10 +1606,13 @@
         UI --&gt; SW
     end
 
-    subgraph Server["Servidor Vite / Backend Python"]
-        API_SCHEMAS[GET /api/schemas\nGET /api/schemas/:nome\nPUT /api/schemas/:nome\nDELETE /api/schemas/:nome]
+    subgraph Server["Servidor Vite (Node.js)"]
+        API_AUTH[POST /api/auth/register\nPOST /api/auth/login]
+        API_SCHEMAS[GET /api/schemas\nPOST /api/save-schema]
         API_AI[POST /api/ai-generate\nPOST /api/ai-models]
         API_DB[POST /api/test-db-connection]
+        API_CLI[POST /api/run-cli\nPOST /api/stop-cli\nGET /api/run-history]
+        API_SCHED[GET /api/schedules\nPOST /api/schedules]
     end
 
     subgraph Core["Core Python"]
@@ -1637,9 +1640,12 @@
         OLLAMA[Ollama local]
     end
 
+    UI -- HTTP --&gt; API_AUTH
     UI -- HTTP --&gt; API_SCHEMAS
     UI -- HTTP --&gt; API_AI
     UI -- HTTP --&gt; API_DB
+    UI -- HTTP --&gt; API_CLI
+    UI -- HTTP --&gt; API_SCHED
     API_AI --&gt; ANTHROPIC
     API_AI --&gt; OPENAI
     API_AI --&gt; GOOGLE
@@ -1690,7 +1696,7 @@
 </tbody>
 </table>
 <h3 id="servidor-viteconfigts">Servidor (vite.config.ts)<a class="headerlink" href="#servidor-viteconfigts" title="Permanent link">&para;</a></h3>
-<p>O servidor de desenvolvimento do Vite expõe endpoints de API via proxy ou plugin. Os endpoints disponíveis são:</p>
+<p>O servidor de desenvolvimento do Vite expõe endpoints de API via plugin. Os endpoints disponíveis são:</p>
 <table>
 <thead>
 <tr>
@@ -1701,24 +1707,29 @@
 </thead>
 <tbody>
 <tr>
+<td><code>/api/auth/register</code></td>
+<td>POST</td>
+<td>Registra novo usuário</td>
+</tr>
+<tr>
+<td><code>/api/auth/login</code></td>
+<td>POST</td>
+<td>Autentica usuário e retorna JWT</td>
+</tr>
+<tr>
+<td><code>/api/auth/me</code></td>
+<td>GET</td>
+<td>Retorna dados do usuário autenticado</td>
+</tr>
+<tr>
 <td><code>/api/schemas</code></td>
 <td>GET</td>
 <td>Lista schemas disponíveis</td>
 </tr>
 <tr>
-<td><code>/api/schemas/:nome</code></td>
-<td>GET</td>
-<td>Retorna o YAML de um schema</td>
-</tr>
-<tr>
-<td><code>/api/schemas/:nome</code></td>
-<td>PUT</td>
-<td>Salva um schema no servidor</td>
-</tr>
-<tr>
-<td><code>/api/schemas/:nome</code></td>
-<td>DELETE</td>
-<td>Remove um schema do servidor</td>
+<td><code>/api/save-schema</code></td>
+<td>POST</td>
+<td>Salva schema no servidor</td>
 </tr>
 <tr>
 <td><code>/api/ai-generate</code></td>
@@ -1734,6 +1745,51 @@
 <td><code>/api/test-db-connection</code></td>
 <td>POST</td>
 <td>Testa uma connection string SQL</td>
+</tr>
+<tr>
+<td><code>/api/run-cli</code></td>
+<td>POST</td>
+<td>Executa o CLI com os parâmetros fornecidos</td>
+</tr>
+<tr>
+<td><code>/api/stop-cli</code></td>
+<td>POST</td>
+<td>Para a execução do CLI em andamento</td>
+</tr>
+<tr>
+<td><code>/api/run-history</code></td>
+<td>GET</td>
+<td>Lista o histórico de execuções</td>
+</tr>
+<tr>
+<td><code>/api/schedules</code></td>
+<td>GET</td>
+<td>Lista execuções agendadas</td>
+</tr>
+<tr>
+<td><code>/api/schedules</code></td>
+<td>POST</td>
+<td>Cria uma nova execução agendada</td>
+</tr>
+<tr>
+<td><code>/api/credential-profiles</code></td>
+<td>GET/POST</td>
+<td>Gerencia perfis de credenciais cloud</td>
+</tr>
+<tr>
+<td><code>/api/profile/env-keys</code></td>
+<td>GET/POST/DELETE</td>
+<td>Gerencia chaves de API salvas por usuário</td>
+</tr>
+<tr>
+<td><code>/api/capabilities</code></td>
+<td>GET</td>
+<td>Retorna capacidades disponíveis no servidor</td>
+</tr>
+<tr>
+<td><code>/api/browse-folder</code></td>
+<td>GET</td>
+<td>Navega pelo sistema de arquivos do servidor</td>
 </tr>
 </tbody>
 </table>

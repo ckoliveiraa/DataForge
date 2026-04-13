@@ -1233,6 +1233,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#granularidade-de-data-nas-particoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Granularidade de data nas partições
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paralelismo-na-escrita" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paralelismo na escrita
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1542,6 +1564,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#granularidade-de-data-nas-particoes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Granularidade de data nas partições
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paralelismo-na-escrita" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Paralelismo na escrita
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1662,6 +1706,56 @@
 <li><strong>DuckDB</strong> — <code>read_parquet("output/ecommerce/orders/**/*.parquet", hive_partitioning=true)</code></li>
 <li><strong>dbt</strong> — uso como source com partições</li>
 </ul>
+<h2 id="granularidade-de-data-nas-particoes">Granularidade de data nas partições<a class="headerlink" href="#granularidade-de-data-nas-particoes" title="Permanent link">&para;</a></h2>
+<p>Quando a coluna de partição contém datas, os valores brutos como <code>2024-03-15</code> geram muitas subpastas. Use <code>--partition-date-granularity</code> para truncar esses valores:</p>
+<table>
+<thead>
+<tr>
+<th>Granularidade</th>
+<th>Formato gerado</th>
+<th>Exemplo de pasta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>year</code></td>
+<td><code>YYYY</code></td>
+<td><code>created_at=2024</code></td>
+</tr>
+<tr>
+<td><code>month</code></td>
+<td><code>YYYY-MM</code></td>
+<td><code>created_at=2024-03</code></td>
+</tr>
+</tbody>
+</table>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Particionar orders por mês</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>cli<span class="w"> </span>generate<span class="w"> </span>-d<span class="w"> </span>ecommerce<span class="w"> </span>-f<span class="w"> </span>parquet<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span>--partition-by<span class="w"> </span><span class="s2">&quot;orders:created_at&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span>--partition-date-granularity<span class="w"> </span><span class="s2">&quot;orders:month&quot;</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="c1"># Aplicar granularidade anual a todas as tabelas</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>cli<span class="w"> </span>generate<span class="w"> </span>-d<span class="w"> </span>ecommerce<span class="w"> </span>-f<span class="w"> </span>parquet<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span>--partition-by<span class="w"> </span>created_at<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span>--partition-date-granularity<span class="w"> </span>year
+</span></code></pre></div>
+<p>Layout de saída com <code>--partition-date-granularity month</code>:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>output/
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>└── ecommerce/
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    └── orders/
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>        ├── created_at=2023-01/
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>        │   └── orders.parquet
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        ├── created_at=2023-02/
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        │   └── orders.parquet
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        └── created_at=2024-12/
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>            └── orders.parquet
+</span></code></pre></div>
+<h2 id="paralelismo-na-escrita">Paralelismo na escrita<a class="headerlink" href="#paralelismo-na-escrita" title="Permanent link">&para;</a></h2>
+<p>Por padrão, a escrita de partições usa até 16 threads em paralelo. Ajuste com <code>--workers</code>:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>docker<span class="w"> </span>compose<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>cli<span class="w"> </span>generate<span class="w"> </span>-d<span class="w"> </span>ecommerce<span class="w"> </span>-f<span class="w"> </span>parquet<span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span>--partition-by<span class="w"> </span><span class="s2">&quot;orders:status&quot;</span><span class="w"> </span><span class="se">\</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span>--workers<span class="w"> </span><span class="m">4</span>
+</span></code></pre></div>
 <div class="admonition tip">
 <p class="admonition-title">Colunas de data</p>
 <p>Particionar por uma coluna de data (<code>created_at</code>, <code>transaction_date</code>) é o padrão mais comum para datasets temporais. Combine com o modo recorrente e <code>--increment</code> para simular pipelines incrementais.</p>
