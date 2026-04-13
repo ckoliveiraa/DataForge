@@ -2,6 +2,8 @@
 
 A interface permite exportar o schema atual como YAML e importar um arquivo YAML existente para o canvas.
 
+![YAML exportado](../assets/screenshots/yaml-exportado.png)
+
 ## Exportar YAML (Preview)
 
 O botão **Preview YAML** gera o YAML do schema atual e exibe no painel lateral.

@@ -35,9 +35,11 @@ Gera datasets e opcionalmente escreve em arquivos, faz upload para nuvem ou carr
 | `--db-url` | | — | string | Connection string SQLAlchemy para carga SQL |
 | `--if-exists` | | `replace` | choice | O que fazer se a tabela SQL já existir: `replace`, `append` ou `fail` |
 | `--db-schema` | | — | string | Schema do banco de destino |
+| `--partition-date-granularity` | | — | string | Trunca valores de data nas partições: `granularidade` ou `tabela:granularidade`. Opções: `year` (→ YYYY) ou `month` (→ YYYY-MM) (repetível) |
 | `--recurrence` | `-R` | — | float | Intervalo em segundos entre batches (modo contínuo) |
 | `--count` | | `0` | int | Número de batches no modo recorrente (`0` = infinito) |
 | `--increment` | | — | string | Desloca valores de coluna a cada batch: `tabela:coluna:passo[:unidade]` (repetível) |
+| `--workers` | | `16` | int | Máximo de threads paralelas para escrita particionada |
 
 ### Unidades para `--increment`
 

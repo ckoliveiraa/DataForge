@@ -14,3 +14,10 @@ repos:
         language: system
         pass_filenames: false
         always_run: true
+
+      - id: frontend-test
+        name: vitest (frontend)
+        entry: bash -c 'cd src/dataforge/frontend && npm test'
+        language: system
+        pass_filenames: false
+        files: ^src/dataforge/frontend/src/.*\.(ts|tsx)$

@@ -2,6 +2,8 @@
 
 O canvas central da interface exibe as tabelas do schema como nós interativos conectados por setas que representam as chaves estrangeiras.
 
+![Diagrama relacional](../assets/screenshots/diagrama-relacional.png)
+
 ## Tecnologia
 
 O diagrama é construído com **ReactFlow**. Cada tabela é um nó do tipo `tableNode` (componente customizado) e cada FK é uma aresta animada.

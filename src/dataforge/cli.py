@@ -358,7 +358,8 @@ def _append_csv(
                 dest_dir = out_path / dataset_name / name / f"{partition_by}={safe_val}"
                 dest_dir.mkdir(parents=True, exist_ok=True)
                 path = dest_dir / f"{name}.csv"
-                group.to_csv(path, mode="a", index=False, header=not path.exists())
+                write_header = not path.exists() or path.stat().st_size == 0
+                group.to_csv(path, mode="a", index=False, header=write_header)
                 click.echo(f"  [csv/append] {path} (+{len(group)} rows)")
                 written.append(
                     (path, f"{dataset_name}/{name}/{partition_by}={safe_val}/{path.name}")
@@ -367,7 +368,8 @@ def _append_csv(
             dest_dir = out_path / dataset_name / name
             dest_dir.mkdir(parents=True, exist_ok=True)
             path = dest_dir / f"{name}.csv"
-            df.to_csv(path, mode="a", index=False, header=not path.exists())
+            write_header = not path.exists() or path.stat().st_size == 0
+            df.to_csv(path, mode="a", index=False, header=write_header)
             click.echo(f"  [csv/append] {path} (+{len(df)} rows)")
             written.append((path, f"{dataset_name}/{name}/{path.name}"))
     return written

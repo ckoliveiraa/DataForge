@@ -77,5 +77,50 @@ O layout Hive-style é reconhecido diretamente por:
 - **DuckDB** — `read_parquet("output/ecommerce/orders/**/*.parquet", hive_partitioning=true)`
 - **dbt** — uso como source com partições
 
+## Granularidade de data nas partições
+
+Quando a coluna de partição contém datas, os valores brutos como `2024-03-15` geram muitas subpastas. Use `--partition-date-granularity` para truncar esses valores:
+
+| Granularidade | Formato gerado | Exemplo de pasta |
+|---------------|----------------|------------------|
+| `year` | `YYYY` | `created_at=2024` |
+| `month` | `YYYY-MM` | `created_at=2024-03` |
+
+```bash
+# Particionar orders por mês
+docker compose run --rm cli generate -d ecommerce -f parquet \
+  --partition-by "orders:created_at" \
+  --partition-date-granularity "orders:month"
+
+# Aplicar granularidade anual a todas as tabelas
+docker compose run --rm cli generate -d ecommerce -f parquet \
+  --partition-by created_at \
+  --partition-date-granularity year
+```
+
+Layout de saída com `--partition-date-granularity month`:
+
+```
+output/
+└── ecommerce/
+    └── orders/
+        ├── created_at=2023-01/
+        │   └── orders.parquet
+        ├── created_at=2023-02/
+        │   └── orders.parquet
+        └── created_at=2024-12/
+            └── orders.parquet
+```
+
+## Paralelismo na escrita
+
+Por padrão, a escrita de partições usa até 16 threads em paralelo. Ajuste com `--workers`:
+
+```bash
+docker compose run --rm cli generate -d ecommerce -f parquet \
+  --partition-by "orders:status" \
+  --workers 4
+```
+
 !!! tip "Colunas de data"
     Particionar por uma coluna de data (`created_at`, `transaction_date`) é o padrão mais comum para datasets temporais. Combine com o modo recorrente e `--increment` para simular pipelines incrementais.
