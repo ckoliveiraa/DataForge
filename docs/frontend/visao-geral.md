@@ -2,6 +2,12 @@
 
 A interface visual roda em `http://localhost:5173` e é a forma principal de uso do Dataforge. Ela permite criar schemas, configurar a geração e executar o CLI sem sair do navegador.
 
+## Autenticação
+
+O acesso à interface requer login. Na primeira vez, crie uma conta pela aba **Create Account** na tela de login. O servidor registra as credenciais localmente em `users.json` (dentro do container/projeto). Após autenticar, um JWT é salvo no `localStorage` com a chave `dataforge_auth` e enviado em todas as chamadas de API.
+
+Para sair, clique no ícone de usuário no canto superior direito e selecione **Sign Out**.
+
 ## Tecnologias
 
 - **React** com TypeScript

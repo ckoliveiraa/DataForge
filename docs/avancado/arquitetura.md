@@ -14,10 +14,13 @@ flowchart LR
         UI --> SW
     end
 
-    subgraph Server["Servidor Vite / Backend Python"]
-        API_SCHEMAS[GET /api/schemas\nGET /api/schemas/:nome\nPUT /api/schemas/:nome\nDELETE /api/schemas/:nome]
+    subgraph Server["Servidor Vite (Node.js)"]
+        API_AUTH[POST /api/auth/register\nPOST /api/auth/login]
+        API_SCHEMAS[GET /api/schemas\nPOST /api/save-schema]
         API_AI[POST /api/ai-generate\nPOST /api/ai-models]
         API_DB[POST /api/test-db-connection]
+        API_CLI[POST /api/run-cli\nPOST /api/stop-cli\nGET /api/run-history]
+        API_SCHED[GET /api/schedules\nPOST /api/schedules]
     end
 
     subgraph Core["Core Python"]
@@ -45,9 +48,12 @@ flowchart LR
         OLLAMA[Ollama local]
     end
 
+    UI -- HTTP --> API_AUTH
     UI -- HTTP --> API_SCHEMAS
     UI -- HTTP --> API_AI
     UI -- HTTP --> API_DB
+    UI -- HTTP --> API_CLI
+    UI -- HTTP --> API_SCHED
     API_AI --> ANTHROPIC
     API_AI --> OPENAI
     API_AI --> GOOGLE
@@ -81,17 +87,27 @@ flowchart LR
 
 ### Servidor (vite.config.ts)
 
-O servidor de desenvolvimento do Vite expõe endpoints de API via proxy ou plugin. Os endpoints disponíveis são:
+O servidor de desenvolvimento do Vite expõe endpoints de API via plugin. Os endpoints disponíveis são:
 
 | Endpoint | Método | Descrição |
 |----------|--------|-----------|
+| `/api/auth/register` | POST | Registra novo usuário |
+| `/api/auth/login` | POST | Autentica usuário e retorna JWT |
+| `/api/auth/me` | GET | Retorna dados do usuário autenticado |
 | `/api/schemas` | GET | Lista schemas disponíveis |
-| `/api/schemas/:nome` | GET | Retorna o YAML de um schema |
-| `/api/schemas/:nome` | PUT | Salva um schema no servidor |
-| `/api/schemas/:nome` | DELETE | Remove um schema do servidor |
+| `/api/save-schema` | POST | Salva schema no servidor |
 | `/api/ai-generate` | POST | Gera schema via IA |
 | `/api/ai-models` | POST | Lista modelos disponíveis para o provider |
 | `/api/test-db-connection` | POST | Testa uma connection string SQL |
+| `/api/run-cli` | POST | Executa o CLI com os parâmetros fornecidos |
+| `/api/stop-cli` | POST | Para a execução do CLI em andamento |
+| `/api/run-history` | GET | Lista o histórico de execuções |
+| `/api/schedules` | GET | Lista execuções agendadas |
+| `/api/schedules` | POST | Cria uma nova execução agendada |
+| `/api/credential-profiles` | GET/POST | Gerencia perfis de credenciais cloud |
+| `/api/profile/env-keys` | GET/POST/DELETE | Gerencia chaves de API salvas por usuário |
+| `/api/capabilities` | GET | Retorna capacidades disponíveis no servidor |
+| `/api/browse-folder` | GET | Navega pelo sistema de arquivos do servidor |
 
 ### Core Python
 
